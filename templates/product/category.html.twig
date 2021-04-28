@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <section id="home">
+        {# INI: ESSE BLOCO PODE SER REMOVIDO, É APENAS PARA INFORMAÇÃO AO DESENVOLVEDOR #}
+        <div class="site-module-name container">PRODUCT CATEGORY</div>
+        <div class="site-module-content container">
+            <b>File:</b> /templates/product/category.html.twig
+        </div>
+
+        <div class="container site-dump">
+            <pre>{{ dump(productType, colProductCategories, arPagination) }}</pre>
+        </div>
+        {# FIM ------------------------------------------------------------------------ #}
+
+        <div class="container">
+            <div class="row my-3">
+                {% if colProductCategories is defined and colProductCategories|length > 0 %}
+                    <h1 class="text-center p-3">Products of <span class="text-info">{{ productType }}</span></h1>
+
+                    <div class="col-12 p-0">
+                        <div class="d-block">
+                            {% for category in colProductCategories %}
+                                {{ category.id }} - {{ category.referenceKey }} - {{ category.name }} - {{ category.description }} - {{ category.image }}<BR>
+
+                                <a href="{{ baseUri }}/product-category/{{ productType }}/{{ category.id }}">Ver Subcategorias desta categoria</a>
+                                |
+                                <a href="{{ baseUri }}/product/{{ productType }}?category={{ category.id }}">Ver Produtos dessa categoria</a>
+
+                                <HR>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="w-100 text-center mt-5">
+                        <h2>Não temos Categories para produtos de <span class="text-info">{{ productType }}</span> no momento</h2>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

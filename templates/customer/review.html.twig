@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<style>
+  .cursor-pointer{cursor:pointer}
+  #customer-my-account-msg{position:fixed;z-index:9}
+  .img-size-40{height:40px}
+  button:disabled{cursor:not-allowed}
+  .progress {background-color: rgba(0,0,0,.125);height:2px;box-shadow: none;border-radius:1px}
+  .progress-bar {background-color: #fff}
+  .fa-camera-retro{font-size:2em;color:#495057}
+</style>
+
+<section>
+  <div class="site-module-name container text-uppercase">
+    {% trans %}Customer Reviews{% endtrans %}
+  </div>
+
+  <!-- start customer menu -->
+  {% from '\/customer/menu.html.twig' import customerMenuTemplate%}
+  {{ customerMenuTemplate(baseUri, app) }}
+  <!-- end customer menu -->
+
+  <div class="site-module-title container text-right mb-n4">Order #{{orderInfoId}}</div>
+  <div class="site-module-content container d-block">
+    <div class="d-flex justify-content-center w-100">
+      <div id="customer-my-account-msg" class="font-weight-bold p-4 d-none alert" role="alert"></div>
+    </div>
+    <div class="row justify-content-center">
+
+    <!-- First the products with no review -->
+    {% for key in arOrderProducts|sort((a, b) => a.review ?? null <=> b.review ?? null) %}
+
+{#TODO key.isDiscount in conditon, the discount dont have a review?? #}
+{# {dump(key.isActive )} #}
+
+    {% if key.isActive %}
+
+      <div class="col-lg-6 col-12">
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group border-bottom mt-4 p-1 product-{{key.productId}}">
+              <img src="{{key.productFilename ?? ''}}" alt="{{key.productName ?? '-/-' }}" class="img-size-40 mr-2">
+              <span>{{key.productName ?? '-/-'}}</span>
+
+              {% if key.review ?? null %}
+
+              </sup><i class="float-right fa fa-check text-info fa-2x"></i>
+
+              {% endif %}
+
+            </div>
+          </div>
+        </div>
+        <form action="/customer/review/save" method="post">
+          <input type="hidden" value="{{key.productId}}" name="productId" {{(key.review ?? null) ? 'disabled' : null}}/>
+          <input type="hidden" value="{{key.orderInfoId}}" name="orderInfoId" {{(key.review ?? null) ? 'disabled' : null}}/>
+          <input type="hidden" value="{{key.review.reviewId ?? null}}" name="productReviewId" {{(key.review ?? null) ? 'disabled' : null}}/>
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label>{% trans %}Image{% endtrans %}</label>
+                <input {{(key.review ?? null) ? 'disabled' : null}} type="file" name="files[]" multiple="multiple" class="custom-file-input set-image form-control d-none"/>
+                <div class="text-center set-image-container cursor-pointer">
+
+                  {% if key.review.colReviewFiles ?? null %}
+
+                  <div class="carousel slide" data-ride="carousel">
+                  <div class="carousel-inner">
+
+                  {% for image in key.review.colReviewFiles %}
+
+                    <div class="carousel-item {{ loop.index == 1 ? 'active' : null}} ">
+                      <img class="d-bloc_k" style="width:auto;max-height:34px" src="{{image.file ?? null}}" alt="{{loop.index}}-slide">
+                    </div>
+
+                  {% endfor %}
+
+                  </div>
+                </div>
+
+                  {% else %}
+
+                  <i class="fas fa-camera-retro"></i>
+
+                  {% endif %}
+
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="form-group">
+                <label>{% trans %}Rate{% endtrans %}</label>
+                <input type="hidden" name="rate" value="{{key.review.rating ?? 0}}">
+                <div class="stars-container">
+
+                  {% for i in 1..5 %}
+                    <i class="{{(key.review.rating ?? 0) < i ? 'far' : 'fas' }} text-warning fa-star icon-star cursor-pointer star-nr-{{i}} star-{{key.productId}}" data-disabled="{{(key.review ?? null) ? true : false}}" data-id="{{key.productId}}" data-index='{{i}}' title="{{i}} {% trans %}Stars{% endtrans %}"></i>
+                  {% endfor %}
+
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-12">
+              <div class="form-group">
+                <label>{% trans %}Review{% endtrans %} ({% trans %}Chars{% endtrans %} Min:10, Máx:500)<span class="ml-1 count-message"></span></label>
+                <textarea {{(key.review ?? null) ? 'disabled' : null}} name="observations" class="form-control" rows="5" placeholder="{% trans %}Leave your review{% endtrans %}">
+                {{~key.review.comments ?? null}}</textarea>
+
+                {% if (key.review.dateInserted ?? null) %}
+
+                  <small class="float-right"><b>{{key.review.dateInserted|date('d/m/Y H:i','Europe/Lisbon')}}</b></small>
+
+                {% endif %}
+
+              </div>
+            </div>
+
+            {% if not key.review ?? null %}
+
+            <div class="col-lg-12">
+              <div class="form-group">
+                <span class="btn btn-secondary btn-clear">
+                  {% trans %}Clear{% endtrans %}
+                </span>
+                <button type="button" class="btn btn-success float-right btn-save">
+                  {% trans %}Save{% endtrans %}
+                </button>
+              </div>
+            </div>
+
+            {% endif %}
+
+          </div>
+        </form>
+      </div>
+
+    {% endif %}
+    {% endfor %}
+
+    </div>
+  </div>
+
+</section>
+<script type="text/javascript" src="/assets/js/querybiz-customer-review.js" ></script>
+<script>
+    $(document).ready(function() {
+      var options = {
+        'errorMessage': '{% trans %}Error Occurred on updating!{% endtrans %}',
+        'requiredMessage': '{% trans %}Required{% endtrans %}',
+        'requiredHtml' : `<span class="not-valid required text-danger small float-right"></span>`,
+        'progressHtml' : `<div class="progress"><div class="progress-bar progress-bar-striped" style="width:0%"></div></div>`,
+        'fileMaxSize' : '{{fileMaxSize}}',
+        'imageExtension' : JSON.parse('{{fileTypeImage|raw}}'),
+        'fileTypeMsg' : '{% trans %}Incorrect File Type{% endtrans %}',
+        'fileSizeMsg': '{% trans %}Max.File Size:{% endtrans %}',
+      };
+      querybizCustomerReview.init(options);
+    });
+</script>
+{% endblock %}

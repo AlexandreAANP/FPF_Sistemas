@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container bg-light border p-2 mt-2" style="position: sticky; top: 56px">
+        <a href="#home" class="js-scroll-trigger">Home</a> | <a href="#aboutUs" class="js-scroll-trigger">{{ content.aboutUs.title }}</a> | <a href="#services" class="js-scroll-trigger">{{ content.services.title }}</a> | <a href="#contact" class="js-scroll-trigger">{{ content.contact.title }}</a>
+    </div>
+
+    <section id="home">
+        <div class="site-module-name container">{% trans %}HOME{% endtrans %}</div>
+        <div class="site-module-title container">Página com o resumo do site</div>
+        <div class="site-module-content container">
+            Aqui é exibido os atalhos para os módulos do site.
+        </div>
+    </section>
+
+    <section id="aboutUs" class="container" style="min-height: 800px">
+        <h1>{{ content.aboutUs.title }}</h1>
+        <h4>{{ content.aboutUs.description }}</h4>
+        <p>{{ content.aboutUs.text|raw }}</p>
+    </section>
+
+    <section id="services" class="container" style="min-height: 800px">
+        <h1>{{ content.services.title }}</h1>
+        <h4>{{ content.services.description }}</h4>
+        <p>{{ content.services.text|raw }}</p>
+    </section>
+
+    <section id="contact" class="container" style="min-height: 800px">
+        <div class="site-module-title container">
+
+            <h2 class="h1-responsive font-weight-bold text-center my-4">{{ content.contact.title }}</h2>
+            <h4>{{ content.contact.description }}</h4>
+            <p class="text-center w-responsive mx-auto mb-5">{{ content.contact.text|raw }}</p>
+
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="md-form mb-0">
+                            <label for="name" class="">Your name</label>
+                            <input type="text" id="name" name="name" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="md-form mb-0">
+                            <label for="email" class="">Your email</label>
+                            <input type="text" id="email" name="email" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="md-form">
+                            <label for="message">Your message</label>
+                            <textarea type="text" id="message" name="message" rows="4" class="form-control md-textarea"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center my-5">
+                    <input type="submit" class="btn btn-primary btn-lg text-white" value="Send">
+                </div>
+            </form>
+
+            <div class="d-block text-center my-5">
+                <div class="d-inline-block m-2">
+                    <i class="fas fa-map-marker-alt m-2 fa-2x"></i>
+                    <p>San Francisco, CA 94126, USA</p>
+                </div>
+
+                <div class="d-inline-block m-2">
+                    <i class="fas fa-phone m-2 fa-2x"></i>
+                    <p>+ 01 234 567 89</p>
+                </div>
+
+                <div class="d-inline-block m-2">
+                    <i class="fas fa-envelope m-2 fa-2x"></i>
+                    <p>contact@client.com</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <link href="/assets/css/scrolling-nav.css" rel="stylesheet">
+    <script src="/assets/js/jquery.easing.min.js"></script>
+    <script src="/assets/js/scrolling-nav.js"></script>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

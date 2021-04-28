@@ -1,0 +1,201 @@
+<footer>
+    <div class="footer-top">
+        <div class="container">
+            <div class="row">
+                <div class="col" style="height: 50px">&nbsp;</div>
+                {#
+                <div class="order-1 order-lg-2 col-12 col-lg-4 d-flex align-items-center justify-content-center py-3">
+                    <i class="mdi mdi-swap-horizontal-bold"></i>
+                    <span class="footer-top-text">Converta Tokens em Pontos</span>
+                </div>
+                <div class="order-2 order-lg-1 col-12 col-lg-4 d-flex align-items-center justify-content-center py-3 footer-top-middle">
+                    <!-- <span class="material-icons">search</span> -->
+                    <i class="mdi mdi-trophy"></i>
+                    <span class="footer-top-text">Troque Pontos por experiências</span>
+                </div>
+                <div class="order-3 order-lg-3 col-12 col-lg-4 d-flex align-items-center justify-content-center py-3">
+                    <i class="mdi mdi-cellphone-text"></i>
+                    <span class="footer-top-text">Ganhe descontos com a app</span>
+                </div>
+                #}
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-menu mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-5 d-flex flex-column order-1 order-lg-2">
+                    <span class="footer-menu-header d-block">{% trans %}Newsletter{% endtrans %}</span>
+                    <p>{% trans %}Subscribe our newsletter{% endtrans %}.</p>
+
+                    <div class="d-block mt-2">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="{% trans %}Type your Email{% endtrans %}">
+                            <span class="input-group-text">
+                                <i class="mdi mdi-telegram"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="my-4 d-lg-none">
+                        <hr>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-7 order-2 order-lg-1">
+                    {% set colContentFooter = LayoutFunctions.getContentGroup('content?area=content-area-footer&fields=area,url', 'area') %}
+                    {% if colContentFooter is iterable and colContentFooter|length > 0 %}
+                        <div class="row">
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <ul class="list-unstyled mb-5">
+                                    <li class="footer-menu-header">Acesso Rápido</li>
+                                    <li><a href="{{ baseUri }}/" title="{% trans %}Home{% endtrans %}">{% trans %}Home{% endtrans %}</a></li>
+                                </ul>
+                            </div>
+
+                            {% if colContentFooter['content-area-help'] is defined %}
+                                <div class="col-12 col-md-6 col-lg-4">
+                                    <ul class="list-unstyled mb-5">
+                                        <li class="footer-menu-header">{% trans %}Help{% endtrans %}</li>
+                                        {% for page in colContentFooter['content-area-help'] %}
+                                            {% set url = page.referenceKey %}
+                                            {% if page.url != '' %}
+                                                {% set url = page.url %}
+                                            {% endif %}
+                                            <li><a href="{{ baseUri }}/{{ url }}" title="{{ page.title }}">{{ page.title }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+
+                            {% if colContentFooter['content-area-contact-us'] is defined %}
+                                <div class="col-12 col-md-6 col-lg-4">
+                                    <ul class="list-unstyled mb-5">
+                                        <li class="footer-menu-header">{% trans %}Contact us{% endtrans %}</li>
+                                        {% for page in colContentFooter['content-area-contact-us'] %}
+                                            {% set url = page.referenceKey %}
+                                            {% if page.url != '' %}
+                                                {% set url = page.url %}
+                                            {% endif %}
+                                            <li><a href="{{ baseUri }}/{{ url }}" title="{{ page.title }}">{{ page.title }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="payments">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 mb-5">
+                    <hr>
+                </div>
+                <div class="col-12 col-md-9 d-flex flex-wrap flex-column flex-md-row justify-content-center justify-content-md-start">
+                    {#
+                    <div class="d-flex flex-wrap">
+                        <a href="#" title="Payments 1">
+                            <img src="/assets/images/payments-1.png" alt="Payment 1">
+                        </a>
+                        <a href="#" title="Payments 2">
+                            <img src="/assets/images/payments-2.png" alt="Payment 2">
+                        </a>
+                    </div>
+                    <div class="d-flex flex-wrap">
+                        <a href="#" title="Paypal">
+                            <img src="/assets/images/paypal.png" alt="Paypal">
+                        </a>
+                        <a href="#" title="Visa">
+                            <img src="/assets/images/visa.png" alt="Visa">
+                        </a>
+                        <a href="#" title="Mastercard">
+                            <img src="/assets/images/mastercard.png" alt="Mastercard">
+                        </a>
+                    </div>
+                    <div class="d-flex flex-wrap">
+                        <a href="#" class="text" title="Points">Points</a>
+                        <a href="#" class="text" title="Tokens">Tokens</a>
+                        <a href="#" class="text" title="Saldos e Descontos">Saldos e Descontos</a>
+                    </div>
+                    #}
+                </div>
+
+                <div class="col-12 col-md-3 d-flex flex-column align-items-md-end">
+                    <div class="my-5 d-md-none">
+                        <hr>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-5">
+                        {% include "_includes/social_media.html.twig" %}
+                    </div>
+                </div>
+                <div class="col-12 mt-5 mt-md-3">
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copyright d-flex justify-content-center mb-5">{{ LayoutFunctions.getLayoutVars('COPYRIGHT')|raw }} {{ 'now' | date('Y') }} - {% trans %}All rights reserved{% endtrans %}.</div>
+
+    {% include '_includes/cookie_consent.html.twig' %}
+</footer>
+
+
+{#
+<footer>
+    <div class="container">
+        <div class="row justify-content-md-center">
+
+            <div class="col-12 py-3 mb-3 border borde-top">
+                {% include "_includes/social_media.html.twig" %}
+            </div>
+
+            <div class="col-lg-4">
+                <div class="h5">
+                    <span>{% trans %}Company{% endtrans %}</span>
+                </div>
+                <div class="list_footer_links">
+                    <ul>
+                        {% set colContent = LayoutFunctions.getAPI('content?area=content-area-footer') %}
+
+                        {% if colContent.colContent is defined %}
+                            {% for area in colContent.colContent %}
+                                <li><a href="{{ area.referenceKey }}">{{ area.title }}</a> </li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="h5">
+                    <span>{% trans %}Information{% endtrans %}</span>
+                </div>
+
+                <div class="list_footer_links">
+                    <ul>
+                        <li><a href="{{ baseUri }}/contact">{% trans %}Contacts{% endtrans %}</a></li>
+                        <li><a href="{{ baseUri }}/privacy-policy">{% trans %}Privacy Policy{% endtrans %}</a></li>
+                        <li><a href="{{ baseUri }}/terms">{% trans %}Terms{% endtrans %}</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <a rel="nofollow" href="https://www.livroreclamacoes.pt/inicio/reclamacao" target="_blank"><img src="https://www.consumidor.gov.pt/upload/membro.id/imagens/i010896.png"></a>
+            </div>
+
+            <div class="col-12 py-3 mt-3 border borde-top">
+                <h6>{{ LayoutFunctions.getLayoutVars('COPYRIGHT')|raw }} {{ 'now' | date('Y') }} - {% trans %}All rights reserved{% endtrans %}</h6>
+            </div>
+        </div>
+    </div>
+
+    {% include '_includes/cookie_consent.html.twig' %}
+</footer>
+#}

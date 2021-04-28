@@ -1,0 +1,147 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Support'|trans,
+        'index': false,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'customer': 'Customer Area'|trans},
+            {'#': 'Support'|trans}
+        ]
+    }) }}
+
+    <section id="orders">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    {% include '_render_block/customer-profile-menu.html.twig' %}
+                </div>
+                <div class="col-md-9">
+
+                    <div class="row">
+                        <div class="col">
+                            <h1 class="profile-header mb-3">
+                                {% trans %}Support Tickets{% endtrans %}
+                            </h1>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button class="btn_open_new_ticket blue-btn">
+                                    {% trans %}Open a new Ticket{% endtrans %}
+                                </button>
+                                <div class="d-flex">
+                                    <a data-spinner="" href="{{ baseUri }}/customer/support" class="{{ status == 'closed' ? 'primary-btn' : 'secondary-btn' }} mr-3">
+                                        {% trans %}Opened Tickets{% endtrans %}
+                                    </a>
+                                    <a data-spinner="" href="{{ baseUri }}/customer/support/closed" class="{{ status == 'closed' ? 'secondary-btn' : 'primary-btn' }}">
+                                        {% trans %}Closed Tickets{% endtrans %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="site-module-content mt-5">
+
+                        <div class="text-center">
+                            <div id="customer_support_msg" class="d-inline-block bg-warning p-2 rounded" style="display: none!important"></div>
+                        </div>
+
+                        <div class="container">
+                            <div id="DIV_cutomer_support_form_sent" class="text-center d-none">
+                                <h3>{% trans %}Your request has been sent{% endtrans %}!</h3>
+                                <p>{% trans %}Follow the service in the list of Support Ticket{% endtrans %}.</p>
+                                <p><a href="{{ baseUri }}/customer/support" class="btn-info btn">{% trans %}Update Support Ticket List{% endtrans %}</a></p>
+                            </div>
+
+                            <div id="DIV_cutomer_support_form" class="d-none w-100">
+                                <form action="{{ baseUri }}/customer/support" id="form_support" method="POST">
+                                    <input type="hidden" id="form_language" name="language" value="{{ app.request.getLocale() }}">
+                                    <div class="form-group">
+                                        <label for="form_title" class="required font-weight-bold">{% trans %}Title{% endtrans %}</label>
+                                        <input type="text" id="form_title" name="title" required="required" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="form_category" class="required font-weight-bold">{% trans %}Subject{% endtrans %}</label>
+                                        <select id="form_category" name="category" required="required" class="form-control">
+                                            <option value="">{% trans %}Select a subject{% endtrans %}</option>
+                                            {% for category in supportCategory %}
+                                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="form_order" class="required font-weight-bold">{% trans %}Related Order{% endtrans %}</label>
+                                        <select id="form_order" name="order" class="form-control">
+                                            <option value="">{% trans %}Select an Order number{% endtrans %}</option>
+                                            {% for category in supportCategory %}
+                                                <option value="{{ category.id }}">#{{ category.id }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="form_text" class="required font-weight-bold">{% trans %}Text{% endtrans %}</label>
+                                        <textarea id="form_text" name="text" required="required" class="form-control" style="width: 100%; height: 200px"></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" id="btn_customer_support_form_cancel" class="mt-3 primary-btn">{% trans %}Cancel{% endtrans %}</button>
+                                            <button data-spinner="" type="submit" id="form_submit" class="mt-3 blue-btn">{% trans %}Send{% endtrans %}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 container">
+                            {% if supportListError %}
+                                {{ dump(supportListError) }}
+
+                            {% elseif supportList|length %}
+                                {% for list in supportList %}
+                                    <div class="row text-center" id="support_{{ list.id }}">
+                                        <div class="col-auto border m-1 bg-info text-white">#{{ list.ticketId }}</div>
+                                        <div class="col border text-left m-1">{{ list.title }}</div>
+                                        <div class="col-auto border m-1">{{ list.orderId }}</div>
+                                        <div class="col-auto border m-1">{{ list.categoryName }}</div>
+                                        <div class="col-auto border m-1 support-status-name" data-status-closed="{{ status }}">{{ list.statusName }}</div>
+                                        <div class="col-auto border m-1">{{ list.dateInserted }}</div>
+                                        <div class="col-auto p-0 ml-1"><button data-spinner="" class="blue-btn text-nowrap btn-support-history" data-support-details-show="0" data-support-id="{{ list.id }}" style="width: 94px; margin-top: 1px">{% trans %}Read Details{% endtrans %}</button></div>
+                                    </div>
+                                    <div id="details_{{ list.id }}"></div>
+                                    <div id="division_{{ list.id }}" class="d-block bg-light my-1" style="height: 5px"></div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="row mt-3 p-3 bg-light text-info" id="support_no_tickets">
+                                    <div class="col text-center">
+                                        <h4>{% trans %}There is no Support Ticket registered{% endtrans %}</h4>
+                                        <button class="btn_open_new_ticket blue-btn mx-auto mt-3">{% trans %}Click here and Open a new Ticket{% endtrans %}</button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function() {
+            var options = {
+            };
+
+            querybizCustomerSupport.init(options);
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,791 @@
+{% extends 'base.html.twig' %}
+
+{% set totalProducts = 0 %}
+{% set totalProductsPrice = 0.00 %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Checkout'|trans,
+        'index': false,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'customer': 'Customer Area'|trans},
+            {'#': 'Checkout'|trans}
+        ]
+    }) }}
+
+    <div class="container mb60">
+        <div class="row">
+            <form id="form_checkout_gateway" method="POST" class="col-12 col-lg-8 needs-validation" novalidate>
+                {% set hasTaxNumber = false %}
+
+                {% if enableAddressOnCheckout %}
+                    {% include '_render_block/checkout-step-address.html.twig' %}
+                {% endif %}
+
+                {% if enableInvoiceOnCheckout %}
+                    {% include '_render_block/checkout-step-invoice.html.twig' %}
+                {% endif %}
+
+                {% include '_render_block/checkout-step-review.html.twig' %}
+
+                {% include '_render_block/checkout-step-payment.html.twig' %}
+            </form>
+
+            <div class="col-12 col-lg-4">
+                {% if (product.listProductItemStock is defined) and (product.listProductItemStock|length > 0) %}
+                    <ul class="list-group">
+                        <li class="list-group-item header">{% trans %}Value Details{% endtrans %}</li>
+
+                        {% set itemsAmount = 0 %}
+
+                        {% set productQuantity = product.productQuantity %}
+                        {% set productPriceQuantity = product.productPriceQuantity %}
+                        {% set productPrice = product.productPrice %}
+                        {% for key,item in product.listProductItemStock %}
+                            {% if item.allowQuantity %}
+                                {% set itemsAmount = itemsAmount + productQuantity[item.productItemStockId] %}
+                            {% endif %}
+
+                        {% endfor %}
+
+                        <li class="list-group-item">
+                            {% trans %}Price{% endtrans %} ({{ itemsAmount }}
+
+                            {% if itemsAmount == 1 %}
+                                {% trans %}Item{% endtrans %}
+                            {% elseif itemsAmount > 1 %}
+                                {% trans %}Items{% endtrans %})
+                            {% endif %}
+                            <span>{{ product.totalPrice }} {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                        </li>
+
+                        <li class="list-group-item footer">
+                            {% trans %}Total Price{% endtrans %}
+                            <span>{{ product.totalPrice }} {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                        </li>
+                    </ul>
+                {% endif %}
+
+                {#
+                <ul class="list-group mt-4">
+                    <li class="list-group-item header">Carteira</li>
+                    <li class="list-group-item">
+                        Saldo
+                        <span>299 {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Pontos
+                        <span>10 {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                    </li>
+                    <li class="list-group-item footer">
+                        Valora a Pagar
+                        <span>609 {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                    </li>
+                </ul>
+                #}
+            </div>
+        </div>
+    </div>
+
+    <form class="d-none invoice-customer" action="/customer/my-account" method="POST">
+        <input type="hidden" name="action">
+        <input type="hidden" name="invoiceId">
+        <input type="text" required name="line1">
+        <input type="hidden" name="country">
+        <input type="text" required name="postalCode">
+        <input type="text" required name="state">
+        <input type="text" required name="city">
+        <input type="hidden" name="line2">
+        <input type="text" required name="taxNumber">
+        <input type="hidden" name="nameToInvoice">
+        <input type="hidden" name="alias">
+        <input type="hidden" name="mainBilling" {{not hasTaxNumber ? 'checked' : null }} value="1">
+    </form>
+
+    <form class="d-none address-customer" action="/customer/my-account" method="POST">
+        <input type="hidden" name="action" value="add_address">
+        <input type="hidden" name="addressId">
+        <input type="text" required name="line1">
+        <input type="hidden" name="line2">
+        <input type="hidden" name="country">
+        <input type="text" required name="postalCode">
+        <input type="text" required name="state">
+        <input type="text" required name="city">
+        <input type="hidden" name="addressType" value="1">
+    </form>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        #paymentMethodCollapse button {
+            min-height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+
+    <style>
+        .not-valid{margin-top:-20px;position:absolute;right:16px}
+        #customer-my-account-msg{position:fixed;z-index:9}
+        .lh-31px{line-height:31px}
+        .navbar.fixed-top{z-index:1040}
+        .select2-container--default .select2-selection--single:not(.squared-form){border-radius: 19px}
+        .select2{width: 100%!important}
+        .select2-container .select2-selection--single {height:37px}
+        .select2-selection__rendered{line-height: 33px!important}
+        .select2-container--default .select2-selection--single .select2-selection__arrow {top: 6px;right: 6px}
+        .select2-container .select2-selection--single .select2-selection__rendered {padding-left: 14px}
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function () {
+            var options = {};
+            querybizProduct.init(options);
+            querybizProduct.showCart('checkout/auth');
+            $('.form-select2').select2();
+        });
+
+        $('#new_one_customer_invoice').is(':checked') ? $('#invoice_one_tab').trigger('click') : false;
+
+        $("body").on("change", ".geo-countries", function () {
+            let form = $(this).closest('form');
+            if ($(this).val() == arDefaultOptions['countryBaseId']) {
+                $(form).find('input.geo-pt-council, input.geo-pt-district').addClass('d-none').attr('disabled', true);
+                $(form).find('select.geo-pt-council, select.geo-pt-district').removeClass('d-none').attr('disabled', false);
+                $(form).find('select.geo-pt-council, select.geo-pt-district').next().removeClass('d-none');
+            } else {
+                $(form).find('input.geo-pt-district, input.geo-pt-council').removeClass('d-none').attr('disabled', false);
+                $(form).find('select.geo-pt-district, select.geo-pt-council').addClass('d-none').attr('disabled', true);
+                $(form).find('select.geo-pt-council, select.geo-pt-district').next().addClass('d-none');
+            }
+            $('input,select').removeClass('border-danger');
+            $('.required').remove();
+        });
+
+        $('body').on('click', '.btn-new-customer-address', function () {
+            let checkoutForm = $('#form_checkout_gateway');
+            let form = $('.address-customer');
+            form.find('input[name=line1]').val(checkoutForm.find('input[name=new_address_line1]').val());
+            form.find('input[name=line2]').val(checkoutForm.find('input[name=new_address_line2]').val());
+            form.find('input[name=country]').val(checkoutForm.find('select[name=new_address_country]').val());
+            form.find('input[name=postalCode]').val(checkoutForm.find('input[name=new_address_postal_code]').val());
+
+            if (checkoutForm.find('select[name=new_address_country]').val() == 177) {
+                form.find('input[name=state]').val(checkoutForm.find('select[name=new_address_state]').val());
+                form.find('input[name=city]').val(checkoutForm.find('select[name=new_address_city]').val());
+            } else {
+                form.find('input[name=state]').val(checkoutForm.find('input[name=new_address_state]').val());
+                form.find('input[name=city]').val(checkoutForm.find('input[name=new_address_city]').val());
+            }
+            if (checkEmptyFields(form, checkoutForm, 'address')) {
+                return false;
+            }
+
+            if (!isValidPtPostalCode(form, checkoutForm, 'address')) {
+                return false;
+            }
+
+            $('.img-loader').removeClass('d-none');
+
+            querybiz.post($(form), function (data) {
+                $.each($(form), function (key, val) {
+                    if ($(val).attr('data-prevent-cancel')) {
+                        $(val).attr('data-prevent-cancel', $(val).val());
+                    }
+                });
+                setTimeout(function () {
+                    location.reload();
+                }, 500);
+            }, function (data) {
+                Swal.fire('{% trans %}Attention{% endtrans %}!', data, 'warning');
+                $('.more-data-checkout').trigger('click');
+                $('.img-loader').removeClass('d-none');
+                return true;
+            });
+        });
+
+        $('body').on('click', '.btn-new-customer-invoice', function () {
+            checkoutForm = $('#form_checkout_gateway');
+            form = $('.invoice-customer');
+            form.find('input[name=mainBilling]').val(checkoutForm.find('input[name=new_invoice_save]').val());
+            form.find('input[name=action]').val(checkoutForm.find('input[name=new_invoice_action]').val());
+            form.find('input[name=invoiceId]').val(checkoutForm.find('input[name=new_invoice_id]').val());
+            form.find('input[name=nameToInvoice]').val(checkoutForm.find('input[name=new_invoice_name]').val());
+            form.find('input[name=line1]').val(checkoutForm.find('input[name=new_invoice_line1]').val());
+            form.find('input[name=line2]').val(checkoutForm.find('input[name=new_invoice_line2]').val());
+            form.find('input[name=country]').val(checkoutForm.find('select[name=new_invoice_country]').val());
+            form.find('input[name=postalCode]').val(checkoutForm.find('input[name=new_invoice_postal_code]').val());
+            form.find('input[name=taxNumber]').val(checkoutForm.find('input[name=new_invoice_tax_number]').val());
+
+            if (checkoutForm.find('select[name=new_invoice_country]').val() == 177) {
+                form.find('input[name=state]').val(checkoutForm.find('select[name=new_invoice_state]').val());
+                form.find('input[name=city]').val(checkoutForm.find('select[name=new_invoice_city]').val());
+            } else {
+                form.find('input[name=state]').val(checkoutForm.find('input[name=new_invoice_state]').val());
+                form.find('input[name=city]').val(checkoutForm.find('input[name=new_invoice_city]').val());
+            }
+
+            if (checkEmptyFields(form, checkoutForm, 'invoice')) {
+                return false;
+            }
+            if (!isValidPtTin(form, checkoutForm)) {
+                return false;
+            }
+            if (!isValidPtPostalCode(form, checkoutForm, 'invoice')) {
+                return false;
+            }
+            $('.img-loader').removeClass('d-none')
+            querybiz.post($(form), function (data) {
+                $.each($(form), function (key, val) {
+                    if ($(val).attr('data-prevent-cancel')) {
+                        $(val).attr('data-prevent-cancel', $(val).val());
+                    }
+                });
+                setTimeout(function () {
+                    location.reload();
+                }, 500);
+            }, function (data) {
+                Swal.fire('{% trans %}Attention{% endtrans %}!', data, 'warning');
+                $('.more-data-checkout').trigger('click');
+                $('.img-loader').removeClass('d-none');
+                return true;
+            });
+        });
+
+        function checkEmptyFields(form, checkoutForm, type) {
+            $('.required').remove();
+            $('input').removeClass('border-danger');
+            let required = '<span class="not-valid required text-danger small float-right">{% trans %}Required{% endtrans %}</span>';
+            let elements = 'input[type=text]:required';
+            let emptyData = $(form).find(elements);
+            var emptyField = false;
+            $.each(emptyData, function (key, val) {
+                if (!$(val).val() && !$(val).hasClass('d-none')) {
+                    emptyField = true;
+                    if ($(val).attr('name') == 'line1') {
+                        checkoutForm.find('input[name=new_' + type + '_line1]').before(required).addClass('border-danger').focus();
+                    }
+
+                    if ($(val).attr('name') == 'postalCode') {
+                        checkoutForm.find('input[name=new_' + type + '_postal_code]').before(required).addClass('border-danger').focus();
+                    }
+
+                    if ($(val).attr('name') == 'state') {
+                        checkoutForm.find('input[name=new_' + type + '_state]').before(required).addClass('border-danger').focus();
+                    }
+
+                    if ($(val).attr('name') == 'city') {
+                        checkoutForm.find('input[name=new_' + type + '_city]').before(required).addClass('border-danger').focus();
+                    }
+
+                    if ($(val).attr('name') == 'taxNumber') {
+                        checkoutForm.find('input[name=new_invoice_tax_number]').before(required).addClass('border-danger').focus();
+                    }
+                }
+            });
+            if (emptyField) {
+                $('.one-invoice').css('zIndex', 9999);
+                $(form).find('.btn-new-customer-' + type).attr('disabled', false);
+                return true;
+            }
+            return false;
+        }
+
+        function isValidPtPostalCode(form, checkoutForm, type) {
+            $('.required').remove();
+            if (checkoutForm.find('select[name=new_' + type + '_country]').val() != 177 || !checkoutForm.find('select[name=new_' + type + '_country]').length) {
+                return true;
+            }
+            let value = checkoutForm.find('input[name=new_' + type + '_postal_code]').val();
+            let invalid = '<span class="not-valid required text-danger small float-right">{% trans %}Invalid{% endtrans %} Ex. 0000-000</span>';
+            var patt = /^\d{4}-\d{3}?$/gm;
+            if (!value.match(patt)) {
+                $('.one-invoice').css('zIndex', 9999);
+                checkoutForm.find('input[name=new_' + type + '_postal_code]').before(invalid).addClass('border-danger').focus();
+                $(form).find('.btn-new-customer-' + type).attr('disabled', false);
+                return false;
+            }
+            return true;
+        }
+
+        function isValidPtTin(form, checkoutForm) {
+            $('.required').remove();
+            let isValid = true;
+            if (checkoutForm.find('select[name=new_invoice_country]').val() != 177 || !checkoutForm.find('select[name=new_invoice_country]').length) {
+                return true;
+            }
+            let value = checkoutForm.find('input[name=new_invoice_tax_number]').val();
+            let invalid = '<span class="not-valid required text-danger small float-right">{% trans %}Invalid{% endtrans %} Ex. 123456789</span>';
+            const nif = typeof value === 'string' ? value : value.toString();
+            const validationSets = {
+                one: ['1', '2', '3', '5', '6', '8'],
+                two: ['45', '70', '71', '72', '74', '75', '77', '79', '90', '91', '98', '99']
+            };
+            if (nif.length !== 9) {
+                isValid = false;
+            }
+            if (!validationSets.one.includes(nif.substr(0, 1)) && !validationSets.two.includes(nif.substr(0, 2))) {
+                isValid = false;
+            }
+            const total = nif[0] * 9 + nif[1] * 8 + nif[2] * 7 + nif[3] * 6 + nif[4] * 5 + nif[5] * 4 + nif[6] * 3 + nif[7] * 2;
+            const modulo11 = (Number(total) % 11);
+            const checkDigit = modulo11 < 2 ? 0 : 11 - modulo11;
+            if (checkDigit !== Number(nif[8])) {
+                isValid = false;
+            }
+            if (!isValid) {
+                $('.one-invoice').css('zIndex', 9999);
+                checkoutForm.find('input[name=new_invoice_tax_number]').before(invalid).addClass('border-danger').focus();
+                //$('.spinner-border').remove();
+                $(form).find('.btn-new-customer-invoice').attr('disabled', false);
+                return false;
+            }
+            return true;
+        }
+
+
+        $('body').on('click', 'input[name=customer_address_id]', function () {
+            if ($(this).attr('id') == 'customer_address_new') {
+                $('.geo-countries').trigger('change');
+                $('#new_customer_address_fields').removeClass('d-none');
+            } else {
+                $('#new_customer_address_fields').addClass('d-none');
+            }
+        });
+
+        $('body').on('click', 'input[name=customer_invoice]', function () {
+            if ($(this).attr('id') == 'new_one_customer_invoice') {
+                $('.geo-countries').trigger('change');
+                $('#new_one_customer_invoice_fields').removeClass('d-none');
+            } else {
+                $('#new_one_customer_invoice_fields').addClass('d-none');
+            }
+        });
+
+        var enableInvoiceOnCheckout = {{ enableInvoiceOnCheckout ? 'true' : 'false' }};
+
+        $(function () {
+            $('.btn-checkout-gateway').click(function (e) {
+                e.preventDefault();
+
+                let invoiceIdChecked = 0;
+                let arOneInvoice = $('.customer-one-invoice');
+                for (let i = 0; i < arOneInvoice.length; i++) {
+                    let el = $(arOneInvoice[i]);
+                    if (el.prop('checked')) {
+                        invoiceIdChecked = el.val();
+                    }
+                }
+
+                if (!invoiceIdChecked && enableInvoiceOnCheckout) {
+                    Swal.fire('{% trans %}Attention{% endtrans %}!', '{% trans %}You need to select an Invoice{% endtrans %}', 'warning');
+                } else {
+                    if ($('#checkout_customer_invoice_id').length) {
+                        $('#checkout_customer_invoice_id').val(invoiceIdChecked);
+                    }
+
+                    let gateway = $(this).attr('data-gateway');
+                    $('#form_checkout_gateway').attr('action', gateway);
+                    $('#form_checkout_gateway').submit();
+                }
+            });
+
+            /*
+                        $('#customer_address_new').click(function() {
+                            $('#new_customer_address_description').hide();
+                            $('#new_customer_address_fields').show().animate({height: '490px'});
+                        });
+
+                        $('.customer-address-saved').click(function() {
+                            $('#new_customer_address_fields').animate({height: '0px'}, function() {
+                                $(this).hide();
+                                $('#new_customer_address_description').show();
+                            });
+                        });
+                        */
+
+        });
+
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                const totalProducts = $("input#total_products").val();
+                const totalProductsPrice = parseFloat($("input#total_products_price").val());
+                var inputedValueInvoice = 0.00;
+
+                var selectTotalValuesToInvoices = 0;
+
+                console.log(`totalProducts: ${totalProducts}\ntotalProductsPrice: ${totalProductsPrice}`);
+                /*
+                                $('#customer_address_new').click(function() {
+                                    $('#new_customer_address_description').hide();
+                                    $('#new_customer_address_fields').show().animate({height: '490px'});
+                                });
+
+                                $('input:radio#new_one_customer_invoice').click(function(evt){
+                                    if($(this).prop('checked')){
+                                        $('div#new_one_customer_invoice_fields').removeClass('d-none');
+                                    }else{
+                                        $('div#new_one_customer_invoice_fields').addClass('d-none');
+                                    }
+                                });
+                */
+                //more_invoice format exibition
+                $('input:checkbox.customer-more-invoice').on("click", function () {
+                    let idEl = $(this).val();
+                    if ($(this).prop('checked')) {
+                        $('div#container_box_' + idEl).removeClass('d-none');
+                    } else {
+                        $('div#container_box_' + idEl).addClass('d-none');
+                    }
+                });
+
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        var btnAction = $('.btn-form-action');
+                        btnAction.prop('disabled', true);
+                        btnAction.append('<span id="spinner-loading" class="spinner-border spinner-border-sm d-block mx-auto" role="status" aria-hidden="true"></span>');
+
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            {#Swal.fire('{% trans %}Attention{% endtrans %}!', '{% trans %}There are required fields not filled in{% endtrans %}!', 'warning');#}
+                            $('.more-data-checkout').trigger('click');
+                        }
+
+                        //valida one invoice : ok
+                        if ($('input:radio#one_invoice').prop('checked')) {
+
+                            let totalRadiosSelecteds = $(':radio[name="customer_invoice"]:checked').length;
+                            if (totalRadiosSelecteds < 1) {
+                                Swal.fire('{% trans %}Attention{% endtrans %}!', '{% trans %}You need to choose one of the options{% endtrans %}!', 'warning');
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+
+                        }
+
+                        //more invoices selecionado
+                        if ($('input:radio#more_invoice').prop('checked')) {
+
+                            //verifica se pessoa/invoice não está selecionado
+                            let totalRadiosSelecteds = ($(':checkbox[name="customer_invoices[]"]:checked').length > 0) ? $(':checkbox[name="customer_invoices[]"]:checked').length : 0;
+                            if (totalRadiosSelecteds < 1) {
+                                Swal.fire('{% trans %}Attention{% endtrans %}!', '{% trans %}You need to choose one of the options to Invoice{% endtrans %}!', 'warning');
+                                $(':checkbox[name="customer_invoices[]"]').focus();
+                                event.preventDefault();
+                                event.stopPropagation();
+                            } else {
+
+                                //verifica se formato NÃO FOI selecionado
+                                let totalRadiosInvoiceFormatProduct = ($(':radio[value="product"]:checked').length > 0) ? $(':radio[value="product"]:checked').length : 0;
+                                let totalRadiosInvoiceFormatValues = ($(':radio[value="values"]:checked').length > 0) ? $(':radio[value="values"]:checked').length : 0;
+                                if (totalRadiosSelecteds > 0 && totalRadiosInvoiceFormatProduct < 1 && totalRadiosInvoiceFormatValues < 1) {
+                                    Swal.fire('{% trans %}Attention{% endtrans %}!', '{% trans %}You need to choose Bill by Product or Share the price between invoices{% endtrans %}', 'warning');
+                                    $(':radio.customer-invoice-format').focus().fadeIn("slow");
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                } else {
+
+                                    if ($(':radio[value="product"]:checked').prop('checked')) {
+
+                                        let totalSelectedProductsInvoice = $(':radio.customer-invoice-format-products-input:checked').length;
+                                        //verifica se algum produto NÃO FOI selecionado para fatura
+                                        if (totalSelectedProductsInvoice < 1) {
+                                            Swal.fire('{% trans %}Attention{% endtrans %}!', '{% trans %}You need to select products{% endtrans %}!', 'warning');
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                        } else {
+
+                                            //verifica SE TODOS os produtos foram selecionados
+                                            if (totalSelectedProductsInvoice < totalProducts) {
+                                                let productNotSelectedToInvoice = parseInt(totalProducts - totalSelectedProductsInvoice);
+                                                Swal.fire('{% trans %}Attention{% endtrans %}!', `{% trans %}You still need to select{% endtrans %} ${productNotSelectedToInvoice} {% trans %}products{% endtrans %}`, 'warning');
+                                                event.preventDefault();
+                                                event.stopPropagation();
+                                            }
+
+                                        }
+
+                                    }
+
+                                    if ($(':radio[value="values"]:checked').prop('checked')) {
+
+                                        let remaining = parseFloat(parseFloat(totalProductsPrice) - parseFloat(inputedValueInvoice));
+                                        if ((inputedValueInvoice < totalProductsPrice)) {
+                                            Swal.fire('{% trans %}Attention{% endtrans %}!', `{% trans %}There are still{% endtrans %} ${remaining.toFixed(2)} {% trans %}to distribute on invoices{% endtrans %}`, 'warning');
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                        }
+
+                                        if (inputedValueInvoice == 0.00) {
+                                            Swal.fire('{% trans %}Attention{% endtrans %}!', `{% trans %}Enter the invoice amount{% endtrans %}`, 'warning');
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                        }
+
+                                    }
+
+
+                                }
+
+                            } //END: more invoices selecionado
+
+
+                        }
+
+                        btnAction.prop('disabled', false);
+                        $('span#spinner-loading').remove();
+                        form.classList.add('was-validated');
+
+                    }, false);
+                });
+
+                $('.customer-invoice-format').click(function () {
+
+                    let elId = $(this).attr('id');
+                    let elVal = $(this).val();
+
+                    if (elVal == 'product') {
+
+                        selectTotalValuesToInvoices = 0;
+                        inputedValueInvoice = 0.00;
+                        let remaining = $('.remaining').data('total-price').toFixed(2);
+                        $('.remaining-value').html(remaining);
+                        $('input:radio[value="product"].customer-invoice-format').prop('checked', true);
+                        $('div.customer-invoice-format-products').removeClass('d-none').show('fast');
+                        $('input:radio.customer-invoice-format-products-input').prop('disabled', false);
+                        $('.customer-invoice-format-values').addClass('d-none');
+                        $('input.customer-invoice-format-values-input').val('').prop('disabled', true);
+
+                        resetRemaining();
+
+                    } else {
+
+                        $('input:radio[value="values"].customer-invoice-format').prop('checked', true);
+                        $('.customer-invoice-format-values').removeClass('d-none');
+                        $('input.customer-invoice-format-values-input').val('').prop('disabled', false);
+                        $('input:radio[value="product"].customer-invoice-format').prop('checked', false);
+                        $('.customer-invoice-format-products').addClass('d-none');
+                        $('input:radio.customer-invoice-format-products-input').prop('disabled', true);
+                        $('input:radio.customer-invoice-format-products-input').prop('checked', false);
+
+                    }
+                });
+
+                $('.customer-invoice-format-values-input').blur(function (evt) {
+
+                    let inputValue = ($(this).val()).trim();
+
+                    if (inputValue.length > 1) {
+                        inputedValueInvoice = parseFloat(inputedValueInvoice) + parseFloat(inputValue);
+
+                        let remaining = parseFloat(parseFloat(totalProductsPrice) - inputedValueInvoice).toFixed(2);
+
+                        if (inputedValueInvoice > totalProductsPrice) {
+                            let correctValue = (parseFloat(inputValue) - Math.abs(remaining));
+                            let exceedValue = (parseFloat(inputValue) - correctValue);
+                            inputedValueInvoice = parseFloat(totalProductsPrice);
+                            Swal.fire('{% trans %}Attention{% endtrans %}!', '{% trans %}Value exceeds in {% endtrans %} ' + parseFloat(exceedValue).toFixed(2), 'warning');
+
+                            remaining = 0.00;
+                            $(this).val(correctValue);
+                            $(".remaining").data("total-price", remaining);
+                            $(".remaining-value").html((remaining).toFixed(2));
+
+                            return false;
+                        } else if (inputedValueInvoice < totalProductsPrice) {
+                            Swal.fire('', '{% trans %}You still have{% endtrans %} ' + parseFloat(remaining).toFixed(2) + ' {% trans %}to finalize you invoice{% endtrans %}', 'success');
+                        }
+                        $(".remaining").data("total-price", remaining);
+                        $(".remaining-value").html(remaining);
+
+                    } else {
+                        let inputedValues = 0.00;
+                        let inputs = $('.customer-invoice-format-values-input');
+
+                        for (let i = 0; i < inputs.length; i++) {
+                            if ((inputs[i].value != "") && (parseFloat(inputs[i].value) > 0.00)) {
+                                inputedValues += parseFloat(inputs[i].value);
+                            }
+                        }
+
+                        if ((inputedValues != "") || (inputedValues > 0.00)) {
+                            inputedValueInvoice = parseFloat(inputedValues);
+                            let remaining = parseFloat(totalProductsPrice - inputedValueInvoice);
+                            $(".remaining").data("total-price", remaining);
+                            $(".remaining-value").html((remaining).toFixed(2));
+                            Swal.fire('', '{% trans %}You still have{% endtrans %} ' + (remaining).toFixed(2) + ' {% trans %}to finalize you invoice{% endtrans %}', 'success');
+                        }
+
+                        console.log("\nlinha 804: inputedValueInvoice: " + inputedValueInvoice);
+
+                    }
+
+                });
+
+                function resetRemaining() {
+                    inputedValueInvoice = 0.00;
+                    $('.remaining').data('total-price', totalProductsPrice);
+                    $('.remaining-value').html(parseFloat(totalProductsPrice).toFixed(2));
+                    $('input.customer-invoice-format-values-input').val('');
+                }
+
+                $('#multiple_customer_invoice_new').click(function () {
+                    $('#new_multiple_invoice_fields_description').hide();
+                    $('#new_multiple_invoice_fields').show().animate({height: '520px'});
+                });
+            }, false);
+        })();
+
+        $(document).ready(function () {
+
+            $("#btn_new_multiple_invoice").click(function (evt) {
+
+                $("div#box_more_invoices").removeClass('d-none');
+
+                $("#btn_new_multiple_invoice").append('<span id="spinner-loading" class="spinner-border spinner-border-sm d-block mx-auto" role="status" aria-hidden="true"></span>');
+                $("#btn_new_multiple_invoice").prop("disabled", true);
+
+                let serviceAPI = '/addCustomerInvoice';
+                let customerId = {{ customerId }};
+                let line1 = ($("#new_multiple_invoice_line_1").val() != "") ? $("#new_multiple_invoice_line_1").val() : null;
+                let line2 = ($("#new_multiple_invoice_line_2").val() != "") ? $("#new_multiple_invoice_line_2").val() : null;
+                let countryId = ($("#new_multiple_invoice_country").val() != "") ? $("#new_multiple_invoice_country").val() : null;
+                let city = ($("#new_multiple_invoice_state").val() != "") ? $("#new_multiple_invoice_state").val() : null;
+                let state = ($("#new_multiple_invoice_city").val() != "") ? $("#new_multiple_invoice_city").val() : null;
+                let postalCode = ($("#new_multiple_invoice_postal_code").val() != "") ? $("#new_multiple_invoice_postal_code").val() : null;
+
+                let url = `${arDefaultOptions['baseUri']}${serviceAPI}?customerId=${customerId}&line1=${line1}&line2=${line2}&countryId=${countryId}&city=${city}&state=${state}&postalCode=${postalCode}`
+                querybiz.request(url, 'POST', (msg) => {
+
+                    let customerInvoiceId = msg.customerInvoiceId;
+                    console.log('customerInvoiceId: ' + customerInvoiceId);
+                    let loopIndex = Math.floor(Math.random() * 1000000);
+                    let container = `<div class="d-inline-block col-auto my-3">
+                                        <div class="card border rounded">
+
+                                            <div class="card-header">
+                                                <div class="">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input customer-more-invoice" name="customer_invoices[]" value="${customerInvoiceId}" id="customer_invoices_${customerInvoiceId}">
+                                                        <label class="custom-control-label" for="customer_invoices_${customerInvoiceId}">Invoice ${customerInvoiceId}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="d-inline-block text-left">
+                                                    <b>{% trans %}Nome{% endtrans %}:</b> <BR>
+                                                    <b>{% trans %}Line 1{% endtrans %}:</b> ${line1}<BR>
+                                                    <b>{% trans %}Line 2{% endtrans %}:</b> ${line2}<BR>
+                                                    <b>{% trans %}City{% endtrans %}:</b> ${city}<BR>
+                                                    <b>{% trans %}State{% endtrans %}:</b> ${state}<BR>
+                                                    <b>{% trans %}Country{% endtrans %}:</b> ${countryId}<BR>
+                                                    <b>{% trans %}Postal Code{% endtrans %}:</b> ${postalCode}<BR>
+                                                    <div class="form-group mt-3 p-2 customer-invoice-value-box d-none" id="container_box_${customerInvoiceId}">
+
+                                                        <p class="">
+                                                            <input class="form-check-input customer-invoice-format" type="radio" name="invoice_format_${customerInvoiceId}" id="invoice_format_${customerInvoiceId}_1" value="product">
+                                                            <label for="invoice_format_${customerInvoiceId}_1">{% trans %}Bill by Product{% endtrans %}</label>
+                                                        </p>
+
+                                                        <div class="customer-invoice-format-products d-none">
+                                                            {% for item in product.listProductItemStock %}
+                                                            <div class="form-check ml-2">
+                                                                <input class="form-check-input customer-invoice-format-products-input" type="radio" name="customer_invoice_product[${customerInvoiceId}][{{ item.productItemStockId }}]" id="invoice_product_${customerInvoiceId}_{{ item.productItemStockId }}" value="{{ product.productPrice[item.productItemStockId] }}">
+                                                                <label class="form-check-label" for="invoice_product_${customerInvoiceId}_{{ item.productItemStockId }}">{{ item.name }}</label>
+                                                            </div>
+                                                            {% endfor %}
+                                                        </div>
+
+                                                        <hr>
+
+                                                        <p class="">
+                                                            <input class="form-check-input customer-invoice-format" type="radio" name="invoice_format_${customerInvoiceId}" id="invoice_format_${customerInvoiceId}_2" value="values">
+                                                            <label for="invoice_format_${customerInvoiceId}_2">{% trans %}Or sharing the price between invoices{% endtrans %}</label>
+                                                        </p>
+
+                                                        <div class="form-group ml-2 customer-invoice-format-values d-none">
+                                                            <label for="customer_invoice_value_${customerInvoiceId}">Enter the invoice amount here:</label>
+                                                            <input type="number" class="form-control customer-invoice-format-values-input" placeholder="Enter value" id="customer_invoice_value_${customerInvoiceId}" name="customer_invoice_value[${customerInvoiceId}]" pattern="[0-9]+([\.,][0-9]+)?" step="0.01">
+                                                            <div class="remaining" data-total-price="{{ totalProductsPrice }}">
+                                                                <label>{% trans %}Remaining{% endtrans %}: </label>
+                                                                <label class="remaining-value">{{ totalProductsPrice }}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>`;
+
+                    $(container).appendTo("#dinamic_invoice");
+
+                    console.log(msg);
+
+                    Swal.fire('Success!', 'Inserted Invoice', 'success');
+
+
+                    $("#btn_new_multiple_invoice").prop("disabled", false);
+                    $('span#spinner-loading').remove();
+
+                    $("#new_multiple_invoice_line_1").val('').focus();
+                    $("#new_multiple_invoice_line_2").val('');
+                    $("#new_multiple_invoice_country").val('');
+                    $("#new_multiple_invoice_state").val('');
+                    $("#new_multiple_invoice_city").val('');
+                    $("#new_multiple_invoice_postal_code").val('');
+
+
+                }, (msg) => console.log("Error: " + msg));
+
+
+            });
+
+        });
+
+    </script>
+
+    <script>
+        $(function () {
+            // write the number of steps. e.g. 1, 2, 3,...
+            $('.cart-box-header-number').map(function (index) {
+                $(this).text(index + 1);
+            });
+
+            // opens the first step if it has closed
+            if ($('.cart-box').first().hasClass('closed')) {
+                $('.cart-box-header a').first().click();
+            }
+
+            // trigger needed to make Select2 (country, state and city) work
+            $('[data-show-fields]').click(function () {
+                $('.geo-countries').trigger('change');
+            });
+
+            // if there is no address open fields for filling
+            (function () {
+                const invoiceCollapse = $('#invoiceCollapse');
+                if (invoiceCollapse.find('.cart-box-address').hasClass('d-none')) {
+                    invoiceCollapse.find('[data-show-fields]').hide();
+                    $('#collapseNewInvoice').collapse('show');
+                    $('.geo-countries').trigger('change');
+                }
+            })();
+        });
+    </script>
+{% endblock %}

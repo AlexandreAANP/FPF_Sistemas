@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Title Blank - {% endblock %}
+{% block description %}Description Blank{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <section class="section-min-height">
+
+        {# INI: ESSE BLOCO PODE SER REMOVIDO, É APENAS PARA INFORMAÇÃO AO DESENVOLVEDOR #}
+        <div class="site-module-name container">CONTENT BLANK</div>
+        <div class="site-module-content container">
+            <b>File:</b> /templates/content/blank.html.twig
+        </div>
+
+        <div class="container site-dump">
+            <pre>{{ dump(referenceKey) }}</pre>
+        </div>
+        {# FIM ------------------------------------------------------------------------ #}
+
+        <div class="container"><h1>Titulo de qualquer coisa</h1></div>
+        <div class="container">
+            Texto de Qualquer coisa
+        </div>
+    </section>
+
+    <HR>
+
+    {% if referenceKey == 'question' %}
+        {% include 'content/page_includes/blank_question.html.twig' %}
+
+    {% elseif referenceKey == 'ask' %}
+        {% include 'content/page_includes/blank_ask.html.twig' %}
+
+    {% endif %}
+
+    <button class="btn btn-info btn-get-api">Get Item from API</button>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(function() {
+            $('.btn-get-api').click(function(e) {
+                e.preventDefault();
+
+                querybiz.post('/getAPI?url=getSocialMedia', function(data) {
+                    dd(data);
+                });
+            });
+        });
+    </script>
+{% endblock %}

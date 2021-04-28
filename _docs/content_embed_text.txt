@@ -1,0 +1,87 @@
+ * Exemplo de como escrever o texto (Back Office):
+    - [embed:fa-icon:fas fa-shower]
+    - [embed:img:http://www.site.com/image.png]
+    - [embed:iframe:http://www.site.com]
+
+ * Exemplo de como usar no TWIG:
+    {{ LayoutFunctions.textEmbed(service.text, {
+        'fa-icon': '<div class="service_icon"><i class="[embed:content]"></i></div>',
+        'img': '<img src="[embed:content]" style="width: 100px">'
+    })|raw }}
+
+Exemplo funcional com slide:
+
+ * Texto no Back Office --------------------
+ Apresentação inicial
+ [embed:slide:start]
+ ADMINISTRAÇÃO<BR>Texto de descrição
+ [embedded:division]
+ SERVIÇOS DE LIMPEZA<BR>Texto de descrição
+ [embedded:division]
+ MANUTENÇÃO DE PISCINA E JARDIM<BR>Texto de descrição
+ [embedded:division]
+ MANUTENÇÃO GERAL<BR>Texto de descrição
+ [embed:slide:end]
+ Texto final
+
+* EX: Código 1 no TWIG (com um slide só)
+    {{ LayoutFunctions.textEmbed(servicesText, {
+        'slide': [
+            '<div class="col-lg-3 number_count">[embed:content]</div>',
+            '<div class="row justify-content-center">[embed:content]</div>'
+        ]})|raw
+    }}
+
+* EX: Código 2 no TWIG (com dois slides diferentes, um com 3 colunas e outro com 2)
+
+        {% if aboutUsText != '' %}
+            {{ LayoutFunctions.textEmbed(aboutUsText, {
+                'img': '<div class="value_img"><img src="[embed:content]"></div>',
+                'slide': {
+                    'first-line': [
+                        '<div class="col-lg-4 about_us_text">[embed:content]</div>',
+                        '<div class="row justify-content-center">[embed:content]</div>'
+                    ],
+                    'second-line': [
+                        '<div class="col-lg-6 about_us_text">[embed:content]</div>',
+                        '<div class="row justify-content-center">[embed:content]</div>'
+                    ]
+                }})|raw
+            }}
+        {% endif %}
+
+* EX: Código 3 no TWIG (com slide de carrossel)
+<div class="service_desc_detail">
+    {{ LayoutFunctions.textEmbed(service.text, {
+        'fa-icon': '<div class="service_icon"><i class="[embed:content]"></i></div>',
+        'slide': [
+                    {
+                        'first': '<div class="carousel-item active text-center p-4 desc_slider_p">[embed:content]</div>',
+                        'all': '<div class="carousel-item text-center p-4 desc_slider_p">[embed:content]</div>'
+                    },
+                    '</div>
+                     <section class="slider_property mb-5" style="margin-left: -15px; margin-right: -15px; background-image: url(/assets/img/property/slider.png)">
+                        <div id="carouselContent2" class="carousel slide" data-ride="carousel">
+                            <ol class="carousel-indicators" style="bottom: 0;">
+                                <li data-target="#carouselContent2" data-slide-to="0" class="active"></li>
+                                <li data-target="#carouselContent2" data-slide-to="1"></li>
+                                <li data-target="#carouselContent2" data-slide-to="2"></li>
+                                <li data-target="#carouselContent2" data-slide-to="3"></li>
+                            </ol>
+                            <div class="container">
+                                <div class="carousel-inner" role="listbox">[embed:content]</div>
+                            </div>
+                            <a class="carousel-control-prev" href="#carouselContent2" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="carousel-control-next" href="#carouselContent2" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </div>
+                    </section>
+                    <div class="service_desc_detail">'
+                ]
+    })|raw }}
+</div>

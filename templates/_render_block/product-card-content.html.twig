@@ -1,0 +1,38 @@
+<div class="products-tag green-tag">Novo</div>
+<div class="products-card-wrapper">
+    <!--
+    <div class="products-card-share">
+        <a href="#"><i class="mdi mdi-compare-horizontal"></i></a>
+        <a href="#"><i class="mdi mdi-heart-outline"></i></a>
+    </div>
+    -->
+    <a href="{{ baseUri }}/{{ product.referenceKey }}"><div class="products-card-image" style="background-image: url('{{ product.filename }}')"></div></a>
+    <a href="#" class="products-card-name">{{ product.name }}</a>
+    <div class="products-card-values">
+        <!--<span class="products-card-values-replaced">{{ product.price }} {{ LayoutFunctions.getCurrencySymbol() ?? null }}</span>-->
+        <span class="products-card-values-original">{{ product.price }} {{ LayoutFunctions.getCurrencySymbol() ?? null }}</span>
+    </div>
+</div>
+
+<div class="products-card-overflowed">
+    {% set classAddProduct = '' %}
+    {% set productItemStockId = 0 %}
+    {% if product.colItems|length == 0 %}
+        {% set productTitle = 'Unavailable' %}
+        {% set classAddProduct = 'btn-modal-product-stock-zero' %}
+
+    {% elseif product.colItems|length == 1 %}
+        {% set productTitle = 'Add to Cart' %}
+        {% set classAddProduct = 'btn-add-product-cart' %}
+        {% set productItemStockId = product.colItems[0].id %}
+
+    {% elseif product.colItems|length > 1 %}
+        {% set productTitle = 'See more' %}
+        {% set classAddProduct = 'btn-modal-product-specification' %}
+    {% endif %}
+
+    <div>
+        <!--<p>Localização</p>-->
+        <button class="secondary-btn {{ classAddProduct }}" data-product-id="{{ product.id }}" data-product-item-stock-id="{{ productItemStockId }}" data-redirect="{{ baseUri }}/addProductToCart">{{ productTitle|trans }}</button>
+    </div>
+</div>

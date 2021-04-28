@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Checkout Error!{% endblock %}
+
+{% block body %}
+    </header>
+    <div class="header_inner">
+        <div class="intro_wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12 col-md-8 col-lg-8">
+                        <div class="intro_text">
+                            <h1>Sorry!</h1>
+                            <h3>{% trans %}Your order failed{% endtrans %}</h3>
+                            <h4>Order Code: {{ orderInfoId }}</h4>
+                            <div class="pages_links">
+                                {% if (customerId is defined) and (customerId > 0) %}
+                                    <a href="{{ baseUri }}/customer" title="My Area" class="sign_in btn btn-primary" style="border:#fff solid 3px">MY AREA</a>
+                                {% else %}
+                                    <a href="#" id="btnLogin" title="Log In" class="sign_in join_now js-modal-show btn-topHeader">Log In</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

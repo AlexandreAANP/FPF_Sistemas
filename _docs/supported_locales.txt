@@ -1,0 +1,4 @@
+Para Adicionar/Aterar idiomas, configure estes ficheiros:
+    1) /.env (DEFAULT_LANGUAGE, SUPPORTED_LOCALES)
+    3) /config/routes/annotations.yaml (app_main.prefix)
+    4) /translations/messages.[LANG].yaml

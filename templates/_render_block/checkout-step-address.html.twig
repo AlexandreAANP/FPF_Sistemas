@@ -1,0 +1,145 @@
+{% set cartBox  = 'closed' %}
+{% set icon     = 'plus' %}
+{% set collapse = '' %}
+
+{% if not enableAddressOnCheckout %}
+    {% set cartBox  = '' %}
+    {% set icon     = 'minus' %}
+    {% set collapse = 'show' %}
+{% endif %}
+
+{% set customerAddressLength = customerAddress|length %}
+
+{% if customerAddressLength %}
+    {% set addressChecked = '' %}
+
+    {% if customerAddressLength == 1 %}
+        {% set addressChecked = 'CHECKED' %}
+    {% endif %}
+    <div class="cart-box {{ cartBox }}">
+        <div class="cart-box-header">
+            <a href="#addressCollapse">
+                <div class="cart-box-header-number">0</div>
+                <div class="cart-box-header-title">{% trans %}Address{% endtrans %}</div>
+                <div class="cart-box-header-collapse-button">
+                    <i class="mdi mdi-{{ icon }}"></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="collapse collapse-item {{ collapse }}" id="addressCollapse">
+            <div class="px-18">
+                {% for address in customerAddress %}
+
+                    {% set userCountry = '-/-' %}
+                    {% for country in colGeoCountry %}
+                        {% if address.countryId == country.id %}
+                            {% set userCountry = country.name %}
+                        {% endif %}
+                    {% endfor %}
+
+
+                    <div class="cart-box-address">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                            <span class="cart-box-address-tip order-2 order-md-1">{% trans %}Send to this address{% endtrans %}</span>
+                            {#
+                            <div class="cart-box-address-options order-1 order-md-2">
+                                <a href="#"><i class="mdi mdi-lead-pencil"></i> {% trans %}Edit{% endtrans %}</a>
+                                <a href="#"><i class="mdi mdi-trash-can"></i> {% trans %}Remove{% endtrans %}</a>
+                            </div>
+                            #}
+                        </div>
+                        <div class="cart-box-address-info">
+                            <label for="customer_address_{{ address.id }}" class="d-flex">
+                                <input type="radio" class="customer-address-saved" name="customer_address_id" value="{{ address.id }}" id="customer_address_{{ address.id }}" {{ address.main or addressChecked ? 'checked' : null }}>
+                                <div>
+                                    {{ address.line1 }}, {{ address.line2 }}, {{ address.city }} - {{ address.state }}<br>
+                                    {{ userCountry }}, {{ address.postalCode }}
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="mb-4">
+                    <button data-show-fields class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseNewAddress" aria-expanded="false" aria-controls="collapseNewAddress">
+                        {% trans %}New Address{% endtrans %}
+                    </button>
+                    <button class="btn btn-outline-light text-dark rounded-pill btn-checkout-next float-right">
+                        {% trans %}Next{% endtrans %} <i class="mdi mdi-arrow-right-bold-circle-outline"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="collapse" id="collapseNewAddress">
+                <div class="px-18">
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-input">
+                                <label for="new_address_line_1">{% trans %}Line{% endtrans %} 1</label>
+                                <input type="text" name="new_address_line1" id="new_address_line_1" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <input type="text" name="new_address_line2" id="new_address_line_2" placeholder="{% trans %}Line{% endtrans %} 2" class="form-control">
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-select">
+                                <label for="new_address_country">{% trans %}Country{% endtrans %}</label>
+                                {% set addressCountry = '-/-' %}
+                                {% set customerCountry = null %}
+                                {% if colGeoCountry is defined and colGeoCountry|length > 0 %}
+                                    <select id="new_address_country" name="new_address_country" class="form-control form-select2 geo-countries">
+                                        <!--option selected value="">{% trans %}Choose{% endtrans %}...</option-->
+                                        {% for country in colGeoCountry %}
+                                            {%if customerAddress[0].countryId == country.id %}
+                                                {% set addressCountry = country.name %}
+                                                {% set customerCountry = country.id %}
+                                            {% endif %}
+                                            <option value="{{country.id}}" {{customerAddress[0].countryId == country.id ? 'selected' : null}}>{{country.iso2~' | '~country.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% set baseCountryId = LayoutFunctions.getEnvVars('BASE_COUNTRY_ID') %}
+                        {{ baseCountryId == customerCountry ? null : null }}
+
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-input">
+{#                                <label for="new_address_state">{% trans %}State{% endtrans %}</label>#}
+                                <select name="new_address_state" id="new_address_state" class="form-control geo-pt-district form-select2">
+                                    {% for district in colGeoPtDistrict ?? [] %}
+                                        <option value='{{district.name}}'>{{district.name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="text" name="new_address_state" placeholder="{% trans %}State{% endtrans %}" class="geo-pt-district d-none form-control">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-select">
+{#                                <label for="new_address_city">{% trans %}City{% endtrans %}</label>#}
+                                <select name="new_address_city" id="new_address_city" class="form-control geo-pt-council form-select2">
+                                    {% for council in colGeoPtCouncil ?? [] %}
+                                        <option value='{{council.name}}'>{{council.name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="text" name="new_address_city" placeholder="{% trans %}City{% endtrans %}" class="geo-pt-council d-none form-control">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-input">
+                                <label for="new_address_postal_code">{% trans %}Postal Code{% endtrans %}</label>
+                                <input type="text" name="new_address_postal_code" id="new_address_postal_code" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-end pb-18">
+                        <button data-spinner="" type="submit" class="secondary-btn btn-new-customer-address">{% trans %}Save{% endtrans %}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

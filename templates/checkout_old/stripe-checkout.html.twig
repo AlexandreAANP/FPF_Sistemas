@@ -1,0 +1,27 @@
+{% block body %}
+    <div id="msg-payment" style="display: none">
+        {% trans %}Click on the button below to complete your Payment Process{% endtrans %}<BR>
+        <button id="checkout-button">Go to Stripe payment platform</button>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://js.stripe.com/v3"></script>
+
+    <script>
+        try {
+            var stripe = Stripe('{{ stripePublishableKey }}');
+
+            stripe.redirectToCheckout({
+                sessionId: '{{ stripeCheckoutSessionId }}'
+            }).then(function (result) {
+                console.log(result.error.message);
+            });
+
+        } catch(e) {
+            setTimeout(function() {
+                document.getElementById('"msg-payment').style.display = 'block';
+            }, 5000);
+        }
+    </script>
+{% endblock %}

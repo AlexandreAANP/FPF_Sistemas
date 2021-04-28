@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    {% if app.request.cookies.has('cookie-consent-' ~ appVersionCookiePolicy) %}
+        {% include '_includes/gtm_head.html.twig' %}
+    {% endif %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% block seo %}
+        {% include '_includes/seo.html.twig' %}
+    {% endblock %}
+
+    {% block stylesheets %}
+        {# https://cdnjs.com/libraries/bootstrap-modal #}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" integrity="sha512-P5MgMn1jBN01asBgU0z60Qk4QxiXo86+wlFahKrsQf37c9cro517WzVSPPV1tDKzhku2iJ2FVgL67wG03SGnNA==" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" />
+
+        {#<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>#}
+        <link rel="stylesheet" href="http://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+        <link rel="stylesheet" href="/assets/lib/range-slider/css/rSlider.min.css">
+        <link rel="stylesheet" href="/assets/css/app.min.css?hash={{ LayoutFunctions.getHashFile('/assets/css/app.min.css') }}">
+        <link rel="stylesheet" href="/assets/css/style.css" />
+
+
+        <style>
+            #navbarResponsive .btn-outline-light {
+                margin-top: 4px;
+                font-size: 1rem;
+                border: 0!important;
+            }
+        </style>
+    {% endblock %}
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" />
+</head>
+
+<body>
+
+<div id="body_loading_first">
+    <h1>{% trans %}Please Wait{% endtrans %}...</h1>
+</div>
+
+<div class="body-loading-load"></div>
+
+
+{% if app.request.cookies.has('cookie-consent-' ~ appVersionCookiePolicy) %}
+    {% include '_includes/gtm_body.html.twig' %}
+{% endif %}
+
+{% include 'menu.html.twig' %}
+
+{% block body %}{% endblock %}
+
+{% include 'footer.html.twig' %}
+
+{% if '.ibiz.pt' in LayoutFunctions.getEnvVars('DOMAIN_NAME') %}
+    <div style="position: fixed; background-color: #ffd; box-shadow: 0 0 2px #888; border-top-right-radius: 5px; border-top: #ccc 1px solid; border-right: #ccc 1px solid; bottom: 0; width: 200px; color: #000; text-align: center; padding: 2px; font-size: 12px; font-weight: normal; z-index: 99999">This is a <a href="https://umbraco.com/about-us/umbraco-dictionary/staging-environment" target="_blank" style="color: #000" title="What is a Staging Environment?">Staging Environment</a><BR>{{ LayoutFunctions.getEnvVars('SITE_URL') }}</div>
+{% endif %}
+
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js" integrity="sha512-XKa9Hemdy1Ui3KSGgJdgMyYlUg1gM+QhL6cnlyTe2qzMCYm4nAZ1PsVerQzTTXzonUR+dmswHqgJPuwCq1MaAg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bigslide.js/0.12.0/bigSlide.min.js" integrity="sha512-Rueg2bYo7TljyoH/AFVvl3IPKZCmPMHC44Db17xIVZUnXDE/1UWRqYIbCGIOmGQjv5w6DetTr7+89FeHCwlweQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.0/umd/popper.min.js" integrity="sha512-uxtUCZ+gIIpqJVZe/0IgmHq5yqW+2gzo3zsSqRXSlUBEM2IYxxnuyg7+i7j9SCv1R74/Zixdx0v8OiyShPWbkQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="/assets/js/script.js?hash={{ LayoutFunctions.getHashFile('/assets/js/script.js') }}"></script>
+    <script src="/assets/js/querybiz.js?hash={{ LayoutFunctions.getHashFile('/assets/js/querybiz.js') }}"></script>
+    <script src="/assets/js/app.min.js?hash={{ LayoutFunctions.getHashFile('/assets/js/app.min.js') }}"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render={{ LayoutFunctions.getSettingsVars('GOOGLE_CAPTCHA_PUBLIC_KEY_V3') }}"></script>
+
+    <script src="/assets/lib/range-slider/js/rSlider.min.js"></script>
+    <script src="/assets/js/app.min.js"></script>
+
+    <script>
+        var arDefaultOptions = [];
+        arDefaultOptions['countryBaseIso'] = '{{ LayoutFunctions.getEnvVars('BASE_COUNTRY_ISO2') }}';
+        arDefaultOptions['countryBaseId'] = '{{ LayoutFunctions.getEnvVars('BASE_COUNTRY_ID') }}';
+
+        arDefaultOptions['translationFiles'] = [];
+        arDefaultOptions['language'] = '{{ app.request.getLocale() }}';
+        arDefaultOptions['baseUri'] = '{{ baseUri }}';
+        arDefaultOptions['apiUrl'] = '{{ apiUrl }}';
+        arDefaultOptions['cdnUrl'] = '{{ cdnUrl }}';
+        arDefaultOptions['requestUri'] = '{{ app.request.requestUri()  }}';
+        arDefaultOptions['requestUriB64'] = '{{ LayoutFunctions.base64_encode(app.request.requestUri()) }}';
+
+        var defaultIsDev = {{ LayoutFunctions.isDev(app.request) ? 'true' : 'false' }};
+    </script>
+
+    {% for file in LayoutFunctions.readTranslationJs(app.request.getLocale()) %}
+        <script src="{{ file }}"></script>
+    {% endfor %}
+
+    <script>
+        jQuery(document).ready(function($) {
+            $('.dropdown-collection').click(function () {
+                $('.dropdown-collection-list').fadeToggle();
+            });
+
+            $('.dropdown-language').click(function () {
+                $('.dropdown-lang-list').fadeToggle();
+            });
+
+            $('.dropdown-currency').click(function () {
+                $('.dropdown-currency-list').fadeToggle();
+            });
+        });
+    </script>
+{% endblock %}
+</body>
+</html>

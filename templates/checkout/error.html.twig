@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Checkout Error'|trans,
+        'index': false,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'customer': 'Customer Area'|trans},
+            {'#': 'Checkout Error'|trans}
+        ]
+    }) }}
+
+    <section id="shopping">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 d-flex align-items-center flex-column text-center">
+                    <img src="/assets/images/checkout-fail.svg" alt="" width="300">
+                    <h1>{% trans %}Checkout Error!{% endtrans %}</h1>
+                    <p>
+                        {% trans %}Your order failed{% endtrans %}
+                        <br/>
+                        {% trans %}Order Code{% endtrans %}: {{ orderInfoId }}
+                    </p>
+                    {% if (customerId is defined) and (customerId > 0) %}
+                        <a href="{{ baseUri }}/customer" class="sign_in secondary-btn continue-shopping">{% trans %}My Area{% endtrans %}</a>
+                    {% else %}
+                        <a href="#" id="btnLogin" class="sign_in join_now js-modal-show secondary-btn continue-shopping">{% trans %}Log In{% endtrans %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

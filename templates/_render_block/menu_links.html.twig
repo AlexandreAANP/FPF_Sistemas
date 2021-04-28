@@ -1,0 +1,76 @@
+{#
+<li><a href="#" title="Experiências">Experiências</a></li>
+<li><a href="#" title="Alojamentos">Alojamentos</a></li>
+<li><a href="#" title="Loja">Loja</a></li>
+<li><a href="#" title="Parceiros">Parceiros</a></li>
+#}
+<li><a href="{{ baseUri }}/" title="{% trans %}Home{% endtrans %}">{% trans %}Home{% endtrans %}</a></li>
+<li class="nav-item dropdown">
+    <a class="dropdown-toggle btn-sm" href="#" id="dropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
+        {% trans %}Content{% endtrans %}
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <li><a href="{{ baseUri }}/articles" data-loading-text="{% trans %}Articles{% endtrans %}" class="{% if controllerNameMenu == 'ContentArticles'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Articles{% endtrans %}</a></li>
+        <li><a href="{{ baseUri }}/articles-category" data-loading-text="{% trans %}Articles Category{% endtrans %}" class="{% if controllerNameMenu == 'ContentArticlesCategory'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Article Category{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+
+        <li><a href="{{ baseUri }}/authors" data-loading-text="{% trans %}Authors{% endtrans %}" class="{% if controllerNameMenu == 'ContentAuthors'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Authors{% endtrans %}</a></li>
+        <li><a href="{{ baseUri }}/authors-category" data-loading-text="{% trans %}Authors Category{% endtrans %}" class="{% if controllerNameMenu == 'ContentAuthorsCategory'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Authors Category{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+
+        <li><a href="{{ baseUri }}/blogs" data-loading-text="{% trans %}Blog{% endtrans %}" class="{% if controllerNameMenu == 'ContentBlog'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Blog{% endtrans %}</a></li>
+        <li><a href="{{ baseUri }}/blogs-category" data-loading-text="{% trans %}Blog Category{% endtrans %}" class="{% if controllerNameMenu == 'ContentBlogsCategory'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Blog Category{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+
+        <li><a href="{{ baseUri }}/events" data-loading-text="{% trans %}Event{% endtrans %}" class="{% if controllerNameMenu == 'ContentEvent'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Event{% endtrans %}</a></li>
+        <li><a href="{{ baseUri }}/events-category" data-loading-text="{% trans %}Event Category{% endtrans %}" class="{% if controllerNameMenu == 'ContentEventsCategory'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Event Category{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+
+        <li><a href="{{ baseUri }}/faq" data-loading-text="{% trans %}Faq{% endtrans %}" class="{% if controllerNameMenu == 'ContentFaq'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Faq{% endtrans %}</a></li>
+        <li><a href="{{ baseUri }}/faq-category" data-loading-text="{% trans %}Faq Category{% endtrans %}" class="{% if controllerNameMenu == 'ContentFaqCategory'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Faq Category{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+
+        <li><a href="{{ baseUri }}/galleries" data-loading-text="{% trans %}Gallery{% endtrans %}" class="{% if controllerNameMenu == 'ContentGallery'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Gallery{% endtrans %}</a></li>
+        <li><a href="{{ baseUri }}/galleries-category" data-loading-text="{% trans %}Gallery Category{% endtrans %}" class="{% if controllerNameMenu == 'ContentGalleryCategory'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Gallery Category{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+
+        <li><a href="{{ baseUri }}/news" data-loading-text="{% trans %}News{% endtrans %}" class="{% if controllerNameMenu == 'ContentNews'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}News{% endtrans %}</a></li>
+        <li><a href="{{ baseUri }}/news-category" data-loading-text="{% trans %}News Category{% endtrans %}" class="{% if controllerNameMenu == 'ContentNewsCategory'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}News Category{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+
+        <li><a href="{{ baseUri }}/services" data-loading-text="{% trans %}Service{% endtrans %}" class="{% if controllerNameMenu == 'ContentService'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Service{% endtrans %}</a></li>
+        <li><a href="{{ baseUri }}/services-category" data-loading-text="{% trans %}Service Category{% endtrans %}" class="{% if controllerNameMenu == 'ContentServicesCategory'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Service Category{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+        <li><a href="{{ baseUri }}/files" data-loading-text="{% trans %}Files{% endtrans %}" class="{% if controllerNameMenu == 'ContentFiles'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Files{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+        <li><a href="{{ baseUri }}/privacy-policy" data-loading-text="{% trans %}Privacy Policy{% endtrans %}" class="{% if controllerNameMenu == 'ContentPrivacyPolicy'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Privacy Policy{% endtrans %}</a></li>
+
+        <li><div class="dropdown-divider"></div></li>
+        <li><a href="{{ baseUri }}/terms" data-loading-text="{% trans %}Terms{% endtrans %}" class="{% if controllerNameMenu == 'ContentTerms'%}active {% endif %}dropdown-item" style="cursor: pointer">{% trans %}Terms{% endtrans %}</a></li>
+    </ul>
+</li>
+<li><a href="{{ baseUri }}/about-us" title="{% trans %}About us{% endtrans %}">{% trans %}About us{% endtrans %}</a></li>
+<li><a href="{{ baseUri }}/product" title="{% trans %}Products{% endtrans %}">{% trans %}Products{% endtrans %}</a></li>
+<li><a href="{{ baseUri }}/contact" title="{% trans %}Contact{% endtrans %}">{% trans %}Contact{% endtrans %}</a></li>
+
+{% if customerId is defined and customerId > 0 %}
+    <li class="px-2">
+        <a href="{{ baseUri }}/customer" class="btn btn-secondary text-white">{% trans %}Customer Area{% endtrans %}</a>
+    </li>
+{% else %}
+    <li class="px-2">
+        <div class="btn-group btn-grey-group btn-group-sm btn-sm" role="group">
+            <a href="{{ baseUri }}/login" class="btn btn-primary text-white">{% trans %}Login{% endtrans %}</a>
+            <a href="{{ baseUri }}/signup" class="btn btn-primary">{% trans %}Register{% endtrans %}</a>
+        </div>
+    </li>
+{% endif %}

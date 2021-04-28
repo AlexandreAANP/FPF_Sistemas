@@ -1,0 +1,341 @@
+{% extends 'base.html.twig' %}
+
+{% set enderecodaapi = '' %}
+
+{% block body %}
+    <link rel="stylesheet" href="/assets/css/querybiz.css" />
+
+    <section>
+        <div class="site-module-name container">{% trans %}PRODUCT{% endtrans %}</div>
+        <div class="site-module-title container">Here your can buy something</div>
+        <div class="site-module-content container">
+            <div>
+                <a href="{{ baseUri }}/product" class="btn btn-info">Order Default</a>
+                <a href="javascript:;" class="btn btn-secondary">Order Template</a>
+                <a href="{{ baseUri }}/product-js" class="btn btn-info">Order JS</a>
+            </div>
+
+            <div id="order_info_status" style="background-color: #eee; height: 30px"></div>
+
+            <div class="DIV_content_menu_before" style="height: 60px">
+                <div class="float-left">
+                    <button id="btn_clear_cart" class="btn btn-secondary btn-sm mt-1" style="display: none">
+                        <i class="fas fa-minus-circle" title="{% trans %}Clear Cart{% endtrans %}"></i>&nbsp;&nbsp;{% trans %}Clear Cart{% endtrans %}
+                    </button>
+                </div>
+
+                <div class="float-right">
+                    <button id="btn_back_to_product" class="d-none btn btn-secondary">
+                        <i class="fas fa-arrow-left" title="{% trans %}Back to Product{% endtrans %}"></i>&nbsp;&nbsp;{% trans %}Back to Products{% endtrans %}
+                    </button>
+                    <button class="btn btn-primary btn_view_cart" disabled="true">
+                        <i class="fas fa-shopping-cart" title="{% trans %}View Cart{% endtrans %}"></i>&nbsp;&nbsp;{% trans %}View Cart{% endtrans %}
+                    </button>
+                </div>
+            </div>
+
+            <div class="DIV_content_category">
+                <select id="category" class="browser-default custom-select">
+                    <option value="">{% trans %}Select a Category{% endtrans %}</option>
+                    {% for item in listCategories %}
+                        <option value="{{ item.id }}">{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="DIV_content_details border w-100 mt-3" style="display: none">
+                <!--
+                <div><%name%></div>
+                <div><button class="btn btn-primary order-info-product-add-cart" data-product-id="<%id%>" data-origin="details" <%addedToCart%>><%addCart%></button></div>
+                -->
+            </div>
+
+            <div class="DIV_content_order row" style="padding: 13px">
+                <!--
+                <div class="col-sm-3 p-0 order-info-product-list" data-product-id="<%id%>" style="margin: 0px">
+                    <div class="card h-100 border-0"  style="padding: 2px">
+                        <div class="card h-100">
+                            <div class="card-body h-100">
+                                <span class="order-info-product-name"><%name%></span><BR>
+                                <div class="image" style="background-image: url('<%filename%>')" title="<%fileTitle%>"><img src="<%filename%>" style="visibility: hidden; width: 100%"></div>
+                                <%description%>
+                            </div>
+                            <div class="card-footer">
+                                <div class="float-left" style="font-size: 20px">{{ LayoutFunctions.getCurrencySymbol() }} <%price%></div>
+                                <div class="float-right"><button class="btn btn-info order-info-product-add-cart" data-addtocartonhome="<%addToCartOnHome%>" <%addedToCart%>><%addCart%></button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                -->
+            </div>
+
+            <div class="DIV_content_detail d-nones text-left">
+                <!--
+                <div class="d-inline-block order-info-product-detail" data-product-id="<%id%>">
+                    <div class="w-100 h-100 d-flex align-content-between flex-wrap">
+                        <div class="w-100">
+                            <span class="order-info-product-name"><%name%></span><BR>
+                            <div class="image" style="background-image: url('<%filename%>')" title="<%fileTitle%>"><img src="<%filename%>" style="visibility: hidden; width: 100%"></div>
+                            <%description%>
+                        </div>
+                        <div class="w-100 text-right">
+                            <div style="font-size: 20px">{{ LayoutFunctions.getCurrencySymbol() }} <%price%></div>
+                            <div><button class="order-info-product-add-cart" data-addtocartonhome="<%addToCartOnHome%>" <%addedToCart%>><%addCart%></button></div>
+                       </div>
+                   </div>
+                </div>
+                -->
+            </div>
+
+
+            <div class="DIV_content_cart d-none text-left">
+                <!--
+                <div class="d-block order-info-cart" data-cart-product-id="<%id%>">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col pl-0">
+                                <div class="d-inline-block"><img src="<%filename%>" title="<%fileTitle%>"></div>
+                                <div class="d-inline-block">
+                                    <span class="order-info-cart-product-name"><%name%></span><span><%description%></span>
+                                </div>
+                            </div>
+                            <div class="col pr-0 text-right">
+                                <div class="d-inline-block w-25 h-100 align-top">
+                                    <div class="d-table w-100 h-100">
+                                        <div class="d-table-cell w-100 h-100 align-middle text-center">
+                                            <button type="button" class="btn btn-default btn_cart_product_delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-inline-block w-25 h-100 align-top">
+                                    <div class="d-table w-100 h-100">
+                                        <div class="d-table-cell w-100 h-100 align-middle text-center">
+                                            <button type="button" class="btn btn-default btn_cart_product_minus">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input type="text" value="<%quantity%>" class="order-info-cart-product-quantity" data-product-quantity="<%maxQuantity%>" style="width: 40px; margin-top: 8px; text-align: center">
+                                            <button type="button" class="btn btn-default btn_cart_product_plus">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-inline-block w-25 h-100 align-top">
+                                    <div class="d-table w-100 h-100">
+                                        <div class="d-table-cell align-middle text-right" style="font-size: 20px">
+                                            {{ LayoutFunctions.getCurrencySymbol() }} <%price%>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                -->
+            </div>
+            <div class="DIV_content_summary d-none text-left">
+                <!--
+                <div class="d-block order-info-summary" data-summary-product-id="<%id%>">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col pl-0">
+                                <div class="d-inline-block"><img src="<%filename%>" title="<%fileTitle%>"></div>
+                                <div class="d-inline-block">
+                                    <span class="order-info-summary-product-name"><%name%></span><span><%description%></span>
+                                </div>
+                            </div>
+                            <div class="col pr-0 text-right">
+                                <div class="d-inline-block w-50 h-100 align-top">
+                                    <div class="d-table w-100 h-100">
+                                        <div class="d-table-cell align-middle text-right" style="font-size: 20px">
+                                            <%quantity%> x <%price%> = <label style="font-size: 24px">{{ LayoutFunctions.getCurrencySymbol() }} <%priceQuantity%></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                -->
+            </div>
+            <div class="DIV_content_menu_after d-none text-right pt-2">
+                <button id="btn_back_to_cart" class="btn btn-secondary d-none">
+                    <i class="fas fa-arrow-left" title="{% trans %}Back to Cart{% endtrans %}"></i>&nbsp;&nbsp;{% trans %}Back to Cart{% endtrans %}
+                </button>
+                <button id="btn_go_to_summary" class="btn btn-primary">
+                    {% trans %}Next{% endtrans %}&nbsp;&nbsp;<i class="fas fa-arrow-right" title="{% trans %}Next{% endtrans %}"></i>
+                </button>
+            </div>
+            <div class="DIV-box-login-out d-none">
+                <div class="DIV-box-login">
+                    <p>{% trans %}Already have an account?{% endtrans %}</p>
+                    <button id="btn_go_to_login" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt" title="{% trans %}Log in{% endtrans %}"></i>&nbsp;&nbsp;{% trans %}Log in{% endtrans %}
+                    </button>
+                </div>
+                <div class="DIV-box-signup">
+                    <p>{% trans %}Sign up to create your account{% endtrans %}</p>
+                    <button id="btn_go_to_signup" class="btn btn-primary">
+                        <i class="far fa-user-circle" title="{% trans %}New user{% endtrans %}"></i>&nbsp;&nbsp;{% trans %}New user{% endtrans %}?
+                    </button>
+                </div>
+
+                <div class="d-block w-100"></div>
+
+                <div class="DIV-login d-none col-md-6">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title" style="display: block">{% trans %}Log in{% endtrans %}</h3>
+                            <div class="card-message"></div>
+                        </div>
+                        <div class="card-body text-left">
+                            <form id="form_login" action="{{ baseUri }}/customer/login" method="POST">
+                                <input type="hidden" name="origin" value="checkout">
+                                <div class="form-group form-title text-center">
+                                    Entre com seus dados de acesso
+                                </div>
+                                <div class="form-group">
+                                    <label for="login_email">Email:</label><BR>
+                                    <input type="text" id="login_email" name="email" placeholder="Email" autofocus class="form-control" srequired>
+                                </div>
+                                <div class="form-group">
+                                    <label for="login_password">Password:</label><BR>
+                                    <input type="password" id="login_password" name="password" placeholder="Password" class="form-control" required>
+                                </div>
+                                <div class="form-group text-center">
+                                    <a href="{{ baseUri }}/customer/recover-password" tabIndex="4">Esqueci minha Senha!</a>
+                                </div>
+                                <div class="text-center">
+                                    <input type="submit" value="Enter" class="btn btn-primary">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="DIV-signup d-none col-md-6">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title" style="display: block">{% trans %}Sign up{% endtrans %}</h3>
+                            <div class="card-message"></div>
+                        </div>
+                        <form id="form_signup" class="form-horizontal">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="signup_email" class="col-sm-2 col-form-label text-nowrap">Email</label>
+                                    <div class="col-sm-10">
+                                        <input type="email" class="form-control" id="signup_email" placeholder="Email">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="signup_password" class="col-sm-2 col-form-label text-nowrap">{% trans %}Password{% endtrans %}</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" id="signup_password" placeholder="{% trans %}Password{% endtrans %}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer" style="height: 62px">
+                                <button type="button" class="btn btn-secondary float-left btn_back_to_summary">{% trans %}Cancel{% endtrans %}</button>
+                                <button type="button" id="btn_signup" class="btn btn-info float-right">{% trans %}Sign up{% endtrans %}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="DIV-checkout d-none col-md-6">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title" style="display: block"><i class="far fa-credit-card"></i>&nbsp;&nbsp;{% trans %}Checkout{% endtrans %}</h3>
+                            <div class="card-message"></div>
+                        </div>
+                        <form id="form_checkout" action="{{ baseUri }}/checkout/add" method="POST" class="form-horizontal">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="checkout_cardnumber" class="col-sm-3 col-form-label">{% trans %}Card Number{% endtrans %}</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="cardNumber" placeholder="{% trans %}Card Number{% endtrans %}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <input type="submit" value="{% trans %}Confirm Order{% endtrans %}" class="btn btn-info float-right">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal mt-5" id="modal_keep_buying">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="mt-2 text-secondary bold">
+                                <div class="d-block text-center">
+                                    <div class="d-inline-block" style="width: 100px" id="img_keep_buying_decide"></div>
+                                </div>
+                                <div class="d-block text-center">
+                                    <label id="label_keep_buying_decide" style="font-weight: bold"></label>
+                                </div>
+                            </div>
+                            <div class="text-center mt-2 text-primary">{% trans %}This item was added to Cart. Choose what you want to do now.{% endtrans %}</div>
+                        </div>
+
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans %}Keep Buying{% endtrans %}</button>
+                            <button type="button" class="btn btn-primary btn_view_cart" data-dismiss="modal" disabled="true">{% trans %}Go to Cart{% endtrans %}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal mt-5" id="modal_delete_cart">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">{% trans %}Removing Item from Cart{% endtrans %}</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="text-center mt-2 text-primary bold"><label id="label_delete_cart_confirm"></label></div>
+                            <div class="text-center mt-2 text-success">* {% trans %}Are you sure you want to remove this item from Cart{% endtrans %}</div>
+                        </div>
+
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                            <button type="button" id="btn_delete_cart_confirm" class="btn btn-primary" data-dismiss="modal">{% trans %}Confirm{% endtrans %}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function() {
+            var options = {
+                'listCategories': {{ listCategories|json_encode()|raw }},
+                'listProducts': {{ listProducts|raw }},
+                'btnViewDetail': '{% trans %}View Details{% endtrans %}',
+                'btnAddCartLabel': '{% trans %}Add Cart{% endtrans %}',
+                'btnAddedLabel': '{% trans %}Added{% endtrans %}',
+                'btnInCartLabel': '{% trans %}In Cart{% endtrans %}',
+                'cardMessageTitle': '{% trans %}ALERT MESSAGE{% endtrans %}',
+            };
+
+            querybizProductTemplate.init(options);
+            querybizProductTemplate.printProduct(options.listProducts);
+            querybizProductTemplate.loadJQEvent();
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base_slim.html.twig' %}
+
+{% block body %}
+    teste
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        function openModal(productId) {
+            querybiz.getProductItemStock(productId);
+        }
+    </script>
+{% endblock %}

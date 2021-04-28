@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ LayoutFunctions.getLayoutVars('METATAG_TITLE')|raw }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ LayoutFunctions.getLayoutVars('METATAG_DESCRIPTION')|raw }}" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/assets/js/script.js?hash={{ LayoutFunctions.getHashFile('/assets/js/script.js') }}"></script>
+    <script src="/assets/js/querybiz.js?hash={{ LayoutFunctions.getHashFile('/assets/js/querybiz.js') }}"></script>
+</head>
+<body>
+
+<section class="body-content" style="margin-top: 80px">
+    <div class="p-2">
+        {% block body %}{% endblock %}
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-12 py-3 mt-3 border borde-top">
+                <h6>{{ LayoutFunctions.getLayoutVars('COPYRIGHT')|raw }} {{ 'now' | date('Y') }} - {% trans %}All rights reserved{% endtrans %}</h6>
+            </div>
+        </div>
+    </div>
+</footer>
+
+{% block javascripts %}
+    <script>
+        var arDefaultOptions = [];
+        arDefaultOptions['countryBaseIso'] = '{{ LayoutFunctions.getEnvVars('BASE_COUNTRY_ISO2') }}';
+        arDefaultOptions['countryBaseId'] = '{{ LayoutFunctions.getEnvVars('BASE_COUNTRY_ID') }}';
+
+        arDefaultOptions['baseUri'] = '{{ baseUri }}';
+        arDefaultOptions['apiUrl'] = '{{ apiUrl }}';
+        arDefaultOptions['cdnUrl'] = '{{ cdnUrl }}';
+        arDefaultOptions['requestUri'] = '{{ app.request.requestUri()  }}';
+        arDefaultOptions['requestUriB64'] = '{{ LayoutFunctions.base64_encode(app.request.requestUri()) }}';
+
+        var defaultIsDev = {{ LayoutFunctions.isDev(app.request) ? 'true' : 'false' }};
+    </script>
+{% endblock %}
+
+</body>
+</html>

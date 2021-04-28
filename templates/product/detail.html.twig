@@ -1,0 +1,309 @@
+{% extends 'base.html.twig' %}
+
+{% block metatag_description %}{{ arProduct.description }}{% endblock %}
+{% set description = arProduct.description %}
+{% set title = arProduct.name %}
+{% set image = arProduct.filename %}
+
+{% block body %}
+    {% include '_includes/breadcrumb.html.twig' %}
+{#
+    {% include '_includes/modal_product_color_size.html.twig' %}
+#}
+
+    {% set product = arProduct %}
+
+    <section id="product" class="mb-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-5 products-large-image">
+                    <div class="products-large-image-main" style="background-image: url('{{ arProduct.filename }}');"></div>
+
+                    <div id="image-selector-slider">
+                        {% if arProduct.productFiles is defined %}
+                            {% for file in arProduct.productFiles %}
+                                {% if file.isImage %}
+                                    <div>
+                                        <a href="{{ cdnUrl }}/{{ file.filename }}" class="products-large-image-small-image">
+                                            <div style="background-image: url('{{ cdnUrl }}/{{ file.filename }}');"></div>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-lg-7 products-desc">
+                    <h1 class="products-desc-name">{{ arProduct.name }}</h1>
+                    <div class="products-desc-sub">
+                        {#<span class="products-desc-score">3.8</span>#}
+                        {#<span class="products-desc-pos">1242 Classificações</span>#}
+                        {% if arProduct.referenceSku != '' %}
+                            <span class="products-desc-sku">SKU: {{ arProduct.referenceSku }}</span>
+                        {% endif %}
+                        <span class="products-desc-available">{% trans %}Available{% endtrans %}</span>
+                    </div>
+                    <div class="products-desc-values">
+                        <span class="products-desc-values-original">{{ arProduct.price }} {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                        {#<span class="products-desc-values-replaced">399 {{ LayoutFunctions.getCurrencySymbol() }}</span>#}
+                    </div>
+
+                    {% include 'product/wishlist.html.twig' %}
+
+                    <div id="modal_product_specification" class="w-100 mb-3">
+                        <div class="w-100 p-4">
+                            <div class="spinner-border" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% set classAddProduct = '' %}
+                    {% set productItemStockId = '' %}
+                    {% if arProduct.colItems|length == 0 %}
+                        {% set classAddProduct = 'btn-modal-product-stock-zero' %}
+                    {% elseif arProduct.colItems|length == 1 %}
+                        {% set classAddProduct = 'btn-add-product-cart' %}
+                        {% set productItemStockId = product.colItems[0].id %}
+                    {% elseif arProduct.colItems|length > 1 %}
+                        {% set classAddProduct = 'btn-add-product-cart modal-product-color-size' %}
+                    {% endif %}
+
+                    <div class="d-flex align-items-center">
+                        <button class="secondary-btn {{ classAddProduct }}" data-product-id="{{ arProduct.id }}" data-product-item-stock-id="{{ productItemStockId }}" data-redirect="{{ baseUri }}/addProductToCart">{% trans %}Add to Cart{% endtrans %}</button>
+                    </div>
+
+                    {#
+                    <form action="">
+                        <div class="row align-items-center">
+                            <div class="form-group col-12 col-md-6 col-lg-5">
+                                <label for="">Início</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="">Selecione</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-12 col-md-6 col-lg-5">
+                                <label for="">Fim</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="">Selecione</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-12 col-md-6 col-lg-5">
+                                <label for="">QNT</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <button class="secondary-btn">COMPRAR</button>
+                            <button class="primary-btn">CARRINHO</button>
+                        </div>
+                    </form>
+                    #}
+
+                    {#
+                    <div class="products-desc-social d-flex flex-column flex-md-row align-items-md-center">
+                        <a href="#"><i class="mdi mdi-email"></i> EMAIL PARA AMIGO</a>
+                        <a href="#"><i class="mdi mdi-heart"></i> ADICIONAR AOS FAVORITOS</a>
+                        <a href="#"><i class="mdi mdi-compare-horizontal"></i> COMPARAR</a>
+                    </div>
+                    #}
+
+                    <div class="products-desc-warning">
+                        {{ arProduct.description }}
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="tabs">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#tab-description">{% trans %}Description{% endtrans %}</a>
+                            </li>
+                            {#
+                            <li class="nav-item">
+                                <a class="nav-link" href="#tab-specs">Especificações</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#tab-score">Classificação e Comentários</a>
+                            </li>
+                            #}
+                        </ul>
+                        <div class="tabs-content">
+                            <div id="tab-description">
+                                {{ arProduct.text|raw }}
+
+                                {#
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <th>Código Produto</th>
+                                        <td>CDP-123456</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Localização</th>
+                                        <td>Algarve</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Duração</th>
+                                        <td>2 dias</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Dificuldade</th>
+                                        <td>Mediana</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Extras</th>
+                                        <td>Extra 1, extra 2, extra 3</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pacote de</th>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pacote de Vendas</th>
+                                        <td>Lazer, Aquático, Diversão</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Outros detalhes</th>
+                                        <td>Aqui aparecerá as observações ou os outros campos previamente preenchidos no BackOffice em relação a este produto.</td>
+                                    </tr>
+                                </table>
+                                #}
+                            </div>
+                            {#
+                            <div id="tab-specs" style="display: none;">
+                                <p>
+                                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur.
+                                </p>
+                                <p>
+                                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                                </p>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <th>Código Produto</th>
+                                        <td>CDP-123456</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Localização</th>
+                                        <td>Algarve</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Duração</th>
+                                        <td>2 dias</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Dificuldade</th>
+                                        <td>Mediana</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Extras</th>
+                                        <td>Extra 1, extra 2, extra 3</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pacote de</th>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pacote de Vendas</th>
+                                        <td>Lazer, Aquático, Diversão</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Outros detalhes</th>
+                                        <td>Aqui aparecerá as observações ou os outros campos previamente preenchidos no BackOffice em relação a este produto.</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="tab-score" style="display: none;">
+                                <div class="comments">
+                                    <div class="comments-title">Comentários de Clientes</div>
+
+                                    <?php for($i = 0; $i < 3; $i++): ?>
+                                    <div class="comments-item">
+                                        <div class="comments-item-stars">
+                                            <i class="mdi mdi-star scored"></i>
+                                            <i class="mdi mdi-star scored"></i>
+                                            <i class="mdi mdi-star scored"></i>
+                                            <i class="mdi mdi-star"></i>
+                                            <i class="mdi mdi-star"></i>
+                                        </div>
+                                        <div class="comments-item-title">Experiências incríveis</div>
+                                        <div class="comments-item-comment">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque feugiat metus lorem, quis aliquam quam lacinia id. Aenean arcu leo, viverra sit amet justo id, porttitor vulputate justo. Sed ultricies facilisis consequat.
+                                        </div>
+                                        <div class="comments-item-author">
+                                            por Henirque Figo, <time datetime="2020-10-21">21 Out 2020</time>
+                                        </div>
+                                    </div>
+                                    <?php endfor; ?>
+
+                                    <div class="comments-title">Escreva a sua Opinião</div>
+                                    <div class="comments-item-stars to-score-stars mt-5 mb-4">
+                                        <i class="mdi mdi-star lg"></i>
+                                        <i class="mdi mdi-star lg"></i>
+                                        <i class="mdi mdi-star lg"></i>
+                                        <i class="mdi mdi-star lg"></i>
+                                        <i class="mdi mdi-star lg"></i>
+                                    </div>
+                                    <form action="">
+                                        <div>
+                                            <textarea placeholder="Escrever aqui" name="" id="" cols="30" rows="10" class="form-control"></textarea>
+                                        </div>
+                                        <div class="mt-4">
+                                            <button class="secondary-btn">SUBMETER</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            #}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(function() {
+            /*
+            $('.btn-modal-keep-buying').click(function(e) {
+                e.preventDefault();
+                let href = $(this).attr('href');
+                $('#redirect').val(href);
+                $('#redirect').closest('form')[0].submit();
+                return false;
+            });
+
+            $('#btn_product_detail_add_to_cart').click(function() {
+                $('#modal_product_detail_keep_buying').modal('show');
+            });
+
+            $('#modal_product_detail_keep_buying').on('hidden.bs.modal', function () {
+                $('#btn_product_detail_add_to_cart').text($('#btn_product_detail_add_to_cart').attr('prev-data-loading-text'));
+            });
+
+             */
+        });
+    </script>
+
+    <script>
+        $(function() {
+            querybiz.post('/getProductItemStock/{{ arProduct.id }}', function(data) {
+                let html = querybiz.buildLayoutModalProductItemStock(data);
+                //html = '<div id="modal_product_specification">' + html + '</div>';
+                $('#modal_product_specification').html(html);
+                querybiz.listenerModalProductItemStock();
+                $($('.modal-product-item-stock-color')[0]).click();
+            });
+
+            var options = {
+                'successMessage': '{% trans %}Data Updated{% endtrans %}',
+                'errorMessage': '{% trans %}Error Occurred on updating!{% endtrans %}',
+            };
+            querybizWishlist.init(options);
+        });
+    </script>
+
+{% endblock %}

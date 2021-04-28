@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <section>
+        <div class="site-module-name container text-uppercase">{% trans %}Customer{% endtrans %}</div>
+
+        <!-- start customer menu -->
+        {% from '\/customer/menu.html.twig' import customerMenuTemplate%}
+        {{ customerMenuTemplate(baseUri, app) }}
+        <!-- end customer menu -->
+
+        <div class="site-module-title container">Drive</div>
+        <div class="site-module-content container">
+
+            <div class="text-center">
+                <div id="customer_drive_msg" class="d-inline-block bg-warning p-2 rounded text-left mb-2" style="display: none!important"></div>
+            </div>
+
+            <div style="display: none; background-color: #000; height: 10px; filter: opacity(0.5)" id="progress_bar"></div>
+
+            <div class="w-100 border">
+                <form method="post" enctype="multipart/form-data" id="formUploadFile">
+                    <input type="hidden" name="customer" value="{{ dir }}" />
+                    <input type="file" id="file" name="files[]" multiple="multiple" style="display: none" />
+                    <div style="height: 40px">
+                        <input id="form_upload_file_submit" type="submit" style="display: none">
+
+                        <button id="select_file" title="Select File(s)" style="border: 0; background: transparent; float: right">
+                            <div style="background-image: url('/assets/images/upload.webp'); background-color: transparent; background-size: 100%; width: 36px; height: 36px; border: 0; cursor: pointer; float: left"></div>
+                            <div style="width: 94px; padding-top: 6px; height: 36px; border: 0">Upload</div>
+                        </button>
+
+                        <!--
+                        <button id="manager_file" style="background-image: url('/assets/images/gear.png'); background-color: transparent; background-size: 100%; float: right; width: 32px; height: 32px; margin: 4px;  border: 0; cursor: pointer; filter: brightness(0.7)" title="Manage Drive"></button>
+                        -->
+
+                    </div>
+                </form>
+            </div>
+
+            <div class="w-100 border p-2" id="drive_list"></div>
+
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function() {
+            var options = {
+                'showDriveList': true,
+            };
+            querybizCustomerDrive.init(options);
+            querybizCustomerDrive.getDrive();
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+<section id="slider">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div id="home-slider" class="smaller-slider">
+                    {% for richmedia in colRichmedia %}
+                        <div>
+                            <div class="slider-content">
+                                <div class="slider-image d-lg-none" style="background-image: url('{{ richmedia.filename }}');"></div>
+                                <div class="slider-image d-none d-lg-block" style="background-image: url('{{ richmedia.filename }}');"></div>
+
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-12 col-lg-11 d-flex align-items-start flex-column mx-auto">
+                                            <p class="slider-product-offer">{{ richmedia.title }}</p>
+                                            <p class="slider-product-name mt-1">{{ richmedia.description }}</p>
+                                            <div class="mt-4">
+                                                {% if richmedia.url != '' %}
+                                                    {% set url = baseUri ~ '/' ~ richmedia.url %}
+                                                    {% set target = '_self' %}
+
+                                                    {% set arUrlInit = ['http://', 'https://'] %}
+                                                    {% set pos = LayoutFunctions.strpos(richmedia.url, '//') %}
+                                                    {% if pos > 0 %}
+                                                        {% set urlInit = LayoutFunctions.substr(richmedia.url, 0, pos + 2) %}
+                                                        {#{{ richmedia.url|lower|slice(0,4) }}#}
+                                                        {% if urlInit|lower in arUrlInit %}
+                                                            {% set url = richmedia.url %}
+                                                            {% set target = '_blank' %}
+                                                        {% endif %}
+                                                    {% endif %}
+
+
+                                                    <a href="{{ url }}" target="{{ target }}" class="blue-btn" title="{% trans %}Know more{% endtrans %}">{% trans %}Know more{% endtrans %}</a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

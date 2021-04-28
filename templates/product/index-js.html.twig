@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% set enderecodaapi = '' %}
+
+{% block body %}
+    <section>
+        <div class="site-module-name container">{% trans %}PRODUCT{% endtrans %}</div>
+        <div class="site-module-title container">Here your can buy something</div>
+        <div class="site-module-content container">
+            <div>
+                <a href="{{ baseUri }}/product" class="btn btn-info">Order Default</a>
+                <a href="{{ baseUri }}/product-template" class="btn btn-info">Order Template</a>
+                <a href="javascript:;" class="btn btn-secondary">Order JS</a>
+            </div>
+
+            <div>Produtos no Carrinho: <span id="spf_cart_items">0</span></div>
+            <div id="spf_message"></div>
+
+            <div id="spf_detail" class="d-none">
+                <div class=" d-inline-block p-2 text-left" style="border: #ccc 1px solid; border-radius: 5px; z-index: 999">
+                    <div class="text-right"><a href="javascript:" id="spf_btn_detail_close"><b>x</b></a></div>
+                    Name: <b id="spf_detail_name"></b><BR>
+                    Price: <i id="spf_detail_price"></i><BR>
+
+                    <HR>
+
+                    <div class="d-block w-100"><button class="btn btn-info" id="spf_btn_detail_get_product_detail">Get Detail - All the GETs below</button></div>
+                    <div class="d-block w-100" id="spf_detail_container"></div>
+
+                    <HR>
+
+                    <div class="d-block w-100"><button class="btn btn-info" id="spf_btn_detail_get_product_text">Get Text</button></div>
+                    <div class="d-block w-100" id="spf_detail_text"></div>
+
+                    <HR>
+
+                    <button class="btn btn-info" id="spf_btn_detail_get_product_file">Get Files</button>
+                    <div id="spf_detail_file"></div>
+
+                    <HR>
+
+                    <button class="btn btn-info" id="spf_btn_detail_get_product_session">Get Session</button>
+                    <div id="spf_detail_session"></div>
+
+                    <HR>
+
+                    <div><button class="btn btn-primary" id="spf_btn_detail_add_to_cart" data-product-id="0">Add to Cart</button></div>
+                </div>
+            </div>
+
+            <ul>
+                <li>
+                    <a href="javascript:;" id="spf_btn_list_categories">List Categories</a>
+                    <div id="spf_list_categories_container"></div>
+                </li>
+
+                <li>
+                    <a href="javascript:;" id="spf_btn_list_products">List Products</a>
+                    <div id="spf_list_products_container"></div>
+                </li>
+
+                <li>
+                    <a href="javascript:;" id="spf_btn_view_cart">View Cart</a>
+                    <div id="spf_cart_container"></div>
+                </li>
+
+                <li>
+                    <a href="javascript:;" id="spf_btn_view_summary">View Summary</a>
+                    <div id="spf_summary_container"></div>
+                </li>
+            </ul>
+            <HR>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function() {
+            var options = {
+                'listCategories': {{ listCategories|json_encode()|raw }},
+                'listProducts': {{ listProducts|raw }},
+            };
+
+            querybizProduct.init(options);
+        });
+    </script>
+{% endblock %}

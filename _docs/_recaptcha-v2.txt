@@ -1,0 +1,52 @@
+TWIG
+// --------------------------------------------- //
+{% block body %}
+    <form>
+        <div class="mt-2" id="recaptcha_html_element"></div>
+    </form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script type="text/javascript">
+        var onloadCallback = function() {
+            grecaptcha.render('recaptcha_html_element', {
+                'sitekey' : '{{ LayoutFunctions.getSettingsVars('GOOGLE_CAPTCHA_PUBLIC_KEY_V2') }}'
+            });
+        };
+    </script>
+
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
+{% endblock %}
+
+// --------------------------------------------- //
+
+CONTROLLER
+// reCAPTCHA Google ---------------------------- //
+$recaptcha = $request->request->get('g-recaptcha-response');
+
+$secretKey = '';
+$arSecretKey = $this->objSettingsService->getSettingsVars('GOOGLE_CAPTCHA_SECRET_KEY_V2');
+if (is_array($arSecretKey)) {
+    $arLanguages = $this->objSettingsService->getEnvVars('SUPPORTED_LOCALES');
+    $localePosition = array_search($defaultLanguage, $arLanguages);
+
+    if (isSet($arSecretKey[$localePosition])) {
+        $secretKey = $arSecretKey[$localePosition];
+    }
+}
+
+$url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($recaptcha);
+$response = file_get_contents($url);
+$arRet = json_decode($response,true);
+
+if ($arRet && array_key_exists('success', $arRet) && $arRet['success'] == false) {
+    if (array_key_exists('error-codes', $arRet) && is_array($arRet['error-codes']) && count($arRet['error-codes']) > 0) {
+        return $this->json([
+            'return' => 'error',
+            'msg' => $arRet['error-codes'][0]
+        ]);
+    }
+}
+// --------------------------------------------- //

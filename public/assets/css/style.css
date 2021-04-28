@@ -1,0 +1,45 @@
+.card-header .card-message {
+	text-align: left;
+}
+
+.form-group LABEL {
+	font-weight: bold;
+	margin-left: 5px;
+	margin-bottom: 2px;
+	font-size: 90%;
+}
+
+.form-title {
+	background-color: #ccc;
+	border-radius: 5px;
+	padding: 5px;
+	font-weight: bold;
+}
+
+.section-min-height {
+	min-height: 500px;
+}
+
+.product-category-list-limit-char {
+	max-width: 20ch;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#body_loading_first {
+	position: absolute;
+	bottom:0;
+	left: 0;
+	right: 0;
+	top:0;
+	opacity:0.5;
+	background-color:#000;
+	color:#fff;
+	z-index:9999;
+}
+
+.body-loading-load {
+	height: 100%;
+	width: 100%;
+}

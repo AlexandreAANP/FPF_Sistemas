@@ -1,0 +1,24 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+  
+  RewriteRule ^favicon\.ico$ /assets/images/favicon.ico [L]
+  
+  RewriteBase /
+  RewriteRule ^index\.php$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.php [L]
+
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Origin "https://admin.dominio.com"
+  Header always set Access-Control-Allow-Origin "https://admin.dominio.ibiz.pt"
+</IfModule>
+
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php73 .php .php7 .phtml
+</IfModule>

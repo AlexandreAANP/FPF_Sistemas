@@ -1,0 +1,548 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'My Account'|trans,
+        'index': false,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'customer': 'Customer Area'|trans},
+            {'customer/my-account': 'My Account'|trans}
+        ]
+    }) }}
+
+
+    <style>
+        .not-valid{margin-top:-20px;position:absolute;right:16px}
+        #customer-my-account-msg{position:fixed;z-index:9}
+        .lh-31px{line-height:31px}
+        .navbar.fixed-top{z-index:1040}
+        .select2-container--default .select2-selection--single:not(.squared-form){border-radius: 19px}
+        .select2{width: 100%!important}
+        .select2-container .select2-selection--single {height:37px}
+        .select2-selection__rendered{line-height: 33px!important}
+        .select2-container--default .select2-selection--single .select2-selection__arrow {top: 6px;right: 6px}
+        .select2-container .select2-selection--single .select2-selection__rendered {padding-left: 14px}
+    </style>
+
+    <section id="profile-info" class="mb60">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    {% include '_render_block/customer-profile-menu.html.twig' %}
+                </div>
+                <div class="col-md-9">
+                    <div class="row">
+                        <!-- Personal Data -->
+                        <div class="col-lg-6 mb-4">
+                            <h1 class="profile-header mb-3">{% trans %}Personal Data{% endtrans %}</h1>
+                            <form id="updateData" action="{{ baseUri }}/customer/my-account" method="post" data-id="1">
+                                <!-- form spoofing -->
+                                <input type="hidden" name="action" value="update_data">
+
+                                <div class="form-group">
+                                    <label for="name">{% trans %}Name{% endtrans %}: *</label><br>
+                                    <input type="text" name="name" required value="{{ arCustomer.name ?? '' }}" placeholder="{% trans %}Name{% endtrans %}" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="tax_number">{% trans %}Tax number{% endtrans %}:</label><br>
+                                    <input type="text" name="taxNumber" value="{{ arCustomer.taxNumber ?? '' }}" placeholder="{% trans %}Tax number{% endtrans %}" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">{% trans %}Email{% endtrans %}: *</label><br>
+                                    <input type="text" name="email" required value="{{ arCustomer.email ?? '' }}" placeholder="{% trans %}Email{% endtrans %}" class="form-control">
+                                </div>
+                                <div class="form-group d-flex">
+                                    <button type="button" class="btn-form-edit secondary-btn">{% trans %}Edit{% endtrans %}</button>
+                                    <button type="button" class="d-none btn-form-cancel primary-btn">{% trans %}Cancel{% endtrans %}</button>
+                                    <button data-spinner="" type="submit" class="d-none ml-3 btn-form-save blue-btn">{% trans %}Save{% endtrans %}</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /Personal Data -->
+
+                        <!-- Password -->
+                        <div class="col-lg-6 mb-4">
+                            <h1 class="profile-header mb-3">{% trans %}Password{% endtrans %}</h1>
+                            <form id="updatePassword" action="{{ baseUri }}/customer/my-account" method="POST" data-id="1">
+                                <!-- form spoofing -->
+                                <input type="hidden" name="action" value="update_password">
+
+                                <div class="d-none password-fields-container">
+                                    <div class="form-group">
+                                        <label for="password_current">{% trans %}Current Password{% endtrans %}: *</label><br>
+                                        <input type="password" required name="password_current" placeholder="{% trans %}Current Password{% endtrans %}" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password">{% trans %}Password{% endtrans %}: *</label><br>
+                                        <input type="password" required name="password" placeholder="{% trans %}Password{% endtrans %}" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password_confirm">{% trans %}Confirm password{% endtrans %}: *</label><br>
+                                        <input type="password" required name="password_confirm" placeholder="{% trans %}Confirm password{% endtrans %}" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-group d-flex">
+                                    <button type="button" class="btn-form-change secondary-btn">{% trans %}Change{% endtrans %}</button>
+                                    <button type="button" class="d-none btn-form-cancel primary-btn">{% trans %}Cancel{% endtrans %}</button>
+                                    <button data-spinner="" type="submit" class="d-none ml-3 btn-form-save blue-btn">{% trans %}Save{% endtrans %}</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /Password -->
+
+                        <!-- Contacts -->
+                        <div class="col-12 mb-4">
+                            <h1 class="profile-header mb-3">{% trans %}Contacts{% endtrans %}</h1>
+                            <button type="button" data-form="add_contact" data-modal="modal_form_contact" class="btn-add-data secondary-btn">{% trans %}Add{% endtrans %}</button>
+
+                            <div class="row mt-3">
+                                {% for key, contactType in colCustomerContact %}
+                                    {% set settingsContactTypeReferenceKey = key %}
+                                    {% set settingsContactTypeId = contactType.id %}
+                                    {% set settingsContactTypeTitle = contactType.title %}
+
+                                    <div class="col-lg-4 mb-1">
+                                        <form class="card p-1" action="{{ baseUri }}/customer/my-account" method="POST" data-id="{{ settingsContactTypeId }}">
+                                            <div class="form-group form-title text-center">
+                                                <span>{{ settingsContactTypeTitle }}</span>
+                                            </div>
+                                            <input type="hidden" name="action" value="update_contact_{{ settingsContactTypeReferenceKey }}">
+                                            <input type="hidden" name="contact_settings_contact_type_id" value="{{ settingsContactTypeId }}">
+
+                                            {% for contactData in contactType.data %}
+                                                <div class="form-group contact-{{ contactData.id }}">
+                                                    <sup class="badge badge-info counter-registries">{{ loop.index }}</sup>
+                                                    <div class="float-left ml-1" style="margin-top: -8px">
+                                                        <input type="radio" id="contaxt_main_{{ contactData.id }}" name="contact_isMain[]" value="{{ contactData.id ?? '' }}" {{ (contactData.main ?? '') ? 'checked' : ''}}>
+                                                        <label for="contaxt_main_{{ contactData.id }}">{% trans %}Main{% endtrans %}</label>
+                                                    </div>
+                                                    <input type="hidden" name="contact_id[]" value="{{ contactData.id ?? '' }}">
+
+                                                    <div class="input-group mb-3">
+                                                        <input type="text" required id="contact_email_{{ contactData.id }}" name="contact_value[]" value="{{ contactData.value }}" placeholder="{{ settingsContactTypeTitle }}" class="form-control">
+                                                        <div class="input-group-append">
+                                                            <button data-id='{{ contactData.id }}' data-action="contact" disabled class="btn btn-danger btn-form-delete d-none" type="button">
+                                                                {% trans %}Delete{% endtrans %}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+
+                                            <div class="text-center mb-2">
+                                                <span value="{% trans %}Cancel{% endtrans %}" class="float-left primary-btn btn-form-cancel d-none">
+                                                    {% trans %}Cancel{% endtrans %}
+                                                </span>
+                                                <button data-spinner="" type="submit" id="update_contact_{{ loop.index }}" class="blue-btn btn-form-save d-none float-right">{% trans %}Save{% endtrans %}</button>
+                                                <button type="button" class="btn-form-edit secondary-btn">{% trans %}Edit{% endtrans %}</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- /Contacts -->
+                        <!-- Address -->
+
+                        <div class="col-12 mb-4">
+                            <h1 class="profile-header mb-3">{% trans %}Address{% endtrans %}</h1>
+                            <button type="button" data-form="add_address" data-modal="modal_form_address" class="btn-add-data secondary-btn">{% trans %}Add{% endtrans %}</button>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col">
+                                {% set baseCountryId = LayoutFunctions.getEnvVars('BASE_COUNTRY_ID') %}
+
+                                {% for address in colCustomerAddress ?? [] %}
+                                    {% set disabled = address.country == baseCountryId ? '' : 'disabled' %}
+                                    {% set hidden = address.country == baseCountryId ? '' : 'd-none' %}
+                                    {%if loop.index > 1 %}
+                                        <div class="form-group form-title text-center mt-4 p-1 address-{{address.id}}">
+                                            <span class="lh-31px">{% trans %}Update your Address{% endtrans %}</span>
+                                        </div>
+                                    {% endif %}
+
+                                    <sup class="badge badge-info counter-registries address-{{address.id}}">{{loop.index}}</sup>
+
+                                    <form class="update-address address-{{address.id}}" action="/customer/my-account" method="POST" data-id="{{ address.id }}">
+                                        <input type="hidden" name="addressId" value="{{ address.id }}">
+                                        <input type="hidden" name="action" value="update_address">
+                                        <div class="row justify-content-center">
+                                            <div class="col-12 col-lg-4 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="line1">{% trans %}Line1{% endtrans %}: *</label><br>
+                                                    <input type="text" required name="line1" value="{{ address.line1 ?? '' }}" placeholder="{% trans %}Line1{% endtrans %}" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-lg-4 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="line2">{% trans %}Line2{% endtrans %}:</label><br>
+                                                    <input type="text" name="line2" value="{{ address.line2 ?? '' }}" placeholder="{% trans %}Line2{% endtrans %}" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-lg-4 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="country">{% trans %}Country{% endtrans %}:</label><br>
+                                                    <select name="country" class="form-control geo-countries form-select2">
+                                                        {% for country in colGeoCountry ?? [] %}
+                                                            <option {{ address.country == country.id ? 'selected' : null }} value={{ country.id }}>{{country.iso2~' | '~country.name}}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-lg-4 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="postalCode">{% trans %}Postal Code{% endtrans %}: *</label><br>
+                                                    <input type="text" required name="postalCode" value="{{ address.postalCode ?? '' }}" placeholder="{% trans %}Postal Code{% endtrans %}" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-lg-4 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="state">{% trans %}State{% endtrans %}: *</label><br>
+                                                    <select name="state" class="form-control geo-pt-district form-select2 border-0 {{ hidden }}" {{ disabled }}>
+                                                        {% for district in colGeoPtDistrict ?? [] %}
+                                                            <option {{ address.state == district.name ? 'selected' : null }} value='{{ district.name }}'>{{ district.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <input {{ disabled ? '' : 'disabled' }} type="text" required name="state" value="{{ address.state ?? ''}}" placeholder="{% trans %}State{% endtrans %}" class="form-control geo-pt-district {{ hidden ? '' : 'd-none' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-lg-4 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="city">{% trans %}City{% endtrans %}: *</label><br>
+                                                    <select name="city" class="border-0 form-control geo-pt-council form-select2 {{ hidden }}" {{ disabled }}>
+                                                        {% for council in colGeoPtCouncil ?? [] %}
+                                                            <option {{ address.city == council.name ? 'selected' : ''}} value={{ council.name }}>{{ council.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <input {{ disabled ? '' : 'disabled' }} type="text" required name="city" value="{{ address.city ?? '' }}" placeholder="{% trans %}City{% endtrans %}" class="geo-pt-council form-control {{ hidden ? '' : 'd-none' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-lg-4 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="addressType">{% trans %}Address Type{% endtrans %}:</label><br>
+                                                    <select name="addressType" class="form-control border-0">
+                                                        {% for addressType in colSettingsAddressType ?? [] %}
+                                                            <option {{ address.settingsAddressTypeId == addressType.id ? 'selected' : null }} value='{{ addressType.id }}'>{{ addressType.title }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 mt-2 text-right">
+                                                <div class="form-group">
+                                                    <input type="checkbox" name="main" value="1" {{address.main ? 'checked' : null}}>
+                                                    <label>{% trans %}Main Address{% endtrans %}</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-lg-12">
+                                                <div class="text-center mx-auto">
+                                                    <button type="button" class="btn-form-edit secondary-btn">{% trans %}Edit{% endtrans %}</button>
+                                                    <div class="btn-group float-left">
+                                                        <span value="{% trans %}Cancel{% endtrans %}" class="float-left btn btn-secondary btn-form-cancel d-none">{% trans %}Cancel{% endtrans %}</span>
+                                                        <span data-id='{{ address.id }}' data-action="address" class="btn btn-danger btn-form-delete d-none">{% trans %}Delete{% endtrans %}</span>
+                                                    </div>
+                                                    <button data-spinner="" class="btn-form-save d-none float-right blue-btn">{% trans %}Save{% endtrans %}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <!-- /Address -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- Add Contacts -->
+    <div class="modal fade" id="modal_form" aria-modal="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" id="modal_form_contact" style="display: none">
+                    <div class="modal-header">
+                        <h4 class="modal-title modal-title-add">{% trans %}Add{% endtrans %}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <form id="form_add_contact" action="{{ baseUri }}/customer/my-account" method="POST" data-id="1">
+
+                        <input type="hidden" name="action" value="add_contact">
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="form-group">
+                                    <label for="contact_type">{% trans %}Contact Type{% endtrans %} :</label><br>
+                                    <select name="type" class="form-control" required>
+                                        {% for type in colSettingsContactType ?? [] %}
+                                            <option value="{{ type.id }}">{{ type.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="form-group">
+                                    <label for="contact_text">{% trans %}Contact{% endtrans %}: *</label><br>
+                                    <input type="text" id="contact" name="contact" placeholder="{% trans %}Contact{% endtrans %}" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 text-right pt-3 mt-3">
+                                <div class="form-group">
+                                    <input type="checkbox" id="contact_text" name="isMain" value="1">
+                                    <label for="contact_text">{% trans %}Main Contact{% endtrans %}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button class="primary-btn" data-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                        <button data-spinner="" class="blue-btn btn-add-contact">{% trans %}Save{% endtrans %}</button>
+                    </div>
+
+            </div>
+
+            <div class="modal-content" id="modal_form_address" style="display: none">
+                    <div class="modal-header">
+                        <h4 class="modal-title modal-title-add">{% trans %}Add{% endtrans %}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                     <form id="form_add_address" action="{{ baseUri }}/customer/my-account" method="POST" data-id="{{ address.id ?? ''}}">
+                        <input type="hidden" name="action" value="add_address">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="line1">{% trans %}Line1{% endtrans %}: *</label><br>
+                                    <input type="text" required name="line1" placeholder="{% trans %}Line1{% endtrans %}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="line2">{% trans %}Line2{% endtrans %}:</label><br>
+                                    <input type="text" name="line2" placeholder="{% trans %}Line2{% endtrans %}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="country">{% trans %}Country{% endtrans %}:</label><br>
+                                    <select name="country" class="form-control geo-countries form-select2">
+                                        {% for country in colGeoCountry ?? [] %}
+                                            <option value={{ country.id }}>{{country.iso2~' | '~country.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-4 col-md-6">
+                                <div class="form-group">
+                                    <label for="postalCode">{% trans %}Postal Code{% endtrans %}: *</label><br>
+                                    <input type="text" required name="postalCode" placeholder="{% trans %}Postal Code{% endtrans %}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="state">{% trans %}State{% endtrans %}: *</label><br>
+                                    <select name="state" class="form-control geo-pt-district d-none form-select2" disabled>
+
+                                        {% for district in colGeoPtDistrict ?? [] %}
+
+                                            <option value='{{ district.name }}'>{{ district.name }}</option>
+
+                                        {% endfor %}
+
+                                    </select>
+                                    <input type="text" name="state" required placeholder="{% trans %}State{% endtrans %}" class="form-control geo-pt-district">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="city">{% trans %}City{% endtrans %}: *</label><br>
+                                    <select name="city" class="form-control geo-pt-council d-none form-select2" disabled>
+
+                                        {% for council in colGeoPtCouncil ?? [] %}
+
+                                         <option value={{ council.name }}>{{ council.name }}</option>
+
+                                        {% endfor %}
+
+                                    </select>
+                                    <input type="text" required name="city" placeholder="{% trans %}City{% endtrans %}" class="form-control geo-pt-council">
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-4 col-md-6">
+                                <div class="form-group">
+                                    <label for="addressType">{% trans %}Address Type{% endtrans %}:</label><br>
+                                    <select name="addressType" class="form-control">
+                                        {% for addressType in colSettingsAddressType ?? [] %}
+                                            <option value='{{addressType.id}}'>{{addressType.title}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-2 text-right">
+                                <div class="form-group">
+                                    <input type="checkbox" name="main" value="1">
+                                    <label>{% trans %}Main Address{% endtrans %}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        </form>
+
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button class="primary-btn" data-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                        <button data-spinner="" class="blue-btn btn-add-address">{% trans %}Save{% endtrans %}</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Add Contacts -->
+
+    <!-- Add Address -->
+    <div class="modal-content" id="modal_form_address" style="display: none">
+            <div class="modal-header">
+                <h4 class="modal-title modal-title-add">{% trans %}Add{% endtrans %}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            <form id="form_add_address" action="{{ baseUri }}/customer/my-account" method="POST" data-id="{{ address.id ?? ''}}">
+                <input type="hidden" name="action" value="add_address">
+                <div class="row justify-content-center">
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <div class="form-group">
+                            <label for="line1">{% trans %}Line1{% endtrans %}: *</label><br>
+                            <input type="text" required name="line1" placeholder="{% trans %}Line1{% endtrans %}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <div class="form-group">
+                            <label for="line2">{% trans %}Line2{% endtrans %}:</label><br>
+                            <input type="text" name="line2" placeholder="{% trans %}Line2{% endtrans %}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <div class="form-group">
+                            <label for="country">{% trans %}Country{% endtrans %}:</label><br>
+                            <select name="country" class="form-control geo-countries form-select2">
+                                {% for country in colGeoCountry ?? [] %}
+                                    <option {{ country.id  == 177 ? 'selected' : null}} value='{{ country.id }}'>{{country.iso2~' | '~country.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label for="postalCode">{% trans %}Postal Code{% endtrans %}: *</label><br>
+                            <input type="text" required name="postalCode" placeholder="{% trans %}Postal Code{% endtrans %} *" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <div class="form-group">
+                            <label for="state">{% trans %}State{% endtrans %}: *</label><br>
+                            <select name="state" class="form-control geo-pt-district d-none" disabled>
+                                {% for district in geoPtDistrict ?? [] %}
+                                    <option value='{{district.name}}'>{{district.name}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="text" name="state" required disabled placeholder="{% trans %}State{% endtrans %}" class="d-none form-control geo-pt-district">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <div class="form-group">
+                            <label for="city">{% trans %}City{% endtrans %}: *</label><br>
+                            <select name="city" class="form-control geo-pt-council">
+                                {% for council in geoPtCouncil ?? [] %}
+                                    <option value='{{council.city}}'>{{council.city}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="text" name="city" required disabled placeholder="{% trans %}City{% endtrans %}" class="d-none form-control geo-pt-council">
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label for="addressType">{% trans %}Address Type{% endtrans %}:</label><br>
+                            <select name="addressType" class="form-control">
+                                {% for addressType in colSettingsAddressType ?? [] %}
+                                    <option value='{{addressType.id}}'>{{addressType.title}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-2 text-right">
+                        <div class="form-group">
+                            <input type="checkbox" name="main" value="1">
+                            <label>{% trans %}Main Address{% endtrans %}</label>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button class="btn btn-secondary" data-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                <button data-spinner="" class="btn btn-success" id="form_add_address_submit">{% trans %}Save{% endtrans %}</button>
+            </div>
+
+    </div>
+
+    <!-- /Add Address -->
+    <!-- Delete -->
+
+    <div class="modal fade" id="modal_delete" aria-modal="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h4 class="modal-title modal-title-add">{% trans %}Delete?{% endtrans %}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% trans %}Are you sure you want to delete this registry?{% endtrans %}
+                    <form class="delete" action="{{ baseUri }}/customer/my-account" method="POST">
+                        <input type="hidden" name="action">
+                        <input type="hidden" name="id">
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button class="btn btn-secondary" data-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                    <button class="btn btn-danger"> {% trans %}Delete{% endtrans %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Delete -->
+    {% endblock %}
+
+    <script src="/assets/js/customer/querybiz-customer-my-account.js?v={{ LayoutFunctions.getHashFile('\/assets/js/customer/querybiz-customer-my-account.js') }}"></script>
+    <script>
+
+        $(document).ready(function() {
+            $('.form-select2').select2();
+            var options = {
+                'successMessage': '{% trans %}Data Updated{% endtrans %}',
+                'errorMessage': '{% trans %}Error Occurred on updating!{% endtrans %}',
+                'requiredMessage': '{% trans %}Required{% endtrans %}',
+                'invalidPassMessage': '{% trans %}The Current Password informed is invalid!{% endtrans %}',
+                'diferentPassMessage': '{% trans %}The New Password and Password Confirm are differents{% endtrans %}',
+                'invalidMessage': '{% trans %}Invalid!{% endtrans %}',
+            };
+            querybizCustomerMyAccount.init(options);
+        });
+    </script>
+{% endblock %}

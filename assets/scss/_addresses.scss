@@ -1,0 +1,38 @@
+.address-box {
+    background-color: #F6F6F6;
+    padding: 24px;
+    margin-bottom: 25px;
+
+    &.rounded-box {
+        border-radius: 15px;
+    }
+
+    &-title {
+        @include RobotoFont(0.82em, 700);
+    }
+
+    &-options {
+        a {
+            @include RobotoFont(0.76em);
+
+            &:last-child {
+                margin-left: 30px;
+            }
+
+            .mdi:before {
+                font-size: 1.4em;
+                position: relative;
+                top: 2px;
+            }
+        }
+    }
+
+    address {
+        @include RobotoFont(0.88em, 400, $secondary, 1.3em);
+
+        b {
+            font-size: 0.93em;
+            font-weight: 700;
+        }
+    }
+}

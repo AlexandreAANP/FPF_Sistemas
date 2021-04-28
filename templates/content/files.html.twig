@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% trans %}Files{% endtrans %} - {% endblock %}
+{% block description %}{% trans %}Files{% endtrans %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <section class="section-min-height">
+        <div class="site-module-name container">{% trans %}CONTENT FILES + CONTENT AREA{% endtrans %}</div>
+        <div class="site-module-title container">
+            <div class="float-left p-1 font-weight-bold">Files in Area "Home-slide":</div>
+            <div class="d-block">
+                {% set arFiles = LayoutFunctions.getAPI('content?type=files&area=home-slide&language=' ~ app.request.getLocale()) %}
+                {% if arFiles.colContent is defined and arFiles.colContent|length > 0 %}
+                    {% for files in arFiles.colContent %}
+                        <div class="d-inline-block m-2" style="border: #eee 1px solid">
+                            <div class="text-center"><img src="{{ files.filename }}" style="height: 100px"></div>
+                            <div class="text-center"><a href="http://backoffice.test/api/downloadContent/{{ files.referenceKey }}?language={{ app.request.getLocale() }}" target="_blank">{{ files.title }}</a></div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="site-module-content container">
+            <b>This file can be changed on Backoffice,<BR> but the SRC here keep the same URL:</b><BR>
+            <img src="http://backoffice.test/api/downloadContent/galleries-galeria-1?language={{ app.request.getLocale() }}" style="width: 300px">
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

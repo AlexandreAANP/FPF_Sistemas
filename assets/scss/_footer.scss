@@ -1,0 +1,106 @@
+footer {
+    hr {
+        border-color: #F0F0F0;
+    }
+
+    .footer {
+        &-top {
+            background-color: #F2F2F2;
+    
+            &-text {
+                @include RobotoFont(1.5em, 300, $secondary);
+                padding-left: 35px;
+            }
+    
+            &-middle {
+                @media (min-width: 992px) {
+                    position: relative;
+    
+                    &:before, &:after {
+                        content: "";
+                        position: absolute;
+                        top: 50%;
+                        width: 1px;
+                        height: calc(100% - 2rem);
+                        transform: translateY(-50%);
+                        background-color: #D4D4D4;
+                    }
+    
+                    &:before {
+                        left: 0;
+                    }
+    
+                    &:after {
+                        right: 0;
+                    }
+                }
+            }
+    
+            .material-icons, .mdi:before {
+                font-size: 3.75em;
+                line-height: 1em;
+            }
+        }
+
+        &-menu {
+            &-header {
+                @extend .mb-3;
+                @include RobotoFont(1em, 500);
+            }
+
+            li:not(.footer-menu-header) {
+                @extend .mb-2;
+
+                a {
+                    @include RobotoFont(0.9em, 400, #979797);
+                }
+            }
+
+            p {
+                @extend .mb-2;
+                @include RobotoFont(0.9em, 400, #979797);
+                line-height: 1.4em;
+            }
+
+            .input-group {
+                * {
+                    border-top: 0;
+                    border-right: 0;
+                    border-left: 0;
+                    border-radius: 0;
+                }
+            }
+        }
+    }
+
+
+    .payments {
+        margin-top: 50px;
+        margin-bottom: 20px;
+
+        @media (min-width: 992px) {
+            margin-top: 30px;
+        }
+
+        a {
+            @include paymentOptions;
+
+            &.social {
+                @extend .mr-4
+            }
+
+            &:hover, &:active {
+                text-decoration: none;
+            }
+        }
+    }
+
+    .copyright {
+        @include PoppinsFont(0.75em, #9F9F9F);
+
+        a {
+            color: #9F9F9F;
+            font-weight: 600;
+        }
+    }
+}

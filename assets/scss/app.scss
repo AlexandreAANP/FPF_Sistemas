@@ -1,0 +1,23 @@
+$primary: white;
+$secondary: #343232;
+$info: #506BFA;
+
+// Bootstrap
+@import '../../node_modules/bootstrap/scss/bootstrap';
+
+// TinySlider
+@import '../../node_modules/tiny-slider/src/tiny-slider';
+
+@import "fonts";
+@import "common";
+@import "nav";
+@import "home";
+@import "home-slider";
+@import "login-box";
+@import "products";
+@import "orders";
+@import "shopping";
+@import "contact";
+@import "addresses";
+@import "cart";
+@import "footer";

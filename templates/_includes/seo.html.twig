@@ -1,0 +1,89 @@
+{% set domainName = LayoutFunctions.getEnvVars('DOMAIN_NAME') %}
+
+{% set defaultIndex = true %}
+{% if '.ibiz.pt' in domainName %}
+    {% set defaultIndex = false %}
+{% endif %}
+
+{% set seo = {
+    'title'         : (title is defined and title|length > 0 ? title ~ ' - ' ~ LayoutFunctions.getSettingsVars('METATAG_NAME') : LayoutFunctions.getSettingsVars('METATAG_NAME') ~ ' - ' ~ LayoutFunctions.getSettingsVars('METATAG_TITLE')),
+    'description'   : (description is defined and description|length > 0 ? description : LayoutFunctions.getSettingsVars('METATAG_DESCRIPTION')),
+    'image'         : (image is defined and image|length > 0 ? image : LayoutFunctions.getEnvVars('SITE_URL') ~ LayoutFunctions.getSettingsVars('METATAG_IMAGE')),
+    'index'         : (index is defined ? (index == 'true' ? true : false) : defaultIndex),
+} %}
+
+{% set seoImageWidth = '' %}
+{% set seoImageHeight = '' %}
+{% if seo.image is defined and seo.image|length > 0 %}
+    {% set arImageSize = LayoutFunctions.getImageSize(seo.image) %}
+    {% if arImageSize|length > 0 and arImageSize.width is defined and arImageSize.height is defined and arImageSize.width > 0 and arImageSize.height > 0 %}
+        {% set seoImageWidth = arImageSize.width %}
+        {% set seoImageHeight = arImageSize.height %}
+    {% endif %}
+{% endif %}
+
+{# Title #}
+<title>{{ seo.title }}</title>
+<meta property="og:title" content="{{ seo.title }}"/>
+<meta name="twitter:title" content="{{ seo.title }}"/>
+<meta itemprop="name" content="{{ seo.title }}"/>
+
+{# Description #}
+<meta name="description" content="{{ seo.description }}"/>
+<meta property="og:description" content="{{ seo.description }}"/>
+<meta name="twitter:description" content="{{ seo.description }}"/>
+<meta itemprop="description" content="{{ seo.description }}"/>
+
+{# Image #}
+<meta property="og:image" content="{{ seo.image }}"/>
+<meta property="og:image:width" content="{{ seoImageWidth }}"/>
+<meta property="og:image:height" content="{{ seoImageHeight }}"/>
+<meta name="twitter:image" content="{{ seo.image }}"/>
+<meta itemprop="image" content="{{ seo.image }}"/>
+
+{# Url #}
+<link rel="canonical" href="{{ app.request.uri }}"/>
+<meta property="og:url" content="{{ app.request.uri }}"/>
+<meta name="twitter:url" content="{{ app.request.uri }}"/>
+<meta itemprop="url" content="{{ app.request.uri }}"/>
+
+<meta property="og:type" content="{{ LayoutFunctions.getEnvVars('PROJECT_TYPE') }}"/>
+<meta property="og:site_name" content="{{ LayoutFunctions.getSettingsVars('METATAG_NAME') }}"/>
+<meta property="og:locale" content="{{ app.request.getLocale() }}"/>
+<meta name="twitter:card" content="summary_large_image"/>
+
+{# Facebook #}
+    {% set articlePublisher = LayoutFunctions.getSettingsVars('FB_PUBLISHER') %}
+    {% set articleAuthor = LayoutFunctions.getSettingsVars('FB_AUTHOR') %}
+    {% set fbAppId = LayoutFunctions.getSettingsVars('FB_APP_ID') %}
+
+<meta property="article:publisher" content="https://www.facebook.com/{{ articlePublisher ?? '' }}"/>
+<meta property="article:author" content="https://www.facebook.com/{{ articleAuthor ?? '' }}"/>
+<meta property="fb:app_id" content="{{ fbAppId ?? '' }}"/>
+
+{# Twitter #}
+    {% set twitterSite = LayoutFunctions.getSettingsVars('TWITTER_SITE') %}
+    {% set twitterCreator = LayoutFunctions.getSettingsVars('TWITTER_CREATOR') %}
+<meta name="twitter:domain" content="{{ LayoutFunctions.getEnvVars('DOMAIN_NAME') }}"/>
+<meta name="twitter:site" content="{{ twitterSite ?? '' }}"/>
+<meta name="twitter:creator" content="{{ twitterCreator ?? '' }}"/>
+
+<meta name="robots" content="{{ seo.index ? 'index, follow' : 'noindex, nofollow' }}"/>
+
+{# Hreflang #}
+{% set supportedLanguages = LayoutFunctions.getSupportedLanguages(LayoutFunctions.getEnvVars('SUPPORTED_LOCALES')) %}
+{% if supportedLanguages|length > 1 %}
+    {% for language in supportedLanguages %}
+        {% set defaultLanguage = LayoutFunctions.getEnvVars('DEFAULT_LANGUAGE') %}
+        {% set siteUrl = LayoutFunctions.getEnvVars('SITE_URL') %}
+
+        {% set lang = '' %}
+        {% set requestUri = app.request.requestUri %}
+        {% if defaultLanguage != app.request.getLocale() %}
+            {% set lang = '/' %}
+            {% set requestUri = requestUri|slice(3) %}
+        {% endif %}
+
+        <link rel="alternate" href="{{ siteUrl ~ '/' ~ language ~ requestUri }}" hreflang="{{ language }}"/>
+    {% endfor %}
+{% endif %}

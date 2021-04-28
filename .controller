@@ -1,0 +1,13 @@
+# CONTENT_POST_GALLERIES_CATEGORY=content?type=galleries&table=category&language=$defaultLanguage
+# CONTENT_POST_GALLERIES_LIST=content?type=galleries&fields=category&language=$defaultLanguage
+# CONTENT_POST_GALLERIES_CATEGORY_LIST=content?type=galleries&category=$serviceCategoryReferenceKey&fields=category,text,url&language=$defaultLanguage
+CONTENT_POST_GALLERIES_DETAIL=content/$contentPostReferenceKey?fields=category,gallery&language=$defaultLanguage
+
+# CONTENT_POST_ARTICLES_CATEGORY=content?type=services&table=category&language=$defaultLanguage
+# CONTENT_POST_ARTICLES_LIST=content?type=services&fields=category&language=$defaultLanguage
+# CONTENT_POST_ARTICLES_CATEGORY_LIST=content?type=services&category=$serviceCategoryReferenceKey&fields=category,text,url&language=$defaultLanguage
+
+CONTENT_POST_SERVICES_CATEGORY=content?type=services&table=category&language=$defaultLanguage
+CONTENT_POST_SERVICES_LIST=content?type=services&fields=category&language=$defaultLanguage
+CONTENT_POST_SERVICES_CATEGORY_LIST=content?type=services&category=$contentCategoryReferenceKey&fields=category,text,url&language=$defaultLanguage
+CONTENT_POST_SERVICES_DETAIL=content/$contentPostReferenceKey?fields=category&language=$defaultLanguage

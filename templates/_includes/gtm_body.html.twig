@@ -1,0 +1,7 @@
+{% set googleTagManager = LayoutFunctions.getSettingsVars('GOOGLE_TAG_MANAGER') %}
+
+{% if googleTagManager is defined and googleTagManager != '' %}
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ googleTagManager }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+{% endif %}

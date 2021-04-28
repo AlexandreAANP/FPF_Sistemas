@@ -1,0 +1,43 @@
+Todas as páginas devem conter a diretiva de bloco 'seo' e incluir a subview '_seo' para alimentar title e demais meta tags de SEO On-Page
+
+Exemplo de utilização:
+
+    - index.html.twig
+
+        {% block seo %}
+            {% include '_includes/seo.html.twig' %}
+        {% endblock %}
+
+Exemplo de utilização passando variáveis (texto estático):
+
+    - contact/index.html.twig
+
+        {% block seo %}
+            {{ include ('_includes/seo.html.twig', {
+                'title': 'Contact'|trans,
+            }) }}
+        {% endblock %}
+
+Exemplo de utilização passando variáveis (texto dinâmico):
+
+    - product/detail.html.twig
+
+        {% block seo %}
+            {{ include ('_includes/seo.html.twig', {
+                'title'         : arProduct.name,
+                'description'   : arProduct.description,
+                'image'         : arProduct.filename,
+            }) }}
+        {% endblock %}
+
+    - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    - content/page.html.twig
+
+        {% block seo %}
+            {{ include ('_includes/seo.html.twig', {
+                'title'         : arPage.title,
+                'description'   : arPage.description,
+                'image'         : arPage.filename,
+            }) }}
+        {% endblock %}

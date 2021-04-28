@@ -1,0 +1,244 @@
+{% set totalProductCategory = 0 %}
+{% set productCategoryName = '' %}
+{% if colProductCategory.colProductCategories is defined %}
+    {% set totalProductCategory = colProductCategory.colProductCategories|length %}
+{% endif %}
+
+{% set knowMoreQueryParameter = '' %}
+{% if app.request.get('category') != '' or app.request.get('search') != '' %}
+    {% set knowMoreQueryParameter = '?' %}
+
+    {% if app.request.get('search') != '' %}
+        {% set knowMoreQueryParameter = knowMoreQueryParameter ~ 'search=' ~ app.request.get('search') %}
+    {% endif %}
+
+    {% if app.request.get('category') != '' %}
+        {% if knowMoreQueryParameter != '?' %}
+            {% set knowMoreQueryParameter = knowMoreQueryParameter ~ '&' %}
+        {% endif %}
+
+        {% set knowMoreQueryParameter = knowMoreQueryParameter ~ 'lastCategory=' ~ app.request.get('category') %}
+    {% endif %}
+{% endif %}
+
+{%  set category_list %}
+    <ul class='ul-category'>
+        {% if colProductAllCategory.colProductCategories is defined and colProductAllCategory.colProductCategories|length > 0 %}
+            {% for category in colProductAllCategory.colProductCategories %}
+                {% set active = '' %}
+                {% if app.request.get('category') is defined and app.request.get('category') != '' %}
+                    {% if app.request.get('category') == category.referenceKey %}
+                        {% set productCategoryName = category.name %}
+                        {% set active = 'active' %}
+                    {% endif %}
+                {% endif %}
+
+                <li class="{{ active }}"><a href="{{ baseUri }}/product/{{ productType }}?category={{ category.referenceKey }}">{{ category.name }} ({{ category.totalProducts }})</a></li>
+
+                {% if colProductCategorySub[category.id] is defined and colProductCategorySub[category.id]|length > 0 %}
+                    {% for categorySub in colProductCategorySub[category.id] %}
+                        {% set active = '' %}
+
+                        {% if app.request.get('category') is defined and app.request.get('category') != '' %}
+                            {% if app.request.get('category') == categorySub.referenceKey %}
+                                {% set productCategoryName = categorySub.name %}
+                                {% set active = 'active-sub' %}
+                            {% endif %}
+                        {% endif %}
+
+                        <li class="{{ active }}" style="padding-left: 10px"><a href="{{ baseUri }}/product/{{ productType }}?category={{ categorySub.referenceKey }}"><i class="fas fa-chevron-right" style="font-size: 10px; margin-bottom: 2px"></i> {{ categorySub.name }} ({{ categorySub.totalProducts }})</a></li>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+
+        {% else %}
+            <li>{% trans %}No categories{% endtrans %}</li>
+
+        {% endif %}
+    </ul>
+{% endset %}
+
+<div class="btn-group-vertical btn-menu">
+    <a href="#" class="btn btn-sm active">
+        Filtros
+    </a>
+
+    <a href="#" class="btn btn-sm" data-toggle="collapse" data-target="#scoreCollapse" aria-expanded="true" aria-controls="scoreCollapse">
+        {% trans %}Category{% endtrans %}
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <div class="b-b w-100">
+        <div class="to-collapse collapse show" id="scoreCollapse">
+            <div>
+                {% if colProductAllCategory.colProductCategories is defined and colProductAllCategory.colProductCategories|length > 0 %}
+                    {% if app.request.get('lastCategory') != '' %}
+                        <div><a href="{{ baseUri }}/product?category={{ app.request.get('lastCategory') }}" class="text-black-50"><- Back</a></div>
+                    {% endif %}
+
+                    {% for category in colProductAllCategory.colProductCategories %}
+                        {% set lastCategory = category.referenceKey %}
+                        {% set checked = '' %}
+                        {% if app.request.get('category') is defined and app.request.get('category') != '' %}
+                            {% if app.request.get('category') == category.referenceKey %}
+                                {% set productCategoryName = category.name %}
+                                {% set checked = 'checked' %}
+                            {% endif %}
+                        {% endif %}
+
+                        <div OnClick="window.location.href='{{ baseUri }}/product/{{ productType }}?category={{ category.referenceKey }}'">
+                            <input type="checkbox" {{ checked }}>
+                            <label style="cursor: pointer">{{ category.name }} <span class="condensed-sm">({{ category.totalProducts }})</span></label>
+                        </div>
+
+                        {% if colProductCategorySub[category.id] is defined and colProductCategorySub[category.id]|length > 0 %}
+                            {% for categorySub in colProductCategorySub[category.id] %}
+                                {% set checked = '' %}
+
+                                {% set totalSubCategory = categorySub.totalSubCategory %}
+
+                                {% if app.request.get('category') is defined and app.request.get('category') != '' %}
+                                    {% if app.request.get('category') == categorySub.referenceKey %}
+                                        {% set productCategoryName = categorySub.name %}
+                                        {% set checked = 'checked' %}
+                                    {% endif %}
+                                {% endif %}
+
+                                {% set href = baseUri ~ '/product/' ~ productType ~ '?category=' ~ categorySub.referenceKey %}
+                                {% if totalSubCategory > 0 %}
+                                    {% set href = href ~ '&lastCategory=' ~ lastCategory %}
+                                {% endif %}
+
+                                {#<li class="{{ active }}" style="padding-left: 10px"><a href="{{ baseUri }}/product/{{ productType }}?category={{ categorySub.referenceKey }}"><i class="fas fa-chevron-right" style="font-size: 10px; margin-bottom: 2px"></i> {{ categorySub.name }}</a></li>#}
+                                <div OnClick="window.location.href='{{ href }}'" class="ml-3" style="cursor: pointer">
+                                    {% set text = categorySub.name %}
+                                    <div class="d-inline-block" style="overflow: hidden;"><input type="checkbox" {{ checked }} style="cursor: pointer"></div>
+                                    <div class="d-inline-block product-category-list-limit-char" style="max-width: 15ch">
+                                        <span style="padding-top: 5px;">
+                                            <label title="{{ categorySub.name }}" style="cursor: pointer">{{ text }}</label>
+                                        </span>
+                                    </div>
+                                    <div class="d-inline-block mb-1" style="overflow: hidden;">
+                                        <span class="condensed-sm">({{ categorySub.totalProducts }})</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+
+                {% else %}
+                    <label for="">{% trans %}No categories{% endtrans %}</label>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {#
+    <a href="#" class="btn btn-sm b-b">
+        <i class="mdi mdi-map-marker"></i>
+        LOCALIDADE
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <a href="#" class="btn btn-sm b-b">
+        <i class="mdi mdi-calendar"></i>
+        DATA INÍCIO
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <a href="#" class="btn btn-sm b-b">
+        <i class="mdi mdi-calendar"></i>
+        DATA FIM
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <a href="#" class="btn btn-sm" data-toggle="collapse" data-target="#priceCollapse" aria-expanded="true" aria-controls="priceCollapse">
+        PREÇO
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <div class="b-b w-100">
+        <div class="to-collapse collapse show" id="priceCollapse">
+            <div>
+                <input type="text" id="priceSlider"/>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="btn btn-sm" data-toggle="collapse" data-target="#scoreCollapse" aria-expanded="false" aria-controls="scoreCollapse">
+        CLASSIFICAÇÂO
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <div class="b-b w-100">
+        <div class="to-collapse collapse" id="scoreCollapse">
+            <div>
+                <?php for($i = 0; $i < 5; $i++): ?>
+                <label for="">
+                    <input type="checkbox">
+                    Opção <span class="condensed-sm">(15)</span>
+                </label>
+                <?php endfor; ?>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="btn btn-sm" data-toggle="collapse" data-target="#experienceCollapse" aria-expanded="false" aria-controls="experienceCollapse">
+        EXPERIÊNCIAS
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <div class="b-b w-100">
+        <div class="to-collapse collapse" id="experienceCollapse">
+            <div>
+                <?php for($i = 0; $i < 5; $i++): ?>
+                <label for="">
+                    <input type="checkbox">
+                    Opção <span class="condensed-sm">(15)</span>
+                </label>
+                <?php endfor; ?>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="btn btn-sm" data-toggle="collapse" data-target="#regionCollapse" aria-expanded="false" aria-controls="regionCollapse">
+        REGIÃO
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <div class="b-b w-100">
+        <div class="to-collapse collapse" id="regionCollapse">
+            <div>
+                <?php for($i = 0; $i < 5; $i++): ?>
+                <label for="">
+                    <input type="checkbox">
+                    Opção <span class="condensed-sm">(15)</span>
+                </label>
+                <?php endfor; ?>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="btn btn-sm" data-toggle="collapse" data-target="#offerCollapse" aria-expanded="false" aria-controls="offerCollapse">
+        OFERTAS
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <div class="b-b w-100">
+        <div class="to-collapse collapse" id="offerCollapse">
+            <div>
+                <?php for($i = 0; $i < 5; $i++): ?>
+                <label for="">
+                    <input type="checkbox">
+                    Opção <span class="condensed-sm">(15)</span>
+                </label>
+                <?php endfor; ?>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="btn btn-sm" data-toggle="collapse" data-target="#tipoCollapse" aria-expanded="false" aria-controls="tipoCollapse">
+        TIPOLOGIA
+        <i class="mdi mdi-chevron-down"></i>
+    </a>
+    <div class="b-b w-100">
+        <div class="to-collapse collapse" id="tipoCollapse">
+            <div>
+                <?php for($i = 0; $i < 5; $i++): ?>
+                <label for="">
+                    <input type="checkbox">
+                    Opção <span class="condensed-sm">(15)</span>
+                </label>
+                <?php endfor; ?>
+            </div>
+        </div>
+    </div>
+    #}
+</div>

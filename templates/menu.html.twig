@@ -1,0 +1,109 @@
+<nav class="navbar fixed-top navbar-expand-lg bg-primary flex-wrap py-3 b-b">
+    <ul class="container">
+        <a href="/{{ app.request.getLocale() }}" title="{% trans %}Home{% endtrans %}">
+            <img src="/assets/images/logo-frontoffice.png" style="width: 120px" alt="title="{% trans %}Home{% endtrans %}"">
+        </a>
+
+        <div class="collapse navbar-collapse">
+            <ul id="desktop-menu" class="list-unstyled d-flex align-items-center justify-content-center mt-0 mb-0 w-100">
+{#                <li class="nav-item dropdown">
+                    <a class="dropdown-toggle btn-sm" href="#" id="dropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
+                        Coleções
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="#">Option</a></li>
+                        <li><a class="dropdown-item" href="#">Option</a></li>
+                        <li><a class="dropdown-item" href="#">Option</a></li>
+                    </ul>
+                </li>#}
+
+                {% include '_render_block/menu_links.html.twig' %}
+            </ul>
+
+            <ul class="list-unstyled d-flex align-items-center justify-content-center mt-0 mb-0">
+                {% set supportedLanguages = LayoutFunctions.getSupportedLanguages(LayoutFunctions.getEnvVars('SUPPORTED_LOCALES')) %}
+                {% if supportedLanguages|length > 1 %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link py-0 dropdown-toggle btn-sm p-1" href="#" id="dropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
+                            {{ LayoutFunctions.getCurrentLanguage()|upper }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink"
+                            {% for language in supportedLanguages %}
+                                {% set href = LayoutFunctions.changeLanguage(language, languageUri) %}
+                                {% if href == '/' %}
+                                    {% set href = '/' ~ LayoutFunctions.getEnvVars('DEFAULT_LANGUAGE') %}
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{{ href }}">{{ language|upper }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link py-0 dropdown-toggle btn-sm" href="#" id="dropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
+                        EUR €
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="#">EUR €</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <a href="#" class="nav-link nav-link-warning btn-open-modal-product-search">
+            <i class="mdi mdi-shopping-search"></i>
+        </a>
+
+        <a href="{{ baseUri }}/product-cart" class="nav-link nav-link-warning" data-loading-text="{% trans %}Cart{% endtrans %} ({{ productItemsInCart }})">
+            <i class="mdi mdi-cart"></i>
+            <span class="warning">{{ productItemsInCart ?? 0 }}</span>
+        </a>
+
+        <a href="#menu" class="d-lg-none btn bt-link ml-auto main-menu">
+            <img src="/assets/images/navbar.svg" />
+        </a>
+    </div>
+</nav>
+
+<div class="modal" id="modal_product_search" style="margin-top: 100px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form id="formProductSearch" action="{{ baseUri }}/product" method="GET" class="d-table w-100">
+                    <div class="d-table-cell align-top w-100">
+                        <input list="list_search_all_categories" type="text" autocomplete="off" name="search" class="form-control m-0" placeholder="{% trans %}What are you looking for?{% endtrans %}" style="border: #343232 1px solid; height: 38px!important; border-right: 0!important; border-bottom-right-radius: 0!important; border-top-right-radius: 0!important">
+                        <datalist id="list_search_all_categories">
+                            {% set colProductCategories = LayoutFunctions.getProductCategories() %}
+                            {% if colProductCategories|length %}
+                                {% for productCategory in colProductCategories %}
+                                    <option>{{ productCategory.name }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </datalist>
+                    </div>
+                    <div class="d-table-cell align-top">
+                        <button type="submit" class="btn btn-outline-secondary rounded-pill m-0" style="height: 38px!important; border-left: 0!important; border-bottom-left-radius: 0!important; border-top-left-radius: 0!important"><i class="fas fa-search"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav id="menu" class="panel" role="navigation">
+    <div class="d-flex flex-column align-items-end h-100">
+        <a href="#menu" class="main-menu mb-4">
+            <img src="/assets/images/close-menu.svg" alt="close menu">
+        </a>
+        <ul id="menu-links" class="list-unstyled d-flex flex-column flex-fill w-100">
+            {% include '_render_block/menu_links.html.twig' %}
+        </ul>
+
+        <div class="d-flex align-items-center justify-content-between w-100 pr-1 pl-1">
+            {% include '_render_block/menu_links.html.twig' %}
+        </div>
+    </div>
+</nav>
+
+<div class="container" style="margin-top: 100px">
+</div>

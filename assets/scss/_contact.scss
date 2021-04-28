@@ -1,0 +1,40 @@
+#contact-page {
+    margin-top: 30px;
+    margin-bottom: 140px;
+
+    h1 {
+        @include RobotoFont(1.1em, 500);
+    }
+
+    p {
+        @include RobotoFont(0.88em, 400, $secondary, auto);
+    }
+}
+
+.contact-info {
+    display: flex;
+    align-items: center;
+
+    div:first-child {
+        padding-right: 18px;
+    }
+
+    i {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ECECEC;
+        border-radius: 50%;
+        width: 55px;
+        height: 55px;
+    }
+
+    span {
+        @include RobotoFont(0.8em);
+        display: block;
+    }
+
+    a {
+        @include RobotoFont(0.82em, 500);
+    }
+}

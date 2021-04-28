@@ -1,0 +1,65 @@
+#home {
+    h1 {
+        @include RobotoFont(1.75em, 300);
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    .m90 {
+        margin-top: 90px;
+        margin-bottom: 90px;
+    }
+
+    .mais-procurados {
+        &-content {
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+    }
+}
+
+.btn-image {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    align-items: flex-end;
+    min-height: 260px;
+    height: 100%;
+    width: 100%;
+    padding: 20px 40px;
+
+    span {
+        @include RobotoFont(1.88em, 500, white);
+        text-shadow: 2px 4px 10px rgba(0, 0, 0, 50);
+    }
+
+    &.rounded-btn {
+        border-radius: 25px;
+    }
+
+    &.middle-info {
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+        .middle-info-btn {
+            @extend .d-flex, .align-items-center, .justify-content-center, .text-center;
+            @include RobotoFont(0.89em, 500, white);
+            border: 2px solid white;
+            border-radius: 20px;
+            width: 111px;
+            height: 35px;
+            margin-top: 15px;
+        }
+
+        &-sm {
+            min-height: 203px;
+        }
+
+        span {
+            font-weight: 700;
+            text-shadow: none;
+        }
+    }
+}

@@ -1,0 +1,120 @@
+{% if (product.listProductItemStock is defined) and (product.listProductItemStock|length > 0) %}
+
+    <div class="cart-box closed">
+        <div class="cart-box-header">
+            <a href="#reviewCollapse">
+                <div class="cart-box-header-number">0</div>
+                <div class="cart-box-header-title">{% trans %}Order Review{% endtrans %}</div>
+                <div class="cart-box-header-collapse-button">
+                    <i class="mdi mdi-plus"></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="collapse collapse-item" id="reviewCollapse">
+            {% set productQuantity = product.productQuantity %}
+            {% set productCalendar = product.productCalendar %}
+            {% set productPriceQuantity = product.productPriceQuantity %}
+            {% set productPrice = product.productPrice %}
+            {% for key,item in product.listProductItemStock %}
+                {% set bgcolor = loop.index0 is odd ? '#fafafa' : '#fff' %}
+
+                <div>
+                    <div class="order-product order-product-inner">
+                        <div class="row w-100 mx-0 flex-lg-nowrap align-items-center">
+                            <div class="col pl-0">
+                                <div class="order-image large mx-auto rounded" style="background-image: url('{{ item.filename }}');"></div>
+                            </div>
+                            <div class="col flex-fill order-info">
+                                <div class="row">
+                                    <div class="col-12 px-0">
+                                        <div class="d-block w-100">
+                                            <h1 class="order-info-title">{{ item.name }}</h1>
+                                            {% if item.productTypeReferenceKey == 'physical-products' %}
+                                                <span class="order-info-subtitle">
+                                                    {% trans %}Color{% endtrans %}: {{ product.productItems[item.productItemStockId].color }} | {% trans %}Size{% endtrans %}: {{ product.productItems[item.productItemStockId].size }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-3 px-0 d-flex align-items-center">
+                                        <div class="d-table w-100">
+                                            <div class="d-table-cell order-info-price text-nowrap">
+                                                <div class="d-block w-100">
+                                                    <div class="d-inline-block">
+                                                        {{ productPrice[item.productItemStockId]|number_format(2, '.', '') }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d-table-cell order-info-quantity">
+                                                <div class="d-block w-100">
+                                                    {% set dateCalendar = productCalendar[item.productItemStockId] %}
+                                                    {% set isDateInSession = true %}
+                                                    {% set dateInSession = dateCalendar|date('d/m/Y H:i') %}
+
+                                                    {% if item.productStockType == 'calendar' %}
+                                                        <div class="d-inline-block">
+                                                            <div class="d-inline-block p-1">{% trans %}Calendar{% endtrans %}</div>
+                                                            <div class="d-inline-block bg-success text-white rounded-pill p-2">{{ dateInSession|trans }}</div>
+                                                        </div>
+
+                                                        <div class="d-inline-block">
+                                                            <div class="d-inline-block ml-3 p-1">{% trans %}Quantity{% endtrans %}</div>
+                                                            <div class="d-inline-block bg-info text-white rounded-pill p-2 text-center" style="min-width: 40px!important">{{ productQuantity[item.productItemStockId] }}</div>
+                                                        </div>
+
+                                                        <div class="float-right ml-3 p-1">{{ productPriceQuantity[item.productItemStockId] }} {{ LayoutFunctions.getCurrencySymbol() }}</div>
+
+                                                    {% else %}
+                                                        <div class="d-inline-block">
+                                                            <div class="d-inline-block p-1">{% trans %}Quantity{% endtrans %}</div>
+                                                            <div class="d-inline-block bg-info text-white rounded-pill ml-2 p-2 text-center" style="min-width: 40px!important">{{ productQuantity[item.productItemStockId] }}</div>
+                                                        </div>
+                                                        <div class="float-right ml-3 p-1">{{ productPriceQuantity[item.productItemStockId] }} {{ LayoutFunctions.getCurrencySymbol() }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {#
+                                    <div class="col-12 mt-3 d-flex align-items-center justify-content-between">
+                                        <span class="order-info-delivery-date">Entrega entre 3-4 Dias</span>
+                                        <a href="#" class="order-info-link">
+                                            <i class="mdi mdi-trash-can"></i>
+                                            Remover
+                                        </a>
+                                    </div>
+                                    #}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+            <div class="bordered p-18" style="border-top: none;">
+                <div class="row no-gutters">
+                    <div class="col-12 col-lg-6 ml-auto">
+                        <div class="cart-box-total">
+                            <div class="row">
+                                <div class="col-12 text-right">
+                                    <b class="mr-2">{% trans %}Total{% endtrans %}</b>
+                                    <b class="cart-box-total-value">{{ product.totalPrice }} {{ LayoutFunctions.getCurrencySymbol() }}</b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column flex-md-row justify-content-between p-18">
+                <button role="link" onclick="window.location.href='{{ baseUri ~ '/product-cart' }}'" type="button" class="secondary-btn">
+                    {% trans %}Back to Cart{% endtrans %}
+                </button>
+                <button class="btn btn-outline-light text-dark rounded-pill btn-checkout-next float-right">
+                    {% trans %}Next{% endtrans %} <i class="mdi mdi-arrow-right-bold-circle-outline"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+{% endif %}

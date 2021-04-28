@@ -1,0 +1,9 @@
+{% macro wishlistTemplate(sessionCustomerId, hasWishlist, productId) %}
+    {% if sessionCustomerId and hasWishlist %}
+        <i style="cursor: pointer" class="fas fa-heart text-danger btn-add-wishlist wishlist-{{ productId }}" data-product-id="{{ productId }}" title="{% trans %}Remove From Wishlist{% endtrans %}?" data-title-on="{% trans %}Remove from Wishlist{% endtrans %}?" data-title-off="{% trans %}Add to Wishlist{% endtrans %}?"></i>
+    {% elseif sessionCustomerId %}
+        <i style="cursor: pointer" class="far fa-heart text-danger btn-add-wishlist wishlist-{{ productId }}" data-product-id="{{ productId }}" title="{% trans %}Add to Wishlist{% endtrans %}?" data-title-on="{% trans %}Remove from Wishlist{% endtrans %}?" data-title-off="{% trans %}Add to Wishlist{% endtrans %}?"></i>
+    {% else %}
+        <i style="cursor: pointer" class="far fa-heart text-danger btn-modal-login" title="{% trans %}Login than add to Wishlist{% endtrans %}"></i>
+    {% endif %}
+{% endmacro %}

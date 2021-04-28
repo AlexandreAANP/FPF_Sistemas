@@ -1,0 +1,19 @@
+{% extends '../base.html.twig' %}
+
+{% block title %}Site{% endblock %}
+
+{% block body %}
+    <section>
+        <div class="container">
+            <div class="font-weight-bold">{% trans %}Site - Error{% endtrans %}</div>
+            <pre>
+                {{ ret }}
+            </pre>
+        </div>
+
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

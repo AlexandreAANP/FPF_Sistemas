@@ -1,0 +1,18 @@
+{% set colContent = LayoutFunctions.getAPI('getSocialMedia') %}
+
+{% if colContent.colSocialMedia is defined and colContent.colSocialMedia|length > 0 %}
+    {% for icon, val in colContent.colSocialMedia %}
+        {% set href = val.href %}
+        {% set src = val.src %}
+
+        {% if icon == 'email' %}
+            {% set href = 'mailto:' ~ href %}
+        {% elseif icon == 'phone' %}
+            {% set href = 'tel:' ~ href %}
+        {% elseif icon == 'whatsapp' %}
+            {% set href = 'https://api.whatsapp.com/send?phone=' ~ href ~ '&text=' %}
+        {% endif %}
+
+        <a href="{{ href }}" class="social" target="_blank" title="{{ icon }}" style="margin-right: 2px"><img src="{{ src }}" alt="{{ icon }}" style="width: 36px"></a>
+    {% endfor %}
+{% endif %}

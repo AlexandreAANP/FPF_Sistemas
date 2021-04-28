@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Products'|trans,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'#': 'Products'|trans}
+        ]
+    }) }}
+    <section id="home">
+        <div class="container text-center" style="height: 400px; padding-top: 100px">
+            <h2>{% trans %}This Product Type is not enabled in this website{% endtrans %}</h2>
+            <a href="{{ baseUri }}/" class="btn btn-primary">{% trans %}Go to Home{% endtrans %}</a>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

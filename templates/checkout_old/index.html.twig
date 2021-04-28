@@ -1,0 +1,1311 @@
+{% extends 'base.html.twig' %}
+{% set totalProducts = 0 %}
+{% set totalProductsPrice = 0.00 %}
+
+{% block body %}
+
+<style>
+    .select2-container{z-index:10000!important}
+    .select2-container--default .select2-selection--single:not(.squared-form){border-radius: 19px}
+    .select2{width: 100%!important}
+    .select2-container .select2-selection--single {height:37px}
+    .select2-selection__rendered{line-height: 33px!important}
+    .select2-container--default .select2-selection--single .select2-selection__arrow {top: 6px;right: 6px}
+    .select2-container .select2-selection--single .select2-selection__rendered {padding-left: 14px}
+    .nav-item a{color:#506BFA}
+</style>
+
+    <form id="form_checkout_gateway" method="POST" class="needs-validation" novalidate>
+        <input type="hidden" name="is_frontoffice_cart" value='true'>
+        <input type="hidden" id="checkout_customer_invoice_id" name="customer_invoice_id">
+        <section>
+            <div class="container mb-0">
+                <h2 class="h1-responsive font-weight-bold text-center mt-4 mb-0">{% trans %}CHECKOUT{% endtrans %}</h2>
+                <p class="text-center w-responsive mx-auto mb-3">{%trans%}Check your products and choose the payment method{%endtrans%}</p>
+            </div>
+            <div class="container mt-0">
+                <div id="product_cart_items_loading" class="p-5 text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+
+                <div id="product_cart_items" style="display: none">
+                    {% if (product.listProductItemStock is defined) and (product.listProductItemStock|length > 0) %}
+                        <div class="row bg-light border p-2 mb-2">
+                            <div class="col h5 product-cart-title-line-1 px-0 text-center">{% trans %}Image{% endtrans %}</div>
+                            <div class="col h5 product-cart-title-line-2 px-0">{% trans %}Name{% endtrans %}</div>
+                            <div class="col h5 product-cart-title-line-3 px-0 text-center">{% trans %}Price{% endtrans %}</div>
+                            <div class="col h5 product-cart-title-line-3 px-0 text-center">{% trans %}Quantity{% endtrans %}</div>
+                            <div class="col h5 product-cart-title-line-3 px-0 text-center">{% trans %}Sub total{% endtrans %}</div>
+                        </div>
+
+                        {% set productQuantity = product.productQuantity %}
+                        {% set productPriceQuantity = product.productPriceQuantity %}
+                        {% set productPrice = product.productPrice %}
+
+                        {% for key,item in product.listProductItemStock %}
+                            {% set bgcolor = loop.index0 is odd ? '#fafafa' : '#fff' %}
+
+                            <div class="row mb-2 py-1 border" style="background: {{ bgcolor }}">
+                                <div class="col product-cart-line-1 px-1 text-center align-middle my-auto"><img src="{{ item.filename }}" class="img-fluid" style="max-height: 60px"></div>
+                                <div class="col product-cart-line-2 px-1 align-middle my-auto">
+                                    {% if item.productAdditionalFields.checkout is defined %}
+                                        <button
+                                                type="button"
+                                                class="btn animate__animated animate__pulse animate__faster animate__infinite infinite btn-outline-warning more-data-checkout"
+                                                data-productid="{{ item.productItemStockId }}"
+                                                data-toggle="collapse"
+                                                data-target="#collapseItem{{ item.productItemStockId }}"
+                                                aria-expanded="false"
+                                                aria-controls="collapseItem{{ item.productItemStockId }}">
+                                            <small class="d-block">{% trans %}click{% endtrans %}</small>
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <small class="d-block">{% trans %}here{% endtrans %}</small>
+                                        </button>
+                                    {% endif %}
+
+                                    <div class="d-block w-100 h5">{{ item.name }}</div>
+                                    {% if item.productTypeReferenceKey == 'physical-products' %}
+                                        <div class="d-block w-100">
+                                            {% trans %}Color{% endtrans %}: {{ product.productItems[item.productItemStockId].color }} | {% trans %}Size{% endtrans %}: {{ product.productItems[item.productItemStockId].size }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col col-3 h6 product-cart-line-0 text-center" style="display: none">{% trans %}Price{% endtrans %}</div>
+                                <div class="col col-3 h6 product-cart-line-0 text-center" style="display: none">{% trans %}Quantity{% endtrans %}</div>
+                                <div class="col col-3 h6 product-cart-line-0 text-center" style="display: none">{% trans %}Sub Total{% endtrans %}</div>
+
+                                <div class="col product-cart-line-3 text-center align-middle my-auto" style="width: 10%">
+                                   {{ productPrice[item.productItemStockId]|number_format(2, '.', '') }}
+                                </div>
+                                <div class="col product-cart-line-3 text-center align-middle my-auto">
+                                    {% if item.allowQuantity %}
+                                        {% if item.productTypeReferenceKey == 'physical-products' %}
+                                            {{ productQuantity[item.productItemStockId] }}
+                                        {% else %}
+                                            <button class="btn btn-outline-primary">{% trans %}Availability{% endtrans %}</button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div class="col product-cart-line-3 text-center align-middle my-auto">
+                                    {{ productPriceQuantity[item.productItemStockId] }}
+                                </div>
+                            </div>
+
+                            {% if item.productAdditionalFields is defined %}
+                                <div>
+                                    <div class="collapse p-0 m-0" id="collapseItem{{ item.productItemStockId }}">
+                                        <div class="form-row p-0 mx-0 mb-3">
+                                            <input type="hidden" name="product_id[]" value="{{ item.productItemStockId }}">
+
+                                            {% set colAdditionalFields = item.productAdditionalFields %}
+                                            {% set fieldPrefix = item.productItemStockId ~ '_' %}
+                                            {% set divOptions = {'class': 'p-2 w-50', 'style': ''} %}
+                                            {% set fieldExcluded = ['product_id', 'order_id'] %}
+                                            {% include '\/_includes/additional_fields.html.twig' %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        {% endfor %}
+
+                    {% else %}
+                        <tbody>
+                        <tr>
+                            <td class="text-center" scope="col">
+                                <h3>{% trans %}There is no Product in Cart{% endtrans %}</h3>
+                                <a href="./" style="border:#ff5a2c solid 3px; color:#ff5a2c; background:transparent" data-loading-text="Backing" class="btn mt-2">{% trans %}Go to Product List{% endtrans %}</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    {% endif %}
+                </div>
+
+                <div class="pb-4 mb-4">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <a href="{{ baseUri }}/product-cart" style="border:#ff5a2c solid 3px; color:#ff5a2c; background: transparent" data-loading-text="Backing" class="btn mx-3">{% trans %}Back to Cart{% endtrans %}</a>
+
+                        <div class="p-0 ml-5">
+                            <div class="h6 p-2 text-right font-weight-bold small" style="margin-bottom:-10px; color:#ff5a2c">{%trans%}Total{%endtrans%}</div>
+                            <div class="h2 p-2 text-right font-weight-bold text-danger">{{ product.totalPrice }} €</div>
+                            <input type="hidden" id="total_products" name="total_products" value="{{ totalProducts }}">
+                            <input type="hidden" id="total_products_price" name="total_products_price" value="{{ totalProductsPrice }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="d-block w-100">
+                <ul class="nav nav-tabs float-right" id="checkoutTab" role="tablist">
+                    {% set activeInvoice = '' %}
+                    {% set ariaSelectedInvoice = 'false' %}
+                    {% set showInvoice = '' %}
+
+                    {% if enableAddressOnCheckout %}
+                        <li class="nav-item">
+                            <a class="nav-link active" id="address_tab" data-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true">{%trans%}Address{%endtrans%}</a>
+                        </li>
+                    {% else %}
+                        {% set activeInvoice = 'active' %}
+                        {% set ariaSelectedInvoice = 'true' %}
+                        {% set showInvoice = 'show active' %}
+                    {% endif %}
+
+                    {% if enableInvoiceOnCheckout %}
+                        <li class="nav-item">
+                            <a class="nav-link {{ activeInvoice }}" id="invoice_one_tab" data-toggle="tab" href="#invoice_one" role="tab" aria-controls="invoice-one" aria-selected="{{ ariaSelectedInvoice }}">{%trans%}Invoice{%endtrans%}</a>
+                        </li>
+                        {% if LayoutFunctions.getEnvVars('SHOW_CHECKOUT_INVOICE_MULTIPLE') == 'true' %}
+                            <li class="nav-item">
+                                <a class="nav-link" id="invoice_multiple_tab" data-toggle="tab" href="#invoice_multiple" role="tab" aria-controls="invoice-multiple" aria-selected="false">{%trans%}Multiple Invoicing{%endtrans%}</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+
+                <!-- ADDRESS START-->
+
+                <div class="tab-content" id="checkoutTabContent">
+
+                {% if enableAddressOnCheckout %}
+
+                        <div class="tab-pane fade show active" id="address" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="container mb-4">
+                                {% set customerAddressLength = customerAddress|length %}
+                                {% if customerAddressLength %}
+                                    {% set addressChecked = '' %}
+                                    {% if customerAddressLength == 1 %}
+                                        {% set addressChecked = 'CHECKED' %}
+                                    {% endif %}
+                                    <div class="row">
+                                        <div class="bg-light w-100 my-2 mr-1 p-1 pt-2 border rounded text-center">
+                                            <h5>{% trans %}Select an address below for we ship your order {% endtrans %}</h5>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="row justify-content-center text-center">
+                                            {% for address in customerAddress %}
+                                                <div class="d-inline-block col-md-4 my-3">
+                                                    <div class="card border rounded">
+                                                        <div class="card-header">
+                                                            <div class="">
+                                                                <div class="custom-control custom-radio">
+                                                                    <input type="radio" class="custom-control-input customer-address-saved" name="customer_address_id" value="{{ address.id }}" id="customer_address_{{ address.id }}" {{ address.main or addressChecked ? 'checked' : null }}>
+                                                                    <label class="custom-control-label" for="customer_address_{{ address.id }}">{%trans%}Address{%endtrans%} {{ loop.index }}</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {% set userCountry = '-/-' %}
+                                                        {% for country in colGeoCountry %}
+                                                            {%if address.countryId == country.id %}
+                                                               {% set userCountry = country.name %}
+                                                            {% endif %}
+                                                        {% endfor %}
+
+                                                        <div class="card-body">
+                                                            <div class="d-inline-block text-left">
+                                                                <b>{% trans %}Line 1:{% endtrans %}</b> {{ address.line1 }}<br>
+                                                                <b>{% trans %}Line 2:{% endtrans %}</b> {{ address.line2 }}<br>
+                                                                <b>{% trans %}City:{% endtrans %}</b> {{ address.city }}<br>
+                                                                <b>{% trans %}State:{% endtrans %}</b> {{ address.state }}<br>
+                                                                <b>{% trans %}Country{% endtrans %}:</b> {{userCountry}}<br>
+                                                                <b>{% trans %}Postal Code:{% endtrans %}</b> {{ address.postalCode }}<br>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+
+                                            <div class="d-inline-block col-md-6 my-3">
+                                                <div class="card border rounded">
+                                                    <div class="card-header bg-info">
+                                                        <div class="">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" class="custom-control-input" name="customer_address_id" value="new" id="customer_address_new">
+                                                                <label class="custom-control-label" for="customer_address_new"><span id="label_customer_address_new" class="text-white">{%trans%}New Address{%endtrans%}</span></label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div id="new_customer_address_fields" class="text-left d-none">
+                                                            <div class="form-group">
+                                                                <label for="new_address_line_1">{% trans %}Line{% endtrans %} 1 *</label>
+                                                                <input type="text" class="form-control" name="new_address_line1" id="new_address_line_1" placeholder="{% trans %}Line{% endtrans %} 1 *">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_address_line_1">{% trans %}Line{% endtrans %} 2</label>
+                                                                <input type="text" class="form-control" name="new_address_line2" id="new_address_line_2" placeholder="{% trans %}Line{% endtrans %} 2">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_address_country">{%trans%}Country{%endtrans%}</label>
+                                                                {% set addressCountry = '-/-' %}
+                                                                {% if colGeoCountry is defined and colGeoCountry|length > 0 %}
+                                                                    <select class="form-control form-select2 geo-countries" id="new_address_country" name="new_address_country">
+                                                                        <!--option selected value="">{% trans %}Choose{% endtrans %}...</option-->
+                                                                            {% for country in colGeoCountry %}
+                                                                                {%if customerAddress[0].countryId == country.id %}
+                                                                                {% set addressCountry = country.name %}
+                                                                                {% endif %}
+                                                                            <option value="{{country.id}}" {{customerAddress[0].countryId == country.id ? 'selected' : null}}>{{country.iso2~' | '~country.name}}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                {% endif %}
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_address_state">{% trans %}State{% endtrans %} *</label>
+                                                                <select class="form-control geo-pt-district form-select2" name="new_address_state" id="new_address_state">
+                                                                    {% for district in colGeoPtDistrict ?? [] %}
+                                                                        <option value='{{district.name}}'>{{district.name}}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <input type="text" name="new_address_state" placeholder="{% trans %}State{% endtrans %}*" class="geo-pt-district d-none form-control">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_address_city">{% trans %}City{% endtrans %} *</label>
+                                                                <select name="new_address_city" id="new_address_city" class="form-control geo-pt-council form-select2">
+                                                                    {% for council in colGeoPtCouncil ?? [] %}
+                                                                        <option value='{{council.name}}'>{{council.name}}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <input type="text" name="new_address_city" placeholder="{% trans %}City{% endtrans %} *" class="geo-pt-council d-none form-control">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_address_postal_code">{% trans %}Postal Code{% endtrans %} *</label>
+                                                                <input type="text" class="form-control" name="new_address_postal_code" id="new_address_postal_code" placeholder="{% trans %}Postal Code{% endtrans %} *">
+                                                            </div>
+                                                            <div class="form-group text-right">
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <!--input type="checkbox" class="custom-control-input" name="new_address_save" id="new_address_save">
+                                                                    <label class="custom-control-label" for="new_address_save">{% trans %}Add this Address to My Account{% endtrans %}</label><br-->
+                                                                    <button type="button" class="secondary-btn btn-new-customer-address">{% trans %}Save{% endtrans %}
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                {% endif %}
+
+                <!-- INVOICE START -->
+
+                {% if enableInvoiceOnCheckout %}
+                    <div class="tab-pane fade {{ showInvoice }}" id="invoice_one" role="tabpanel" aria-labelledby="invoice-one-tab">
+                        <div class="container mb-4">
+
+                            {% set customerInvoiceLength = customerInvoice|length %}
+
+                            <div class="row">
+                                <div class="bg-light w-100 my-2 p-1 pt-2 border rounded text-center">
+                                    <h5>{% trans %}Select an invoice below for we send your bill{% endtrans %}</h5>
+                                </div>
+                            </div>
+
+                            {% if customerInvoiceLength %}
+                                {% set invoiceChecked = '' %}
+                                {% set hasTaxNumber = false %}
+
+                                {% if customerInvoiceLength == 1 %}
+                                    {% set invoiceChecked = 'CHECKED' %}
+                                {% endif %}
+
+                                <div class="box-customer-one-invoice">
+                                    <div class="row justify-content-center text-center">
+
+                                        {% for invoice in customerInvoice %}
+
+                                        {% set hasTaxNumber = invoice.taxNumber ? true : false %}
+
+                                            <div class="col-md-4 mt-2 mb-2 {{(hasTaxNumber ?? null) ? 'd-inline-block' : 'd-none'}}">
+                                                <div class="card border rounded">
+                                                    <div class="card-header">
+                                                        <div class="">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" class="custom-control-input customer-one-invoice" name="customer_invoice" value="{{ invoice.id }}" id="customer_invoice_{{ invoice.id }}" {{ invoice.mainBilling or invoiceChecked ? 'checked' : null }}>
+                                                                <label class="custom-control-label" for="customer_invoice_{{ invoice.id }}">{%trans%}Invoice{%endtrans%} {{ loop.index }}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {% set userCountry = '-/-' %}
+                                                    {% for country in colGeoCountry %}
+                                                        {%if invoice.countryId == country.id %}
+                                                           {% set userCountry = country.name %}
+                                                        {% endif %}
+                                                    {% endfor %}
+
+                                                    <div class="card-body">
+                                                        <div class="d-inline-block text-left">
+                                                            <b>{% trans %}Name{% endtrans %}:</b> {{ invoice.name }}<br>
+                                                            <b>{% trans %}Tax Number{% endtrans %}:</b> {{ invoice.taxNumber }}<br>
+                                                            <b>{% trans %}Line 1{% endtrans %}:</b> {{ invoice.line1 }}<br>
+                                                            <b>{% trans %}Line 2{% endtrans %}:</b> {{ invoice.line2 }}<br>
+                                                            <b>{% trans %}City{% endtrans %}:</b> {{ invoice.city }}<br>
+                                                            <b>{% trans %}State{% endtrans %}:</b> {{ invoice.state }}<br>
+                                                            <b>{% trans %}Country{% endtrans %}:</b> {{userCountry}}<br>
+                                                            <b>{% trans %}Postal Code{% endtrans %}:</b> {{ invoice.postalCode }}<br>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+
+                                        <div class="col-md-6 mt-2 one-invoice mb-3">
+                                            <div class="card border rounded">
+                                                <div class="card-header bg-info">
+                                                    <div class="">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" {{ not hasTaxNumber ? 'checked' : null }} class="custom-control-input customer-one-invoice" name="customer_invoice" value="new" id="new_one_customer_invoice">
+                                                            <label class="custom-control-label" for="new_one_customer_invoice"><span id="label_customer_invoice_new" class="text-white">{%trans%}New Invoice{%endtrans%}</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="new_customer_invoice_description">
+                                                        {%trans%}Select this option for creating a new Invoice{% endtrans %}
+                                                    </div>
+                                                    <div id="new_one_customer_invoice_fields" class="text-left {{(hasTaxNumber ?? null) ? 'd-none' : null }}">
+                                                        <div class="form-group">
+                                                            <input type="hidden" name="new_invoice_action" value="{{hasTaxNumber ? 'add_invoice' : 'update_invoice'}}">
+                                                            <input type="hidden" name="new_invoice_id" value="{{hasTaxNumber ? null : customerInvoice[0].id}}">
+                                                            <label>{%trans%}Name{%endtrans%}</label>
+                                                            <input type="text" class="form-control new-customer-invoice" name="new_invoice_name" id="new_invoice_name" placeholder="{%trans%}Name{%endtrans%}" value="{{hasTaxNumber ? null : customerInvoice[0].name}}">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label>{%trans%}Tax Number{%endtrans%} *</label>
+                                                            <input type="text" class="form-control new-customer-invoice" name="new_invoice_tax_number" id="new_invoice_tax_number" placeholder="{%trans%}Tax Number{%endtrans%}*">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="new_invoice_line_1">{%trans%}Line{%endtrans%} 1 *</label>
+                                                            <input type="text" class="form-control new-customer-invoice" name="new_invoice_line1" id="new_invoice_line_1" placeholder="{%trans%}Line{%endtrans%} 1 *" value="{{hasTaxNumber ? null : customerInvoice[0].line1}}">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="new_invoice_line_1">{%trans%}Line{%endtrans%} 2</label>
+                                                            <input type="text" class="form-control new-customer-invoice" name="new_invoice_line2" id="new_invoice_line_2" placeholder="{%trans%}Line{%endtrans%} 2" value="{{hasTaxNumber ? null: customerInvoice[0].line2}}">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="new_invoice_country">{%trans%}Country{%endtrans%}</label>
+
+                                                            {% if colGeoCountry is defined and colGeoCountry|length > 0 %}
+                                                                <select class="geo-countries custom-select_ form-control_ new-customer-invoice form-select2" id="new_invoice_country" name="new_invoice_country">
+                                                                    {% for country in colGeoCountry %}
+                                                                        {%if customerInvoice[0].countryId == country.id %}
+                                                                        {% endif %}
+
+                                                                    <option value="{{country.id}}" {{customerInvoice[0].countryId == country.id ? 'selected' : null}}>{{country.iso2~' | '~country.name}}</option>
+
+                                                                    {% endfor %}
+                                                                </select>
+                                                            {% endif %}
+
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="new_invoice_state">{%trans%}State{%endtrans%} *</label>
+                                                            <select class="geo-pt-district form-select2" name="new_invoice_state" id="new_invoice_state" >
+                                                                {% for district in colGeoPtDistrict ?? [] %}
+
+                                                                    <option value='{{district.name}}' {{not hasTaxNumber and customerInvoice[0].state == district.name ? 'selected' : null}}>{{district.name}}</option>
+
+                                                                {% endfor %}
+
+                                                            </select>
+                                                            <input type="text" name="new_invoice_state" placeholder="{% trans %}State{% endtrans %} *" class="geo-pt-district form-control d-none">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="new_invoice_city">{%trans%}City{%endtrans%} *</label>
+                                                            <select name="new_invoice_city" id="new_invoice_city" class="geo-pt-council form-select2">
+
+                                                                {% for council in colGeoPtCouncil ?? [] %}
+
+                                                                    <option value='{{council.name}}' {{not hasTaxNumber and customerInvoice[0].city == council.name ? 'selected' :  null}} >{{council.name}}</option>
+
+                                                                {% endfor %}
+
+                                                            </select>
+                                                            <input type="text" name="new_invoice_city" placeholder="{% trans %}City{% endtrans %} *" class="geo-pt-council d-none form-control">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="new_invoice_postal_code">{%trans%}Postal Code{%endtrans%} *</label>
+                                                            <input type="text" class="form-control new-customer-invoice" name="new_invoice_postal_code" id="new_invoice_postal_code" placeholder="{%trans%}Postal Code{%endtrans%} *" value="{{hasTaxNumber ? null : customerInvoice[0].postalCode}}">
+                                                        </div>
+                                                        <div class="form-group text-right">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <!--input type="checkbox" {{hasTaxNumber ? null : 'checked'}} class="{{hasTaxNumber ? null : 'd-none'}} custom-control-input new-customer-invoice" name="new_invoice_save" id="customer_invoice_new_save" value="save">
+                                                                <label class="custom-control-label {{ hasTaxNumber ? null : 'd-none'}} " for="customer_invoice_new_save">{%trans%}Add this Invoice to My Account{%endtrans%}</label><br-->
+                                                                <button type="button" class="secondary-btn btn-new-customer-invoice">{% trans %}Save{% endtrans %}</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {# END OF INVOICE ONE - START INVOICE MULTIPLE #}
+
+                    {% if LayoutFunctions.getEnvVars('SHOW_CHECKOUT_INVOICE_MULTIPLE') == 'true' %}
+                        <div class="tab-pane fade" id="invoice_multiple" role="tabpanel" aria-labelledby="invoice-multiple-tab">
+                            <div class="container mb-4">
+                                <div class="row">
+                                    <div class="bg-light w-100 my-2 p-1 pt-2 border rounded text-center">
+                                        <h5>{% trans %}Select the invoices below for we send your bills{% endtrans %}</h5>
+                                    </div>
+                                </div>
+
+                                <div id="box_more_invoices">
+                                    <div id="dinamic_invoice" class="row d-block text-center">
+                                        {% set customerInvoiceLength = customerInvoice|length %}
+                                        {% if customerInvoiceLength %}
+                                            {% set invoiceChecked = '' %}
+                                            {% if customerInvoiceLength == 1 %}
+                                                {% set invoiceChecked = 'CHECKED' %}
+                                            {% endif %}
+
+                                            {% for invoice in customerInvoice %}
+                                                <div class="d-inline-block col-auto my-3">
+                                                    <div class="card border rounded">
+
+                                                        <div class="card-header">
+                                                            <div class="">
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input customer-more-invoice" name="customer_invoices[]" value="{{ invoice.id }}" id="customer_invoices_{{ invoice.id }}">
+                                                                    <label class="custom-control-label" for="customer_invoices_{{ invoice.id }}">Invoice {{ invoice.id }}</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card-body">
+                                                            <div class="d-inline-block text-left">
+                                                                <b>{% trans %}Nome:{% endtrans %}</b> {{ invoice.name }}<br>
+                                                                <b>{% trans %}Line 1:{% endtrans %}</b> {{ invoice.line1 }}<br>
+                                                                <b>{% trans %}Line 2:{% endtrans %}</b> {{ invoice.line2 }}<br>
+                                                                <b>{% trans %}City:{% endtrans %}</b> {{ invoice.city }}<br>
+                                                                <b>{% trans %}State:{% endtrans %}</b> {{ invoice.state }}<br>
+                                                                <b>{% trans %}Country:{% endtrans %}</b><span class="set-invoice-country"></span><br>
+                                                                <b>{% trans %}Postal Code:{% endtrans %}</b> {{ invoice.postalCode }}<br>
+
+
+                                                                <div class="form-group mt-3 p-2 customer-invoice-value-box d-none" id="container_box_{{ invoice.id }}">
+
+                                                                    <p class="">
+                                                                        <input class="form-check-input customer-invoice-format" type="radio" name="invoice_format_{{invoice.id }}" id="invoice_format_{{invoice.id }}_1" value="product">
+                                                                        <label for="invoice_format_{{ invoice.id }}_1">{% trans %}Bill by Product{% endtrans %}</label>
+                                                                    </p>
+
+                                                                    <div class="customer-invoice-format-products d-none">
+                                                                        {% for item in product.listProductItemStock %}
+                                                                            <div class="form-check ml-2">
+                                                                                <input class="form-check-input customer-invoice-format-products-input" type="radio" name="customer_invoice_product[{{ invoice.id }}][{{ item.productItemStockId }}]" id="invoice_product_{{ invoice.id }}_{{ item.productItemStockId }}" value="{{ productPrice[item.productItemStockId] }}">
+                                                                                <label class="form-check-label" for="invoice_product_{{ invoice.id }}_{{ item.productItemStockId }}">{{ item.name }}</label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                    </div>
+
+                                                                    <hr>
+
+                                                                    <p class="">
+                                                                        <input class="form-check-input customer-invoice-format" type="radio" name="invoice_format_{{invoice.id }}" id="invoice_format_{{invoice.id }}_2" value="values">
+                                                                        <label for="invoice_format_{{invoice.id }}_2">{% trans %}Or sharing the price between invoices{% endtrans %}</label>
+                                                                    </p>
+
+                                                                    <div class="form-group ml-2 customer-invoice-format-values d-none">
+                                                                        <label for="customer_invoice_value_{{ invoice.id }}">{%trans%}Enter the invoice amount here{%endtrans%}:</label>
+                                                                        <input type="number" class="form-control customer-invoice-format-values-input" placeholder="Enter value" id="customer_invoice_value_{{ invoice.id }}" name="customer_invoice_value[{{ invoice.id }}]" pattern="[0-9]+([\.,][0-9]+)?" step="0.01">
+                                                                        <div class="remaining" data-total-price="{{ totalProductsPrice }}">
+                                                                            <label>{% trans %}Remaining{% endtrans %}: </label>
+                                                                            <label class="remaining-value">{{ totalProductsPrice }}</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                            <div class="d-inline-block col-md-4 mb-3">
+                                                <div class="card border rounded">
+                                                    <div class="card-header bg-info">
+                                                        <div class="">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input customer-more-invoice" name="multiple_customer_invoice_new" value="new" id="multiple_customer_invoice_new">
+                                                                <label class="custom-control-label" for="multiple_customer_invoice_new"><span id="label_customer_invoice_new" class="text-white">{%trans%}New Invoice{%endtrans%}</span></label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div id="new_multiple_invoice_fields_description">
+                                                            {%trans%}Select this option for creating a new Invoice{% endtrans %}
+                                                        </div>
+                                                        <div id="new_multiple_invoice_fields" class="text-left" style="height: 0; display: none!important">
+                                                            <div class="form-group">
+                                                                <label for="new_multiple_invoice_line_1">{%trans%}Line{%endtrans%} 1</label>
+                                                                <input type="text" class="form-control new-multiple-customer-invoice" name="new_multiple_invoice_line1" id="new_multiple_invoice_line_1" placeholder="{%trans%}Line{%endtrans%} 1">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_multiple_invoice_line_2">{%trans%}Line{%endtrans%} 2</label>
+                                                                <input type="text" class="form-control new-multiple-customer-invoice" name="new_multiple_invoice_line2" id="new_multiple_invoice_line_2" placeholder="{%trans%}Line{%endtrans%} 2">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_multiple_invoice_country">{%trans%}Country{%endtrans%}</label>
+                                                                {% if colGeoCountry is defined and colGeoCountry|length > 0 %}
+                                                                    <select class="custom-select form-control new-multiple-customer-invoice" id="new_multiple_invoice_country" name="new_multiple_invoice_country">
+                                                                        <option selected value="">{% trans %}Choose{% endtrans %}...</option>
+                                                                        {% for country in colGeoCountry %}
+                                                                            <option value="{{country.id}}">{{country.iso2~' | '~country.name}}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                {% endif %}
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_multiple_invoice_state">{%trans%}State{%endtrans%}</label>
+                                                                <input type="text" class="form-control new-multiple-customer-invoice" name="new_multiple_invoice_state" id="new_multiple_invoice_state" placeholder="{%trans%}State{%endtrans%}">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_multiple_invoice_city">{%trans%}City{%endtrans%}</label>
+                                                                <input type="text" class="form-control new-multiple-customer-invoice" name="new_multiple_invoice_city" id="new_multiple_invoice_city" placeholder="{%trans%}City{%endtrans%}">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="new_multiple_invoice_postal_code">{%trans%}Postal Code{%endtrans%}</label>
+                                                                <input type="text" class="form-control new-multiple-customer-invoice" name="new_multiple_invoice_postal_code" id="new_multiple_invoice_postal_code" placeholder="{%trans%}Postal Code{%endtrans%}">
+                                                            </div>
+                                                            <div class="form-group text-center">
+                                                                <button type="button" class="btn btn-info p-3" id="btn_new_multiple_invoice">{% trans %}Add{% endtrans %}</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </section>
+    </form>
+
+    <section>
+        <div class="container" style="margin-bottom: 100px">
+            <div class="row">
+                <div class="bg-light w-100 my-2 p-1 pt-2 border rounded text-center">
+                    <h5>
+                        {% trans %}Select a Payment Gateway{% endtrans %}
+                    </h5>
+                </div>
+            </div>
+            <div>
+                <div class="row d-block text-center">
+                    {% if listPaymentGateway|length %}
+                        <div class="row justify-content-center">
+                            {% for paymentGateway in listPaymentGateway %}
+                                <div class="card border-0 m-2 text-center" style="min-width: 180px">
+                                    {% if paymentGateway.referenceKey == 'payment_gateway_none' or paymentGateway.referenceKey == 'payment_gateway_check_availability' %}
+                                        <button data-gateway="{{baseUri}}{{ paymentGateway.link }}" class="btn btn-dark text-white btn-checkout-gateway w-100" style="font-size: 20px; padding: 15px 10px; font-weight: bold; white-space: nowrap">
+                                            {{ paymentGateway.name }}
+                                        </button>
+                                    {% else %}
+                                        <button data-gateway="{{baseUri}}{{baseUri}}{{ paymentGateway.link }}" class="btn btn-dark btn-checkout-gateway w-100">
+                                            <i class="fab {{ paymentGateway.icon}} fa-3x text-white"></i>
+                                        </button>
+                                        <span class="small">Pagar com <strong>{{ paymentGateway.name }}</strong></span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <form class="d-none invoice-customer" action="/customer/my-account" method="POST">
+        <input type="hidden" name="action">
+        <input type="hidden" name="invoiceId">
+        <input type="text" required name="line1">
+        <input type="hidden" name="country">
+        <input type="text" required name="postalCode">
+        <input type="text" required name="state">
+        <input type="text" required name="city">
+        <input type="hidden" name="line2">
+        <input type="text" required name="taxNumber">
+        <input type="hidden" name="nameToInvoice">
+        <input type="hidden" name="alias">
+        <input type="hidden" name="mainBilling" {{not hasTaxNumber ? 'checked' : null }} value="1">
+    </form>
+
+    <form class="d-none address-customer" action="/customer/my-account" method="POST">
+        <input type="hidden" name="action" value="add_address">
+        <input type="hidden" name="addressId">
+        <input type="text" required name="line1">
+        <input type="hidden" name="line2">
+        <input type="hidden" name="country">
+        <input type="text" required name="postalCode">
+        <input type="text" required name="state">
+        <input type="text" required name="city">
+        <input type="hidden" name="addressType" value="1">
+    </form>
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function() {
+            var options = {};
+            querybizProduct.init(options);
+            querybizProduct.showCart('checkout/auth');
+            $('.form-select2').select2();
+        });
+
+        $('#new_one_customer_invoice').is(':checked') ? $('#invoice_one_tab').trigger('click') : false;
+
+        $( "body" ).on( "change", ".geo-countries", function() {
+            let form = $(this).closest('form');
+            if ($(this).val() == arDefaultOptions['countryBaseId']) {
+                $(form).find('input.geo-pt-council, input.geo-pt-district').addClass('d-none').attr('disabled', true);
+                $(form).find('select.geo-pt-council, select.geo-pt-district').removeClass('d-none').attr('disabled', false);
+                $(form).find('select.geo-pt-council, select.geo-pt-district').next().removeClass('d-none');
+            } else {
+                $(form).find('input.geo-pt-district, input.geo-pt-council').removeClass('d-none').attr('disabled', false);
+                $(form).find('select.geo-pt-district, select.geo-pt-council').addClass('d-none').attr('disabled', true);
+                $(form).find('select.geo-pt-council, select.geo-pt-district').next().addClass('d-none');
+            }
+            $('input,select').removeClass('border-danger');
+            $('.required').remove();
+        });
+
+        $( 'body').on('click', '.btn-new-customer-address', function(){
+            checkoutForm = $('#form_checkout_gateway');
+            form = $('.address-customer');
+            form.find('input[name=line1]').val(checkoutForm.find('input[name=new_address_line1]').val());
+            form.find('input[name=line2]').val(checkoutForm.find('input[name=new_address_line2]').val());
+            form.find('input[name=country]').val(checkoutForm.find('select[name=new_address_country]').val());
+            form.find('input[name=postalCode]').val(checkoutForm.find('input[name=new_address_postal_code]').val());
+
+            if(checkoutForm.find('select[name=new_address_country]').val() == 177){
+                form.find('input[name=state]').val(checkoutForm.find('select[name=new_address_state]').val());
+                form.find('input[name=city]').val(checkoutForm.find('select[name=new_address_city]').val());
+            }
+            else{
+                form.find('input[name=state]').val(checkoutForm.find('input[name=new_address_state]').val());
+                form.find('input[name=city]').val(checkoutForm.find('input[name=new_address_city]').val());
+            }
+           if(checkEmptyFields(form, checkoutForm, 'address')){
+                return false;
+            }
+
+            if(!isValidPtPostalCode(form, checkoutForm, 'address')){
+                return false;
+            }
+
+            $('.img-loader').removeClass('d-none')
+
+            querybiz.post($(form), function(data) {
+                $.each($(form), function(key, val) {
+                    if ($(val).attr('data-prevent-cancel')) {
+                        $(val).attr('data-prevent-cancel', $(val).val());
+                    }
+                });
+                setTimeout(function(){
+                   location.reload();
+                }, 500);
+            }, function(data) {
+
+                console.log(data)
+
+                Swal.fire('{%trans%}Attention{%endtrans%}!',data,'warning');
+                $('.more-data-checkout').trigger('click');
+                $('.img-loader').removeClass('d-none')
+                return
+            });
+        })
+
+         $( 'body' ).on('click', '.btn-new-customer-invoice', function(){
+            checkoutForm = $('#form_checkout_gateway');
+            form = $('.invoice-customer');
+            form.find('input[name=mainBilling]').val(checkoutForm.find('input[name=new_invoice_save]').val());
+            form.find('input[name=action]').val(checkoutForm.find('input[name=new_invoice_action]').val());
+            form.find('input[name=invoiceId]').val(checkoutForm.find('input[name=new_invoice_id]').val());
+            form.find('input[name=nameToInvoice]').val(checkoutForm.find('input[name=new_invoice_name]').val());
+            form.find('input[name=line1]').val(checkoutForm.find('input[name=new_invoice_line1]').val());
+            form.find('input[name=line2]').val(checkoutForm.find('input[name=new_invoice_line2]').val());
+            form.find('input[name=country]').val(checkoutForm.find('select[name=new_invoice_country]').val());
+            form.find('input[name=postalCode]').val(checkoutForm.find('input[name=new_invoice_postal_code]').val());
+            form.find('input[name=taxNumber]').val(checkoutForm.find('input[name=new_invoice_tax_number]').val());
+
+            if(checkoutForm.find('select[name=new_invoice_country]').val() == 177){
+                form.find('input[name=state]').val(checkoutForm.find('select[name=new_invoice_state]').val());
+                form.find('input[name=city]').val(checkoutForm.find('select[name=new_invoice_city]').val());
+            }
+            else{
+                form.find('input[name=state]').val(checkoutForm.find('input[name=new_invoice_state]').val());
+                form.find('input[name=city]').val(checkoutForm.find('input[name=new_invoice_city]').val());
+            }
+
+           if(checkEmptyFields(form, checkoutForm, 'invoice')){
+                return false;
+            }
+            if(!isValidPtTin(form, checkoutForm)){
+                return false;
+            }
+            if(!isValidPtPostalCode(form, checkoutForm, 'invoice')){
+                return false;
+            }
+            $('.img-loader').removeClass('d-none')
+            querybiz.post($(form), function(data) {
+                $.each($(form), function(key, val) {
+                    if ($(val).attr('data-prevent-cancel')) {
+                        $(val).attr('data-prevent-cancel', $(val).val());
+                    }
+                });
+                setTimeout(function(){
+                   location.reload();
+                }, 500);
+            }, function(data) {
+                Swal.fire('{%trans%}Attention{%endtrans%}!',data,'warning');
+                $('.more-data-checkout').trigger('click');
+                $('.img-loader').removeClass('d-none')
+                return
+            });
+        })
+
+        function checkEmptyFields (form, checkoutForm, type){
+            $('.required').remove();
+            $('input').removeClass('border-danger');
+            required = '<span class="not-valid required text-danger small float-right">{%trans%}Required{%endtrans%}</span>';
+            elements = 'input[type=text]:required';
+            emptyData = $(form).find(elements);
+            emptyField = false;
+            $.each(emptyData, function (key, val) {
+                if(!$(val).val() && !$(val).hasClass('d-none')){
+                    emptyField = true;
+                    if ($(val).attr('name') == 'line1')
+                        checkoutForm.find('input[name=new_'+type+'_line1]').before(required).addClass('border-danger').focus();
+                    if ($(val).attr('name') == 'postalCode')
+                        checkoutForm.find('input[name=new_'+type+'_postal_code]').before(required).addClass('border-danger').focus();
+                    if ($(val).attr('name') == 'state')
+                        checkoutForm.find('input[name=new_'+type+'_state]').before(required).addClass('border-danger').focus();
+                    if ($(val).attr('name') == 'city')
+                        checkoutForm.find('input[name=new_'+type+'_city]').before(required).addClass('border-danger').focus();
+                    if ($(val).attr('name') == 'taxNumber')
+                        checkoutForm.find('input[name=new_invoice_tax_number]').before(required).addClass('border-danger').focus();
+                }
+            });
+            if(emptyField){
+                $('.one-invoice').css('zIndex',9999);
+                $(form).find('.btn-new-customer-'+type).attr('disabled', false);
+                return true;
+            }
+            return false;
+        }
+        function isValidPtPostalCode(form, checkoutForm, type){
+            $('.required').remove();
+            isValid = true;
+            if( checkoutForm.find('select[name=new_'+type+'_country]').val() != 177 || !checkoutForm.find('select[name=new_'+type+'_country]').length){
+                return true;
+            }
+            value = checkoutForm.find('input[name=new_'+type+'_postal_code]').val();
+            invalid = '<span class="not-valid required text-danger small float-right">{%trans%}Invalid{%endtrans%} Ex. 0000-000</span>';
+            var patt = /^\d{4}-\d{3}?$/gm;
+            if(!value.match(patt)){
+                $('.one-invoice').css('zIndex',9999);
+                checkoutForm.find('input[name=new_'+type+'_postal_code]').before(invalid).addClass('border-danger').focus();
+                $(form).find('.btn-new-customer-'+type).attr('disabled', false);
+                return false;
+            }
+            return true;
+        }
+
+        function isValidPtTin(form, checkoutForm){
+            $('.required').remove();
+            isValid = true;
+            if( checkoutForm.find('select[name=new_invoice_country]').val() != 177 || !checkoutForm.find('select[name=new_invoice_country]').length){
+                return true;
+            }
+            value =  checkoutForm.find('input[name=new_invoice_tax_number]').val();
+            invalid = '<span class="not-valid required text-danger small float-right">{%trans%}Invalid{%endtrans%} Ex. 123456789</span>';
+            const nif = typeof value === 'string' ? value : value.toString();
+            const validationSets = {
+                one: ['1', '2', '3', '5', '6', '8'],
+                two: ['45', '70', '71', '72', '74', '75', '77', '79', '90', '91', '98', '99']
+            };
+            if (nif.length !== 9){
+                isValid = false;
+            }
+            if (!validationSets.one.includes(nif.substr(0, 1)) && !validationSets.two.includes(nif.substr(0, 2))) {
+                isValid = false;
+            }
+            const total = nif[0] * 9 + nif[1] * 8 + nif[2] * 7 + nif[3] * 6 + nif[4] * 5 + nif[5] * 4 + nif[6] * 3 + nif[7] * 2;
+            const modulo11 = (Number(total) % 11);
+            const checkDigit = modulo11 < 2 ? 0 : 11 - modulo11;
+            if(checkDigit !== Number(nif[8])){
+                isValid = false;
+            }
+            if(!isValid){
+                $('.one-invoice').css('zIndex',9999);
+                checkoutForm.find('input[name=new_invoice_tax_number]').before(invalid).addClass('border-danger').focus();
+                //$('.spinner-border').remove();
+                $(form).find('.btn-new-customer-invoice').attr('disabled', false);
+                return false;
+            }
+            return true;
+        }
+
+
+        $( 'body').on('click', 'input[name=customer_address_id]', function(){
+            console.log('ef')
+            if($(this).attr('id') == 'customer_address_new'){
+                $('.geo-countries').trigger('change');
+                $('#new_customer_address_fields').removeClass('d-none');
+            }
+            else{
+                $('#new_customer_address_fields').addClass('d-none');
+            }
+        });
+
+
+        $( 'body').on('click', 'input[name=customer_invoice]', function(){
+            if($(this).attr('id') == 'new_one_customer_invoice'){
+                $('.geo-countries').trigger('change');
+                $('#new_one_customer_invoice_fields').removeClass('d-none');
+            }
+            else{
+                $('#new_one_customer_invoice_fields').addClass('d-none');
+            }
+        });
+
+        var enableInvoiceOnCheckout = {{ enableInvoiceOnCheckout ? 'true' : 'false' }};
+
+        $(function() {
+            $('.btn-checkout-gateway').click(function(e) {
+                e.preventDefault();
+
+                let invoiceIdChecked = 0;
+                let arOneInvoice = $('.customer-one-invoice');
+                for (let i = 0; i < arOneInvoice.length; i++) {
+                    let el = $(arOneInvoice[i]);
+                    if (el.prop('checked')) {
+                        invoiceIdChecked = el.val();
+                    }
+                }
+
+                if (!invoiceIdChecked && enableInvoiceOnCheckout) {
+                    Swal.fire('{%trans%}Attention{%endtrans%}!','{%trans%}You need to select an Invoice{% endtrans%}','warning');
+                } else {
+                    if ($('#checkout_customer_invoice_id').length) {
+                        $('#checkout_customer_invoice_id').val(invoiceIdChecked);
+                    }
+
+                    let gateway = $(this).attr('data-gateway');
+                    $('#form_checkout_gateway').attr('action', gateway);
+                    $('#form_checkout_gateway').submit();
+                }
+            });
+
+/*
+            $('#customer_address_new').click(function() {
+                $('#new_customer_address_description').hide();
+                $('#new_customer_address_fields').show().animate({height: '490px'});
+            });
+
+            $('.customer-address-saved').click(function() {
+                $('#new_customer_address_fields').animate({height: '0px'}, function() {
+                    $(this).hide();
+                    $('#new_customer_address_description').show();
+                });
+            });
+            */
+
+        });
+
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+
+                const totalProducts = $("input#total_products").val();
+                const totalProductsPrice = parseFloat($("input#total_products_price").val());
+                var inputedValueInvoice = 0.00;
+
+                var selectTotalValuesToInvoices = 0;
+
+                console.log(`totalProducts: ${totalProducts}\ntotalProductsPrice: ${totalProductsPrice}`);
+/*
+                $('#customer_address_new').click(function() {
+                    $('#new_customer_address_description').hide();
+                    $('#new_customer_address_fields').show().animate({height: '490px'});
+                });
+
+                $('input:radio#new_one_customer_invoice').click(function(evt){
+                    if($(this).prop('checked')){
+                        $('div#new_one_customer_invoice_fields').removeClass('d-none');
+                    }else{
+                        $('div#new_one_customer_invoice_fields').addClass('d-none');
+                    }
+                });
+*/
+                //more_invoice format exibition
+                $('input:checkbox.customer-more-invoice').on("click", function(){
+                    let idEl = $(this).val();
+                    if($(this).prop('checked')){
+                        $('div#container_box_'+idEl).removeClass('d-none');
+                    } else {
+                        $('div#container_box_'+idEl).addClass('d-none');
+                    }
+                });
+
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        var btnAction = $('.btn-form-action');
+                        btnAction.prop('disabled',true);
+                        btnAction.append('<span id="spinner-loading" class="spinner-border spinner-border-sm d-block mx-auto" role="status" aria-hidden="true"></span>');
+
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            Swal.fire('{%trans%}Attention{%endtrans%}!','{%trans%}There are required fields not filled in{%endtrans%}!','warning');
+                            $('.more-data-checkout').trigger('click');
+                        }
+
+                        //valida one invoice : ok
+                        if($('input:radio#one_invoice').prop('checked'))
+                        {
+
+                            let totalRadiosSelecteds = $(':radio[name="customer_invoice"]:checked').length;
+                            if(totalRadiosSelecteds<1) {
+                                Swal.fire('{%trans%}Attention{%endtrans%}!','{%trans%}You need to choose one of the options{%endtrans%}!','warning');
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+
+                        }
+
+                        //more invoices selecionado
+                        if($('input:radio#more_invoice').prop('checked'))
+                        {
+
+                            //verifica se pessoa/invoice não está selecionado
+                            let totalRadiosSelecteds = ($(':checkbox[name="customer_invoices[]"]:checked').length>0)?$(':checkbox[name="customer_invoices[]"]:checked').length:0;
+                            if(totalRadiosSelecteds<1)
+                            {
+                                Swal.fire('{%trans%}Attention{%endtrans%}!','{%trans%}You need to choose one of the options to Invoice{%endtrans%}!','warning');
+                                $(':checkbox[name="customer_invoices[]"]').focus();
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            else
+                            {
+
+                                //verifica se formato NÃO FOI selecionado
+                                let totalRadiosInvoiceFormatProduct = ($(':radio[value="product"]:checked').length>0)?$(':radio[value="product"]:checked').length:0;
+                                let totalRadiosInvoiceFormatValues = ($(':radio[value="values"]:checked').length>0)?$(':radio[value="values"]:checked').length:0;
+                                if(totalRadiosSelecteds>0 && totalRadiosInvoiceFormatProduct<1 && totalRadiosInvoiceFormatValues<1 ) {
+                                    Swal.fire('{%trans%}Attention{%endtrans%}!','{%trans%}You need to choose Bill by Product or Share the price between invoices{%endtrans%}','warning');
+                                    $(':radio.customer-invoice-format').focus().fadeIn("slow");
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                }
+                                else
+                                {
+
+                                    if($(':radio[value="product"]:checked').prop('checked'))
+                                    {
+
+                                        let totalSelectedProductsInvoice = $(':radio.customer-invoice-format-products-input:checked').length;
+                                        //verifica se algum produto NÃO FOI selecionado para fatura
+                                        if(totalSelectedProductsInvoice<1){
+                                            Swal.fire('{%trans%}Attention{%endtrans%}!','{%trans%}You need to select products{%endtrans%}!','warning');
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                        }
+                                        else
+                                        {
+
+                                            //verifica SE TODOS os produtos foram selecionados
+                                            if(totalSelectedProductsInvoice<totalProducts) {
+                                                let productNotSelectedToInvoice = parseInt(totalProducts-totalSelectedProductsInvoice);
+                                                Swal.fire('{%trans%}Attention{%endtrans%}!',`{%trans%}You still need to select{%endtrans%} ${productNotSelectedToInvoice} {%trans%}products{%endtrans%}`,'warning');
+                                                event.preventDefault();
+                                                event.stopPropagation();
+                                            }
+
+                                        }
+
+                                    }
+
+                                    if($(':radio[value="values"]:checked').prop('checked'))
+                                    {
+
+                                        let remaining = parseFloat(parseFloat(totalProductsPrice)-parseFloat(inputedValueInvoice));
+                                        if((inputedValueInvoice<totalProductsPrice)) {
+                                            Swal.fire('{%trans%}Attention{%endtrans%}!',`{%trans%}There are still{%endtrans%} ${remaining.toFixed(2)} {%trans%}to distribute on invoices{%endtrans%}`,'warning');
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                        }
+
+                                        if(inputedValueInvoice==0.00) {
+                                            Swal.fire('{%trans%}Attention{%endtrans%}!',`{%trans%}Enter the invoice amount{%endtrans%}`,'warning');
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                        }
+
+                                    }
+
+
+                                }
+
+                            } //END: more invoices selecionado
+
+
+                        }
+
+                        btnAction.prop('disabled',false);
+                        $('span#spinner-loading').remove();
+                        form.classList.add('was-validated');
+
+                    }, false);
+                });
+
+                $('.customer-invoice-format').click(function(){
+
+                    let elId = $(this).attr('id');
+                    let elVal = $(this).val();
+
+                    if(elVal=='product')
+                    {
+
+                        selectTotalValuesToInvoices = 0;
+                        inputedValueInvoice = 0.00;
+                        let remaining = $('.remaining').data('total-price').toFixed(2);
+                        $('.remaining-value').html(remaining);
+                        $('input:radio[value="product"].customer-invoice-format').prop('checked',true);
+                        $('div.customer-invoice-format-products').removeClass('d-none').show('fast');
+                        $('input:radio.customer-invoice-format-products-input').prop('disabled',false);
+                        $('.customer-invoice-format-values').addClass('d-none');
+                        $('input.customer-invoice-format-values-input').val('').prop('disabled',true);
+
+                        resetRemaining();
+
+                    }
+                    else
+                    {
+
+                        $('input:radio[value="values"].customer-invoice-format').prop('checked',true);
+                        $('.customer-invoice-format-values').removeClass('d-none');
+                        $('input.customer-invoice-format-values-input').val('').prop('disabled',false);
+                        $('input:radio[value="product"].customer-invoice-format').prop('checked',false);
+                        $('.customer-invoice-format-products').addClass('d-none');
+                        $('input:radio.customer-invoice-format-products-input').prop('disabled',true);
+                        $('input:radio.customer-invoice-format-products-input').prop('checked',false);
+
+                    }
+                });
+
+                $('.customer-invoice-format-values-input').blur(function(evt){
+
+                    let inputValue = ($(this).val()).trim();
+
+                    if(inputValue.length>1) {
+
+                        console.log("\nlinha 752: inputedValueInvoice: " + inputedValueInvoice);
+
+                        inputedValueInvoice = parseFloat(inputedValueInvoice) + parseFloat(inputValue);
+
+                        console.log("\nlinha 756: inputedValueInvoice + entrada: " + inputedValueInvoice);
+
+                        let remaining = parseFloat(parseFloat(totalProductsPrice) - inputedValueInvoice).toFixed(2);
+
+                        if(inputedValueInvoice>totalProductsPrice) {
+
+                            let correctValue = (parseFloat(inputValue)-Math.abs(remaining));
+                            let exceedValue  = (parseFloat(inputValue)-correctValue);
+                            inputedValueInvoice = parseFloat(totalProductsPrice);
+                            Swal.fire('{%trans%}Attention{%endtrans%}!','{%trans%}Value exceeds in {%endtrans%} '+parseFloat(exceedValue).toFixed(2),'warning');
+
+                            remaining = 0.00;
+                            $(this).val(correctValue);
+                            $(".remaining").data("total-price", remaining);
+                            $(".remaining-value").html((remaining).toFixed(2));
+
+                            console.log("\nlinha 772: inputedValueInvoice: " + inputedValueInvoice);
+
+                            return false;
+                        }
+                        else if(inputedValueInvoice<totalProductsPrice)
+                        {
+                            Swal.fire('','{%trans%}You still have{%endtrans%} ' + parseFloat(remaining).toFixed(2) + ' {%trans%}to finalize you invoice{%endtrans%}' ,'success');
+                        }
+                        $(".remaining").data("total-price", remaining);
+                        $(".remaining-value").html(remaining);
+
+                    } else {
+                        let inputedValues = 0.00;
+                        let inputs = $('.customer-invoice-format-values-input');
+
+                        for(let i=0;i<inputs.length;i++){
+                            if( (inputs[i].value!="") && (parseFloat(inputs[i].value)>0.00) ){
+                                inputedValues+=parseFloat(inputs[i].value);
+                            }
+                        }
+
+                        if((inputedValues!="") || (inputedValues>0.00) ) {
+                            inputedValueInvoice = parseFloat(inputedValues);
+                            let remaining = parseFloat(totalProductsPrice - inputedValueInvoice);
+                            $(".remaining").data("total-price", remaining );
+                            $(".remaining-value").html((remaining).toFixed(2));
+                            Swal.fire('','{%trans%}You still have{%endtrans%} ' + (remaining).toFixed(2) + ' {%trans%}to finalize you invoice{%endtrans%}' ,'success');
+                        }
+
+                        console.log("\nlinha 804: inputedValueInvoice: " + inputedValueInvoice);
+
+                    }
+
+                });
+
+                function resetRemaining()
+                {
+                    inputedValueInvoice = 0.00;
+                    $('.remaining').data('total-price', totalProductsPrice);
+                    $('.remaining-value').html(parseFloat(totalProductsPrice).toFixed(2));
+                    $('input.customer-invoice-format-values-input').val('');
+                }
+
+                $('#multiple_customer_invoice_new').click(function() {
+                    $('#new_multiple_invoice_fields_description').hide();
+                    $('#new_multiple_invoice_fields').show().animate({height: '520px'});
+                });
+            }, false);
+        })();
+
+        $(document).ready(function(){
+
+            $("#btn_new_multiple_invoice").click(function(evt){
+
+                $("div#box_more_invoices").removeClass('d-none');
+
+                $("#btn_new_multiple_invoice").append('<span id="spinner-loading" class="spinner-border spinner-border-sm d-block mx-auto" role="status" aria-hidden="true"></span>');
+                $("#btn_new_multiple_invoice").prop("disabled",true);
+
+                let serviceAPI  = '/addCustomerInvoice';
+                let customerId  = {{customerId}};
+                let line1       = ($("#new_multiple_invoice_line_1").val()!="")      ?$("#new_multiple_invoice_line_1").val()     :null;
+                let line2       = ($("#new_multiple_invoice_line_2").val()!="")      ?$("#new_multiple_invoice_line_2").val()     :null;
+                let countryId   = ($("#new_multiple_invoice_country").val()!="")     ?$("#new_multiple_invoice_country").val()    :null;
+                let city        = ($("#new_multiple_invoice_state").val()!="")       ?$("#new_multiple_invoice_state").val()      :null;
+                let state       = ($("#new_multiple_invoice_city").val()!="")        ?$("#new_multiple_invoice_city").val()       :null;
+                let postalCode  = ($("#new_multiple_invoice_postal_code").val()!="") ?$("#new_multiple_invoice_postal_code").val():null;
+
+                let url	= `${arDefaultOptions['baseUri']}${serviceAPI}?customerId=${customerId}&line1=${line1}&line2=${line2}&countryId=${countryId}&city=${city}&state=${state}&postalCode=${postalCode}`
+                querybiz.request(url,'POST',(msg)=>{
+
+                    let customerInvoiceId = msg.customerInvoiceId;
+                    console.log('customerInvoiceId: '+customerInvoiceId);
+                    let loopIndex  = Math.floor(Math.random() * 1000000);
+                    let container  = `<div class="d-inline-block col-auto my-3">
+                                        <div class="card border rounded">
+
+                                            <div class="card-header">
+                                                <div class="">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input customer-more-invoice" name="customer_invoices[]" value="${customerInvoiceId}" id="customer_invoices_${customerInvoiceId}">
+                                                        <label class="custom-control-label" for="customer_invoices_${customerInvoiceId}">Invoice ${customerInvoiceId}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="d-inline-block text-left">
+                                                    <b>{% trans %}Nome{% endtrans %}:</b> <BR>
+                                                    <b>{% trans %}Line 1{% endtrans %}:</b> ${line1}<BR>
+                                                    <b>{% trans %}Line 2{% endtrans %}:</b> ${line2}<BR>
+                                                    <b>{% trans %}City{% endtrans %}:</b> ${city}<BR>
+                                                    <b>{% trans %}State{% endtrans %}:</b> ${state}<BR>
+                                                    <b>{% trans %}Country{% endtrans %}:</b> ${countryId}<BR>
+                                                    <b>{% trans %}Postal Code{% endtrans %}:</b> ${postalCode}<BR>
+                                                    <div class="form-group mt-3 p-2 customer-invoice-value-box d-none" id="container_box_${customerInvoiceId}">
+
+                                                        <p class="">
+                                                            <input class="form-check-input customer-invoice-format" type="radio" name="invoice_format_${customerInvoiceId}" id="invoice_format_${customerInvoiceId}_1" value="product">
+                                                            <label for="invoice_format_${customerInvoiceId}_1">{% trans %}Bill by Product{% endtrans %}</label>
+                                                        </p>
+
+                                                        <div class="customer-invoice-format-products d-none">
+                                                            {% for item in product.listProductItemStock %}
+                                                            <div class="form-check ml-2">
+                                                                <input class="form-check-input customer-invoice-format-products-input" type="radio" name="customer_invoice_product[${customerInvoiceId}][{{ item.productItemStockId }}]" id="invoice_product_${customerInvoiceId}_{{ item.productItemStockId }}" value="{{ product.productPrice[item.productItemStockId] }}">
+                                                                <label class="form-check-label" for="invoice_product_${customerInvoiceId}_{{ item.productItemStockId }}">{{ item.name }}</label>
+                                                            </div>
+                                                            {% endfor %}
+                                                        </div>
+
+                                                        <hr>
+
+                                                        <p class="">
+                                                            <input class="form-check-input customer-invoice-format" type="radio" name="invoice_format_${customerInvoiceId}" id="invoice_format_${customerInvoiceId}_2" value="values">
+                                                            <label for="invoice_format_${customerInvoiceId}_2">{% trans %}Or sharing the price between invoices{% endtrans %}</label>
+                                                        </p>
+
+                                                        <div class="form-group ml-2 customer-invoice-format-values d-none">
+                                                            <label for="customer_invoice_value_${customerInvoiceId}">Enter the invoice amount here:</label>
+                                                            <input type="number" class="form-control customer-invoice-format-values-input" placeholder="Enter value" id="customer_invoice_value_${customerInvoiceId}" name="customer_invoice_value[${customerInvoiceId}]" pattern="[0-9]+([\.,][0-9]+)?" step="0.01">
+                                                            <div class="remaining" data-total-price="{{ totalProductsPrice }}">
+                                                                <label>{% trans %}Remaining{% endtrans %}: </label>
+                                                                <label class="remaining-value">{{ totalProductsPrice }}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>`;
+
+                    $( container ).appendTo( "#dinamic_invoice"  );
+
+                    console.log(msg);
+
+                    Swal.fire('Success!','Inserted Invoice','success');
+
+
+                    $("#btn_new_multiple_invoice").prop("disabled",false);
+                    $('span#spinner-loading').remove();
+
+                    $("#new_multiple_invoice_line_1").val('').focus();
+                    $("#new_multiple_invoice_line_2").val('');
+                    $("#new_multiple_invoice_country").val('');
+                    $("#new_multiple_invoice_state").val('');
+                    $("#new_multiple_invoice_city").val('');
+                    $("#new_multiple_invoice_postal_code").val('');
+
+
+                },(msg)=>console.log("Error: " + msg));
+
+
+            });
+
+        });
+
+    </script>
+{% endblock %}

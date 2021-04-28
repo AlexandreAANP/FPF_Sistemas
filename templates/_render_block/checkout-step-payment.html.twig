@@ -1,0 +1,32 @@
+<div class="cart-box closed">
+    <div class="cart-box-header">
+        <a href="#paymentMethodCollapse">
+            <div class="cart-box-header-number">0</div>
+            <div class="cart-box-header-title">{% trans %}Payment Method{% endtrans %}</div>
+            <div class="cart-box-header-collapse-button">
+                <i class="mdi mdi-plus"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="collapse collapse-item" id="paymentMethodCollapse">
+        {% if listPaymentGateway|length %}
+            <div class="row justify-content-center">
+                {% for paymentGateway in listPaymentGateway %}
+                    <div class="card border-0 m-2 text-center" style="min-width: 180px;">
+                        {% if paymentGateway.referenceKey == 'payment_gateway_none' or paymentGateway.referenceKey == 'payment_gateway_check_availability' %}
+                            <button data-gateway="{{baseUri}}{{ paymentGateway.link }}" class="btn btn-secondary text-white btn-checkout-gateway w-100" style="font-size: 20px; padding: 15px 10px; font-weight: bold; white-space: nowrap">
+                                {{ paymentGateway.name }}
+                            </button>
+                        {% else %}
+                            <button data-gateway="{{baseUri}}{{baseUri}}{{ paymentGateway.link }}" class="btn btn-secondary btn-checkout-gateway w-100">
+                                <i class="fab {{ paymentGateway.icon}} fa-3x text-white"></i>
+                            </button>
+                            <span class="small">{% trans %}Pay with{% endtrans %} <strong>{{ paymentGateway.name }}</strong></span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>

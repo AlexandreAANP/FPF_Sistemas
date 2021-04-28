@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include 'slider.html.twig' %}
+
+    {% include '_includes/modal_product_color_size.html.twig' %}
+
+    <section class="mt-5 mb60">
+
+        <div class="container text-center mb-5">
+            {% set colContentHomeInstitucional = LayoutFunctions.getContentGroup('content?area=content-area-home-institucional&fields=area,url', 'area') %}
+            {% if colContentHomeInstitucional is iterable and colContentHomeInstitucional|length > 0 %}
+                {% if colContentHomeInstitucional['content-area-home-institucional'] is defined %}
+                    {% for page in colContentHomeInstitucional['content-area-home-institucional'] %}
+                        {% set url = page.referenceKey %}
+                        {% if page.url != '' %}
+                            {% set url = page.url %}
+                        {% endif %}
+
+                        <a href="{{ baseUri }}/{{ url }}" title="{{ page.title }}">
+                            <div class="col-5 d-inline-block" style="height: 200px; background-image: url('{{ page.filename }}'); background-size: cover; background-repeat: no-repeat">
+                                {{ page.title }}
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% endif %}
+
+            {% endif %}
+        </div>
+
+        <div class="container">
+            <div class="row">
+                {% if colProductHighlighted['physical-products'] is defined and colProductHighlighted['physical-products']|length > 0 %}
+                    <div class="col-12 positive-z-index">
+                        <div class="products-slider-top">
+                            <h1>{% trans %}Highlighted{% endtrans %}</h1>
+                        </div>
+                        <div class="products-slider">
+                            {% for product in colProductHighlighted['physical-products'] %}
+                                <div>
+                                    {{ include('_render_block/product-card-rounded.html.twig', {
+                                        'baseUri': baseUri,
+                                        'product': product,
+                                    }) }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                {% if colProductCategoryHighlighted is defined and colProductCategoryHighlighted|length > 0 %}
+                    {% for productCategoryHighlighted in colProductCategoryHighlighted %}
+                        <div>
+                            <a href="{{ baseUri }}/product?category={{ productCategoryHighlighted.referenceKey }}">
+                                <div class="m-2" data-name="{{ productCategoryHighlighted.name|url_encode }}" style="width: 200px; height: 200px; background-image: url('{{ productCategoryHighlighted.image }}'); background-size: cover; background-repeat: no-repeat; ">
+                                    <div class="title_activity_s">
+                                    <span>
+                                        {{ productCategoryHighlighted.name }}
+                                    </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

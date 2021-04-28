@@ -1,0 +1,187 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'My Orders'|trans,
+        'index': false,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'customer': 'Customer Area'|trans},
+            {'customer/my-orders': 'My Orders'|trans}
+        ]
+    }) }}
+
+    <section id="orders">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    {% include '_render_block/customer-profile-menu.html.twig' %}
+                </div>
+                <div class="col-md-9">
+                    <div class="float-right mb-4" style="font-size:0.8em">
+                        <span class="badge badge-info">{{ orders.colOrders|length }}</span>
+                        {% trans %}of page{% endtrans %}
+                        <span class="badge badge-info">{{ orders.currentPage }}</span>
+                        {% trans %}from{% endtrans %}
+                        <span class="badge badge-info">{{ orders.registers }}</span>
+                        {% trans %}results{% endtrans %}
+                    </div>
+
+                    <div class="d-flex justify-content-center w-100 mn-5">
+                        <div id="customer-my-account-msg" class="p-4 {{info ?? null ? '': 'd-none'}} alert alert-info" role="alert">
+                            {%  if info ?? null %}
+                                {{ info }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- start search form -->
+                    <div class="row justify-content-center pb-3 text-center">
+                        <div class="col-12">
+                            <form name="orderSearch" method="post" autocomplete="off" action="/customer/my-orders">
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 col-sm-12">
+                                        <label for="startDate">{% trans %}Start Date{% endtrans %}</label>
+                                        <input type="date" name="dateFrom" class="form-control" placeholder="{% trans %}Start Date{% endtrans %}" value="{{dateFrom}}">
+                                    </div>
+                                    <div class="col-lg-3 col-md-4 col-sm-12">
+                                        <label for="endDate">{% trans %}End Date{% endtrans %}</label>
+                                        <input type="date" name="dateTo" class="form-control" placeholder="{% trans %}End Date{% endtrans %}" value="{{dateTo}}">
+                                    </div>
+
+                                    {% if orderStatusFrontoffice ?? null %}
+                                        <div class="col-lg-3 col-md-4 col-sm-12">
+                                            <label for="startDate">{% trans %}Status{% endtrans %}</label>
+                                            <select class="form-control" name="orderStatus">
+                                                <option>{% trans %}Choose{% endtrans %}</option>
+
+                                                {% for status in orderStatusFrontoffice ?? [] %}
+                                                    <option {{(orderStatus ?? null) == status.orderStatusFrontofficeId ? 'selected' : null}} value="{{ status.orderStatusFrontofficeId }}">{{ status.name }}</option>
+                                                {% endfor%}
+                                            </select>
+                                        </div>
+                                    {% endif %}
+
+                                    <div class="col-lg-3 col-md-12 col-sm-12 text-right">
+                                        <label>&nbsp;</label><br>
+                                        <button class="btn btn-info btn-get-orders">
+                                            {% trans %}Search{% endtrans %}
+                                        </button>
+                                    </div>
+                                </div>
+                                <input name="page" type="hidden" value="{{orders.currentPage}}">
+                            </form>
+                        </div>
+                    </div>
+                    <!-- end search form -->
+
+                    <!-- start orders-->
+                    <div class="row pt-3 pb-3 text-left">
+                        {% for order in orders.colOrders %}
+                            <div class="col-12 _col-lg-4 _col-md-6 mb-3">
+                                <div class="card p-1 bg-eee px-2">
+                                    <form name="orderDetails" action="/customer/order-details" method="POST">
+                                        <b>{% trans %}Order{% endtrans %} #{{order.orderInfoId}}</b>
+                                        <br>
+                                        <button data-spinner="" type="button" class="btn-view-order btn btn-secondary">
+                                            {% trans %}Details{% endtrans %}
+                                        </button>
+                                        <input type="hidden" name="id" value="{{order.orderInfoId}}">
+                                        <span class="float-right">
+                                            <b>{% trans %}Date{% endtrans %} </b>{{order.dateInserted|date("Y-m-d")}}
+                                        </span>
+                                    </form>
+
+                                    <div class="d-block">
+                                        {# Review only possible in this cases #}
+                                        {% if (order.orderStatus.isPaymentCompleted ?? 0) or (order.orderStatus.referenceKey ?? null )  == 'order-status-completed' %}
+                                            {#
+                                            <form class="float-left" action="/customer/review/" method="post">
+                                                <input type="hidden" name="id" value="{{order.orderInfoId}}">
+                                                <button class="btn text-warning border-0 p-0" onclick="$(this).children('sup').removeClass('d-none')">
+                                                    <b>{% trans %}Review{% endtrans %}</b>
+                                                    <sup class="ml-1 spinner-border d-none text-info spinner-border-sm"></sup>
+                                                </button>
+                                            </form>
+                                            #}
+                                        {% else %}
+                                            {#
+                                            <button class="btn text-warning border-0 p-0" disabled>
+                                                <b>{% trans %}Review{% endtrans %}</b>
+                                            </button>
+                                            #}
+                                        {% endif %}
+
+                                        <span class="float-right">
+                                            <b>{% trans %}Status{% endtrans %}</b> {{order.orderStatus.frontofficeName}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% endfor %}
+
+                        <!-- start pagination -->
+                        <div class="col-12 text-right">
+                            <div class="btn-group" role="group">
+                                <button type="button" {{orders.currentPage == 1 ? 'disabled'}} class="btn btn-outline-info btn-previous">
+                                    {% trans %}Previous{% endtrans %}
+                                </button>
+
+                                {% if orders.currentPage > 0 and orders.currentPage <= orders.pages %}
+                                    <button type="button" disabled class="btn btn-info">{{orders.currentPage}}</button>
+                                {% endif %}
+
+                                <button type="button" {{orders.currentPage == orders.pages ? 'disabled'}}
+                                        class="btn btn-outline-info btn-next">{% trans %}Next{% endtrans %}
+                                </button>
+                            </div>
+                        </div>
+                        <!-- end pagination -->
+
+                    </div>
+                    <!-- end orders-->
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- container to add the modal with the order info -->
+    <section class="order-info-container"></section>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        .results-tag{position:absolute;right:18px;margin-top:-8px;font-size: 1.4em}
+        .bg-eee{background:#fafafa}
+        .cursor-pointer{cursor:pointer}
+        button:disabled{cursor: not-allowed}
+        #customer-my-account-msg{position:fixed;z-index:9}
+        .spinner-border{color:#111!important}
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script src="/assets/js/customer/order/querybiz-customer-order.js?v={{ LayoutFunctions.getHashFile('/assets/js/customer/order/querybiz-customer-order.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            var options = {
+                'errorMessage': '{% trans %}Error Occurred on updating!{% endtrans %}',
+                'currentPage': '{{ orders.currentPage }}',
+                'totalPages': '{{ orders.pages }}'
+            };
+            querybizCustomerOrder.init(options);
+        });
+
+    </script>
+{% endblock %}

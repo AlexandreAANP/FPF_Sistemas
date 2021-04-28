@@ -1,0 +1,152 @@
+{% set cartBox  = 'closed' %}
+{% set icon     = 'plus' %}
+{% set collapse = '' %}
+
+{% if not enableAddressOnCheckout %}
+    {% set cartBox  = '' %}
+    {% set icon     = 'minus' %}
+    {% set collapse = 'show' %}
+{% endif %}
+
+{% set customerInvoiceLength = customerInvoice|length %}
+
+{% if customerInvoiceLength %}
+    {% set invoiceChecked = '' %}
+    {% set hasTaxNumber = false %}
+
+    {% if customerInvoiceLength == 1 %}
+        {% set invoiceChecked = 'CHECKED' %}
+    {% endif %}
+    <div class="cart-box {{ cartBox }}">
+        <div class="cart-box-header">
+            <a href="#invoiceCollapse">
+                <div class="cart-box-header-number">0</div>
+                <div class="cart-box-header-title">{% trans %}Invoice{% endtrans %}</div>
+                <div class="cart-box-header-collapse-button">
+                    <i class="mdi mdi-{{ icon }}"></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="collapse collapse-item {{ collapse }}" id="invoiceCollapse">
+            <div class="px-18">
+                {% for invoice in customerInvoice %}
+                    {% set hasTaxNumber = invoice.taxNumber ? true : false %}
+
+                    {% set userCountry = '-/-' %}
+                    {% for country in colGeoCountry %}
+                        {% if invoice.countryId == country.id %}
+                            {% set userCountry = country.name %}
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="cart-box-address {% if not invoice.taxNumber %}d-none{% endif %}">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                            <span class="cart-box-address-tip order-2 order-md-1">{% trans %}Send to this address{% endtrans %}</span>
+                            {#
+                                <div class="cart-box-address-options order-1 order-md-2">
+                                    <a href="#"><i class="mdi mdi-lead-pencil"></i> {% trans %}Edit{% endtrans %}</a>
+                                    <a href="#"><i class="mdi mdi-trash-can"></i> {% trans %}Remove{% endtrans %}</a>
+                                </div>
+                            #}
+                        </div>
+                        <div class="cart-box-address-info">
+                            <label for="customer_invoice_{{ invoice.id }}" class="d-flex">
+                                <input type="radio" class="customer-one-invoice" name="customer_invoice_id" value="{{ invoice.id }}" id="customer_invoice_{{ invoice.id }}" {{ invoice.mainBilling or invoiceChecked ? 'checked' : null }}>
+                                <div>
+                                    <b>{{ invoice.name }}</b>
+                                    <br>
+                                    {{ invoice.line1 }}, {{ invoice.line2 }}, {{ invoice.city }} - {{ invoice.state }}<br>
+                                    {{ userCountry }}, {{ invoice.postalCode }}<br>
+                                    <strong>{% trans %}Tax Number:{% endtrans %}</strong> {{ invoice.taxNumber }}
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="mb-4">
+                    <button data-show-fields class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseNewInvoice" aria-expanded="false" aria-controls="collapseNewInvoice">
+                        {% trans %}New Invoice{% endtrans %}
+                    </button>
+                    <button class="btn btn-outline-light text-dark rounded-pill btn-checkout-next float-right">
+                        {% trans %}Next{% endtrans %} <i class="mdi mdi-arrow-right-bold-circle-outline"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="collapse" id="collapseNewInvoice">
+                <div class="px-18">
+                    <input type="hidden" name="new_invoice_action" value="{{ hasTaxNumber ? 'add_invoice' : 'update_invoice' }}">
+                    <input type="hidden" name="new_invoice_id" value="{{ hasTaxNumber ? null : customerInvoice[0].id }}">
+
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <input type="text" placeholder="{% trans %}Name{% endtrans %}" name="new_invoice_name" id="new_invoice_name" value="{{hasTaxNumber ? null : customerInvoice[0].name}}" class="new-customer-invoice form-control" required>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-input">
+                                <label for="new_invoice_tax_number">{% trans %}Tax Number{% endtrans %}</label>
+                                <input type="text" name="new_invoice_tax_number" id="new_invoice_tax_number" class="new-customer-invoice form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-input">
+                                <label for="new_invoice_line_1">{% trans %}Line{% endtrans %} 1</label>
+                                <input type="text" name="new_invoice_line1" id="new_invoice_line_1" value="{{hasTaxNumber ? null : customerInvoice[0].line1}}" class="new-customer-invoice form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <input type="text" placeholder="{% trans %}Line{% endtrans %} 2" name="new_invoice_line2" id="new_invoice_line_2" value="{{hasTaxNumber ? null: customerInvoice[0].line2}}" class="new-customer-invoice form-control">
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-select">
+{#                                <label for="new_invoice_country">{% trans %}Country{% endtrans %}</label>#}
+                                {% if colGeoCountry is defined and colGeoCountry|length > 0 %}
+                                    <select class="geo-countries custom-select_ form-control_ new-customer-invoice form-select2" id="new_invoice_country" name="new_invoice_country" style="width: 100% !important;">
+                                        {% for country in colGeoCountry %}
+                                            {%if customerInvoice[0].countryId == country.id %}
+                                            {% endif %}
+                                            <option value="{{country.id}}" {{customerInvoice[0].countryId == country.id ? 'selected' : null}}>{{country.iso2~' | '~country.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-input">
+{#                                <label for="new_invoice_state">{% trans %}State{% endtrans %}</label>#}
+                                <select class="geo-pt-district form-select2 form-control" name="new_invoice_state" id="new_invoice_state" >
+                                    {% for district in colGeoPtDistrict ?? [] %}
+                                        <option value='{{district.name}}' {{not hasTaxNumber and customerInvoice[0].state == district.name ? 'selected' : null}}>{{district.name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="text" name="new_invoice_state" placeholder="{% trans %}State{% endtrans %}" class="geo-pt-district form-control d-none">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-select">
+{#                                <label for="new_invoice_city">{% trans %}City{% endtrans %}</label>#}
+                                <select name="new_invoice_city" id="new_invoice_city" class="geo-pt-council form-select2 form-control">
+                                    {% for council in colGeoPtCouncil ?? [] %}
+                                        <option value='{{council.name}}' {{not hasTaxNumber and customerInvoice[0].city == council.name ? 'selected' :  null}} >{{council.name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="text" name="new_invoice_city" placeholder="{% trans %}City{% endtrans %}" class="geo-pt-council d-none form-control">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="required-input">
+                                <label for="new_invoice_postal_code">{% trans %}Postal Code{% endtrans %}</label>
+                                <input type="text" class="form-control new-customer-invoice" name="new_invoice_postal_code" id="new_invoice_postal_code" value="{{hasTaxNumber ? null : customerInvoice[0].postalCode}}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-end pb-18">
+                        <button data-spinner="" type="submit" class="secondary-btn btn-new-customer-invoice">{% trans %}Save{% endtrans %}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

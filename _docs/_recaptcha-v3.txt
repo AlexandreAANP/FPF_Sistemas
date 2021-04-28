@@ -1,0 +1,66 @@
+Google Console: https://www.google.com/u/1/recaptcha/admin/site/444630594
+-----------------
+
+TWIG
+// --------------------------------------------- //
+{% block body %}
+    <form>
+        <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+    </form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script src="https://www.google.com/recaptcha/api.js?render={{ LayoutFunctions.getSettingsVars('GOOGLE_CAPTCHA_PUBLIC_KEY_V3') }}"></script>
+    <script>
+        grecaptcha.ready(function() {
+            grecaptcha.execute('{{ LayoutFunctions.getSettingsVars('GOOGLE_CAPTCHA_PUBLIC_KEY_V3') }}', { action: 'validate_captcha' }).then(function(token) {
+                document.getElementById('g-recaptcha-response').value = token;
+            });
+        });
+    </script>
+{% endblock %}
+
+// --------------------------------------------- //
+
+CONTROLLER
+
+// reCAPTCHA Google ---------------------------- //
+$captcha = $request->request->get('g-recaptcha-response');
+
+$defaultLanguage = $request->getLocale();
+
+$secretKey = '';
+$arSecretKey = $this->objSettingsService->getSettingsVars('GOOGLE_CAPTCHA_SECRET_KEY_V3');
+if (is_array($arSecretKey)) {
+    $arLanguages = $this->objSettingsService->getEnvVars('SUPPORTED_LOCALES');
+    $localePosition = array_search($defaultLanguage, $arLanguages);
+
+    if (isSet($arSecretKey[$localePosition])) {
+        $secretKey = $arSecretKey[$localePosition];
+    }
+}
+
+$data = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secretKey . '&response=' . $captcha . '&remoteip=' . $_SERVER['REMOTE_ADDR']);
+if ($objData = json_decode($data, JSON_UNESCAPED_UNICODE)) {
+    if (array_key_exists('success', $objData) && $objData['success'] === false) {
+
+        $msg = $objData['error-codes'][0];
+        if ($msg == 'timeout-or-duplicate') {
+            $msg = 'Too long time without activity, reload this page';
+        }
+
+        return $this->json([
+            'return' => 'error',
+            'from' => 'recaptch',
+            'msg' => $msg
+        ]);
+    } else if (array_key_exists('success', $objData) && $objData['success'] == true && $objData['score'] <= 0.5) {
+        return $this->json([
+            'return' => 'error',
+            'msg' => 'Invalid Access - reCaptcha score: not qualified'
+        ]);
+    }
+}
+// --------------------------------------------- //

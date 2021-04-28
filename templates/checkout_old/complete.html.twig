@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Thank You'|trans,
+        'index': false,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'customer': 'Customer Area'|trans},
+            {'#': 'Thank You'|trans}
+        ]
+    }) }}
+
+    <section id="shopping">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 d-flex align-items-center flex-column text-center">
+                    <img src="/assets/images/shopping-finish.svg" alt="">
+                    <h1>{% trans %}Thank You!{% endtrans %}</h1>
+                    <p>
+                        {% trans %}Your order was registered successfully{% endtrans %}
+                        <br/>
+                        {% trans %}Order Code{% endtrans %}: {{ orderInfoId }}
+                    </p>
+                    <p>
+                        <small class="d-none">
+                            <i class="mdi mdi-file-document"></i>
+                            Após o pedido ser despachado, a fatura é enviada para o seu
+                            ID de e-mail registado.
+                            <br/>
+                            <i class="mdi mdi-email"></i>
+                            Após o pedido ser despachado, você receberá detalhes de
+                            rastreamento no seu ID de e-mail registado.
+                        </small>
+                    </p>
+                    {% if (customerId is defined) and (customerId > 0) %}
+                        <a href="{{ baseUri }}/customer" class="sign_in secondary-btn continue-shopping">{% trans %}My Area{% endtrans %}</a>
+                    {% else %}
+                        <a href="#" id="btnLogin" class="sign_in join_now js-modal-show secondary-btn continue-shopping">{% trans %}Log In{% endtrans %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

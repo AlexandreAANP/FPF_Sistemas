@@ -1,0 +1,6 @@
+COPYRIGHT="Copyright &copy;&nbsp;<a href=`https://www.site.pt` target=`_blank` title=`Site Title`>Site Title</a>"|"Copyright &copy;&nbsp;<a href=`https://www.site.pt` target=`_blank` title=`Site Title`>Site Title</a>"
+PAGE_CONTACT_ADDRESS="Address"|"Morada"
+PAGE_CONTACT_PHONE="Phone"|"Telefone"
+PAGE_CONTACT_EMAIL="Email"|"Email"
+GOOGLE_CAPTCHA_SECRET_KEY_V2="6Lev66YaAAAAAKokDAFAe3tdCAE8_VJO_Rz4Ns_a"
+GOOGLE_CAPTCHA_PUBLIC_KEY_V2="6Lev66YaAAAAAJIwWcUzklcZdO82TTBIv1k_gfJq"

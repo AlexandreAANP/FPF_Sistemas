@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="103" height="27" viewBox="0 0 103 27">
+  <g id="Grupo_1" data-name="Grupo 1" transform="translate(0 -5)">
+    <g id="Retângulo_1" data-name="Retângulo 1" transform="translate(0 5)" fill="#fff" stroke="#707070" stroke-width="1">
+      <rect width="103" height="27" stroke="none"/>
+      <rect x="0.5" y="0.5" width="102" height="26" fill="none"/>
+    </g>
+    <text id="Logótipo" transform="translate(51 25)" fill="#707070" font-size="15" font-family="Anton-Regular, Anton" letter-spacing="0.339em"><tspan x="-43.597" y="0">Logótipo</tspan></text>
+  </g>
+</svg>

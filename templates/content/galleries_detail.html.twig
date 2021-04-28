@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ arContent.title }} - {% endblock %}
+{% block description %}{{ arContent.description }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <section class="section-min-height">
+        <div class="container">
+            <div cass="d-bock">
+                <a href="{{ from }}" data-loading-text="Backing" class="btn btn-outline-info btn-sm"><i class="fas fa-arrow-circle-left mr-1" title="{% trans %}Back{% endtrans %}"></i>{% trans %}Back{% endtrans %}</a>
+            </div>
+            {% if arContent and arContent.colContentGallery is defined %}
+                <h1 class="mt-3 mb-3">{{ arContent.title }}</h1>
+                <h3>{{ arContent.description }}</h3>
+                <BR>
+
+                <div class="d-block w-100 text-info mb-3" style="font-size: 12px">
+                    {% for category in arContent.colContentCategory %}
+                        {{ category.name }} |
+                    {% endfor %}
+                </div>
+
+                <div >
+                    {% for gallery in arContent.colContentGallery %}
+                        <a href="{{ cdnUrl }}{{ gallery.filename }}"><img src="{{ cdnUrl }}{{ gallery.filename }}" style="width: 200px"></a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                - {% trans %}Choose a Gallery{% endtrans %}
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

@@ -1,0 +1,127 @@
+#orders {
+    margin-bottom: 100px;
+}
+
+.order {
+    &-product {
+        @extend .d-flex, .flex-column, .flex-md-row, .align-items-center;
+        padding-top: 20px;
+        border-bottom: 1px solid #DEDCDC;
+
+        &:hover {
+            text-decoration: none;
+        }
+
+        &-inner {
+            padding-right: 20px;
+            padding-left: 20px;
+        }
+    }
+
+    &-image {
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        width: 100%;
+        max-width: 100%;
+        margin-right: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #DEDCDC;
+        
+        &:not(.large) {
+            height: 100px;
+
+            @media (min-width: 992px) {
+                width: 100px;
+            }
+        }
+
+        &.large {
+            width: 100%;
+            height: 121px;
+            
+            @media (min-width: 992px) {
+                width: 121px;
+            }
+        }
+
+    }
+
+    &-info {
+        margin-bottom: 20px;
+        
+        &-title {
+            @include RobotoFont(0.94em, 500);
+
+            &:hover {
+                text-decoration: none;
+                color: $secondary;
+            }
+        }
+
+        &-subtitle {
+            @include RobotoFont(0.75em, 500);
+        }
+
+        &-price {
+            @include RobotoFont(1.45em);
+        }
+
+        &-quantity {
+            @extend .d-flex, .align-items-center;
+            @include RobotoFont(calc(1em / 16 * 15));
+            margin-left: 30px;
+            
+            input {
+                margin-left: 15px;
+                max-width: 67px;
+                text-align: center;
+            }
+        }
+
+        &-delivery-date {
+            @include RobotoFont(calc(1em / 16 * 12), 500, #529E34);
+        }
+
+        &-link {
+            @include RobotoFont(calc(1em / 16 * 12), 500);
+
+            .mdi {
+                &:before {
+                    font-size: 1.2em;
+                    position: relative;
+                    top: 1px;
+                }
+            }
+        }
+
+        &-discount {
+            @include RobotoFont(0.95em, 400, $info);
+            margin-left: 10px;
+        }
+
+        &-sub {
+            margin-top: 20px;
+
+            span {
+                @include RobotoFont(0.75em, 400, $secondary, 1.8em);
+                margin-right: 20px;
+
+                time {
+                    font-weight: 700;
+                }
+            }
+        }
+
+        &-remove {
+            @include RobotoFont(0.76em);
+            white-space: nowrap;
+
+            .mdi:before {
+                font-size: 1.4em;
+                position: relative;
+                top: 2px;
+            }
+        }
+    }
+}

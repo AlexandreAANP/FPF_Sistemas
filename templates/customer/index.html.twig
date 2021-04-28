@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Dashboard'|trans,
+        'index': false,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'customer': 'Customer Area'|trans},
+            {'#': 'Dashboard'|trans}
+        ]
+    }) }}
+
+    <section id="orders">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    {% include '_render_block/customer-profile-menu.html.twig' %}
+                </div>
+                <div class="col-md-9">
+
+                    <div class="row">
+                        <div class="col-3">
+                            <form id="formUploadFile" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="customer" value="{{ customerId }}/profile" />
+                                <input class="d-none" type="file" id="file" name="files[]"/>
+                                <input class="d-none" id="form_upload_file_submit" type="submit">
+
+                                <img src="{{ profilePicture }}" id="select_file" alt="Profile Picture" title="{% trans %}Click to change your Profile Picture{% endtrans %}" class="shadow p-2 w-100" style="cursor:pointer">
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function() {
+            var options = {
+                'dir': {{ customerId }},
+                'execAfterUpload': 'updateProfilePicture',
+            };
+            querybizCustomerDrive.init(options);
+        });
+    </script>
+{% endblock %}

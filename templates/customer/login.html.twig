@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Login'|trans,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'#': 'Login'|trans}
+        ]
+    }) }}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+                <div class="login-box">
+                    <h1>{% trans %}Client Access{% endtrans %}</h1>
+                    <h2>{% trans %}Registered Users{% endtrans %}</h2>
+                    <p>{% trans %}If you have an account, enter your email address.{% endtrans %}</p>
+
+                    <div class="d-flex justify-content-center w-100 mt-2">
+                        <div id="customer_msg_login" class="alert alert-warning" role="alert" style="display: none; box-shadow: 0 0 2px 3px #fff; padding: 5px; border: #ccc 1px solid; border-radius: 5px; margin-bottom: 10px"></div>
+                    </div>
+
+                    <div id="customer_login_redirect" class="text-center" style="display: none;">
+                        <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+
+                    <form id="form_login" action="{{ baseUri }}/customer/login" method="post" class="d-flex flex-column align-items-center" novalidate>
+                        <!-- form spoofing -->
+                        <input type="hidden" name="redirect" value="{{ redirect }}">
+                        <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+
+                        <div class="required-input w-100">
+                            <label for="email">{% trans %}Email{% endtrans %}:</label>
+                            <input type="text" name="email" id="email" class="form-control" tabIndex="1" required autofocus>
+                        </div>
+                        <div class="required-input w-100">
+                            <label for="password">{% trans %}Password{% endtrans %}:</label>
+                            <input type="password" name="password" id="password" class="form-control" tabindex="2" required>
+                        </div>
+
+                        <div>
+                            <a href="{{ baseUri }}/customer/recover-password" tabIndex="4">
+                                {% trans %}Forgot your password?{% endtrans %}
+                            </a>
+                        </div>
+
+                        <div>
+                            <button data-spinner="" type="submit" id="form_customer_login_submit" class="btn-form-action login-btn mt-4" tabIndex="3">{% trans %}Enter{% endtrans %}</button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <h1>{% trans %}New Customer{% endtrans %}</h1>
+                    <p>{% trans %}Creating an account has many benefits: faster checkout, keeping more than one address, tracking orders, and more.{% endtrans %}</p>
+                    <a href="{{ baseUri }}/customer/signup" class="register-secondary-btn">{% trans %}Create an account{% endtrans %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function () {
+            var options = {};
+            querybizCustomer.init(options);
+        });
+    </script>
+
+    <script>
+        grecaptcha.ready(function () {
+            grecaptcha.execute('{{ LayoutFunctions.getSettingsVars('GOOGLE_CAPTCHA_PUBLIC_KEY_V3') }}', {action: 'validate_captcha'}).then(function (token) {
+                document.getElementById('g-recaptcha-response').value = token;
+            });
+        });
+    </script>
+{% endblock %}

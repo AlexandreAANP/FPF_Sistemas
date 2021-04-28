@@ -1,0 +1,42 @@
+<div class="btn-group-vertical w-100">
+    {% set navs = [
+        {
+            'icon'  : 'mdi mdi-speedometer',
+            'title' : 'Dashboard',
+            'href'  : '/customer'
+        },
+        {
+            'icon'  : 'mdi mdi-sort-ascending',
+            'title' : 'My Orders',
+            'href'  : '/customer/my-orders'
+        },
+        {
+            'icon'  : 'mdi mdi-account',
+            'title' : 'My Account',
+            'href'  : '/customer/my-account'
+        },
+        {
+            'icon'  : 'mdi mdi-text-box-multiple-outline',
+            'title' : 'My Invoices',
+            'href'  : '/customer/my-invoices'
+        },
+        {
+            'icon'  : 'mdi mdi-face-agent',
+            'title' : 'Support',
+            'href'  : '/customer/support'
+        },
+        {
+            'icon'  : 'mdi mdi-logout',
+            'title' : 'Logout',
+            'href'  : '/customer/logout'
+        },
+    ] %}
+
+    {% for nav in navs %}
+        <a href="{{ baseUri ~ nav.href }}"
+           class="btn{% if app.request.pathInfo == baseUri ~ nav.href %} active{% endif %}">
+            <i class="{{ nav.icon }}"></i>
+            {{ nav.title|trans }}
+        </a>
+    {% endfor %}
+</div>

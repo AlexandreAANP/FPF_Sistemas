@@ -1,0 +1,71 @@
+$mobileMenuSize: 15.625em;
+
+.navbar {
+    &.b-b {
+        border-bottom: 1px solid #C5C5C5;
+        margin-bottom: 30px;
+    }
+
+    &.fixed-top {
+        z-index: 1099;
+    }
+
+    .nav-link {
+        color: $secondary;
+
+        &-warning {
+            position: relative;
+            padding: 0;
+            margin: 0 1rem;
+
+            .material-icons {
+                font-size: 22px;
+            }
+
+            .warning {
+                @extend .d-flex, .align-items-center, .justify-content-center;
+                @include RobotoFont(0.8em, 400, white);
+                position: absolute;
+                top: 0;
+                right: 0;
+                transform: translate(50%, -50%);
+                width: 23px;
+                height: 23px;
+                border-radius: 50%;
+                background-color: $info;
+            }
+        }
+    }
+
+    #desktop-menu {
+        a {
+            &:not(.nav-link) {
+                @extend .pr-4, .pl-4;
+                @include RobotoFont(0.88em, 700);
+                text-decoration: none;
+            }
+        }
+    }
+
+}
+
+#menu {
+	position: fixed;
+	right: calc(#{$mobileMenuSize} * -1); /*right or left and the width of your navigation panel*/
+    width: $mobileMenuSize; /*should match the above value*/
+    z-index: 1100;
+    padding: 22px 28px 29px;
+    background-color: $primary;
+
+    &-links {
+        a {
+            @extend .d-block, .w-100, .p-4, .text-right;
+            @include RobotoFont(0.88em, 700);
+            text-decoration: none;
+        }
+    }
+
+    .material-icons {
+        font-size: 1.1em;
+    }
+}

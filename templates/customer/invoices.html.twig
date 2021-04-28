@@ -1,0 +1,342 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'My Invoices'|trans,
+        'index': false,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'customer': 'Customer Area'|trans},
+            {'#': 'My Invoices'|trans}
+        ]
+    }) }}
+
+    <style>
+        .not-valid{margin-top:-20px;position:absolute;right:16px}
+        #customer-my-account-msg{position:fixed;z-index:9}
+        .lh-31px{line-height:31px}
+        .navbar.fixed-top{z-index:1040}
+        .select2-container--default .select2-selection--single:not(.squared-form){border-radius: 19px}
+        .select2{width: 100%!important}
+        .select2-container .select2-selection--single {height:37px}
+        .select2-selection__rendered{line-height: 33px!important}
+        .select2-container--default .select2-selection--single .select2-selection__arrow {top: 6px;right: 6px}
+        .select2-container .select2-selection--single .select2-selection__rendered {padding-left: 14px}
+    </style>
+
+    <section id="orders">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    {% include '_render_block/customer-profile-menu.html.twig' %}
+                </div>
+                <div class="col-md-9">
+
+                    <div class="d-flex justify-content-center w-100">
+                        <div id="customer-my-account-msg" class="p-4 d-none alert alert-success" role="alert"></div>
+                    </div>
+
+                    <div class="mb-5 d-flex justify-content-between align-items-center">
+                        <h1 class="profile-header mb-3">{% trans %}Invoice Data{% endtrans %}</h1>
+                        <button type="button" class="btn-add-data secondary-btn">{% trans %}Add{% endtrans %}</button>
+                    </div>
+
+                    <!-- start invoice data -->
+                    <div class="row justify-content-center">
+                        <div class="col-lg-12 col-s12">
+                            {% for invoice in customerInvoices ??[] %}
+                                {% set disabled = invoice.country == 177 ? '' : 'disabled' %}
+                                {% set hidden = invoice.country == 177 ? '' : 'd-none' %}
+                                {% if loop.index > 1 %}
+
+                                    <div class="mt-5 mb-3 invoice-{{invoice.id}}">
+                                        <h1 class="profile-header mb-3">{% trans %}Invoice Data{% endtrans %}</h1>
+                                    </div>
+
+                                {% endif %}
+
+                                <sup class="badge badge-info counter-registries invoice-{{invoice.id}}">{{loop.index}}</sup>
+                                <form class="update-invoice invoice-{{invoice.id}}" action="/customer/my-account" method="POST" data-id="{{ invoice.id }}">
+                                    <input type="hidden" name="invoiceId" value="{{ invoice.id }}">
+                                    <input type="hidden" name="action" value="update_invoice">
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 col-lg-3 col-md-6">
+                                            <div class="form-group">
+                                                <label for="line1">{% trans %}Line1{% endtrans %}: *</label><br>
+                                                <input type="text" name="line1" required value="{{ invoice.line1 ?? '' }}" placeholder="{% trans %}Line1{% endtrans %}" class="border-0 form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 col-md-6">
+                                            <div class="form-group">
+                                                <label for="line2">{% trans %}Line2{% endtrans %}:</label><br>
+                                                <input type="text" name="line2" value="{{ invoice.line2 ?? '' }}" placeholder="{% trans %}Line2{% endtrans %}" class="border-0 form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 col-md-6">
+                                            <div class="form-group">
+                                                <label for="country">{% trans %}Country{% endtrans %}:</label><br>
+                                                <select name="country" class="form-control geo-countries border-0 form-select2">
+
+                                                    {% for country in geoCountries ?? [] %}
+
+                                                        <option {{invoice.country == country.id ? 'selected' : '' }} value={{country.id}}>{{country.iso2~' | '~country.name}}</option>
+
+                                                    {%endfor%}
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 col-md-6">
+                                            <div class="form-group">
+                                                <label for="postalCode">{% trans %}Postal Code{% endtrans %}: *</label><br>
+                                                <input type="text" name="postalCode" required value="{{ invoice.postalCode ?? ''}}" placeholder="{% trans %}Postal Code{% endtrans %}" class="border-0 form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 col-md-6">
+                                            <div class="form-group">
+                                                <label for="state">{% trans %}State{% endtrans %}: *</label><br>
+                                                <select name="state" class="form-control geo-pt-district border-0 {{hidden}} form-select2" {{disabled}}>
+
+                                                    {% for district in geoPtDistrict ?? [] %}
+
+                                                        <option {{invoice.state == district.name ? 'selected' : '' }} value='{{district.name}}'>{{district.name}}</option>
+
+                                                    {%endfor%}
+
+                                                </select>
+
+                                                <input {{disabled ? '' : 'disabled'}} required type="text" name="state" value="{{ invoice.state }}" placeholder="{% trans %}State{% endtrans %}" class="border-0 form-control geo-pt-district {{hidden ? '' : 'd-none'}}">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 col-md-6">
+                                            <div class="form-group">
+                                                <label for="city">{% trans %}City{% endtrans %}: *</label><br>
+                                                <select name="city" class="border-0 form-control geo-pt-council {{hidden}} form-select2" {{disabled}}>
+
+                                                    {% for council in geoPtCouncil ?? [] %}
+
+                                                        <option {{invoice.city ?? 'invoice.city' == council.name ?? 'council.namecity' ? 'selected' : ''}} value='{{council.name}}'>{{council.name}}</option>
+
+                                                    {%endfor%}
+
+                                                </select>
+                                                <input {{disabled ? '' : 'disabled'}} required type="text" name="city" value="{{ invoice.city ?? '' }}" placeholder="{% trans %}City{% endtrans %}" class="geo-pt-council border-0 form-control {{hidden ? '' : 'd-none'}}">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 col-md-6">
+                                            <div class="form-group">
+                                                <label for="taxNumber">{% trans %}Tax Number{% endtrans %}: *</label><br>
+                                                <input type="text" required name="taxNumber" value="{{ invoice.taxNumber ?? '' }}" placeholder="{% trans %}Tax Number{% endtrans %}" class="border-0 form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 col-md-6">
+                                            <div class="form-group">
+                                                <label for="nameToInvoice">{% trans %}Name To Invoice{% endtrans %}:</label><br>
+                                                <input type="text" name="nameToInvoice" value="{{ invoice.nameToInvoice ?? ''}}" placeholder="{% trans %}Name To Invoice{% endtrans %}" class="border-0 form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <div class="form-group">
+                                                <label for="alias">{% trans %}Alias{% endtrans %}:</label><br>
+                                                <input type="text" name="alias" value="{{ invoice.alias ?? '' }}" placeholder="{% trans %}Alias{% endtrans %}" class="border-0 form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-2 text-right">
+                                            <div class="form-group">
+                                                <input type="checkbox" name="mainBilling" value="1" {{invoice.mainBilling ? 'checked' : ''}}>
+                                                <label>{% trans %}Main Billing{% endtrans %}</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-lg-12">
+                                            <div class="text-center">
+                                                <button type="button" class="btn-edit secondary-btn">{% trans %}Edit{% endtrans %}</button>
+                                                <div class="btn-group float-left">
+                                                <button type="button" class="float-left primary-btn btn-cancel d-none">
+                                                    {% trans %}Cancel{% endtrans %}
+                                                </button>
+
+                                                    {% if loop.index > 1 %}
+
+                                                        <span class="btn btn-danger btn-delete d-none">{% trans %}Delete{% endtrans %}</span>
+
+                                                    {% endif %}
+
+                                                </div>
+                                                <button type="submit" class="blue-btn btn-save d-none float-right">{% trans %}Save{% endtrans %}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                    <!-- end invoice data -->
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <div class="modal fade" id="modal_form" aria-modal="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title modal-title-add">{% trans %}Add{% endtrans %}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="add-invoice" action="/customer/my-account" method="POST">
+                        <input type="hidden" name="action" value="add_invoice">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="line1">{% trans %}Line1{% endtrans %}: *</label><br>
+                                    <input type="text" required name="line1" required placeholder="{% trans %}Line1{% endtrans %}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="line2">{% trans %}Line2{% endtrans %}:</label><br>
+                                    <input type="text" name="line2" placeholder="{% trans %}Line2{% endtrans %}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="country">{% trans %}Country{% endtrans %}:</label><br>
+                                    <select name="country" class="form-control geo-countries form-select2">
+
+                                        {% for country in geoCountries ?? [] %}
+
+                                            <option value={{country.id}}>{{country.iso2~' | '~country.name}}</option>
+
+                                        {%endfor%}
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="postalCode">{% trans %}Postal Code{% endtrans %}: *</label><br>
+                                    <input type="text" required name="postalCode" placeholder="{% trans %}Postal Code{% endtrans %}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="state">{% trans %}State{% endtrans %}: *</label><br>
+                                    <select name="state" class="form-control geo-pt-district d-none form-select2" disabled>
+
+                                        {% for district in geoPtDistrict ?? [] %}
+
+                                            <option value='{{district.name}}'>{{district.name}}</option>
+
+                                        {%endfor%}
+
+                                    </select>
+                                    <input type="text" name="state" required placeholder="{% trans %}State{% endtrans %}" class="form-control geo-pt-district">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="city">{% trans %}City{% endtrans %}: *</label><br>
+                                    <select name="city" class="form-control geo-pt-council d-none form-select2" disabled>
+
+                                        {% for council in geoPtCouncil ?? [] %}
+
+                                            <option value='{{council.name}}'>{{council.name}}</option>
+
+                                        {%endfor%}
+
+                                    </select>
+                                    <input type="text" required name="city" placeholder="{% trans %}City{% endtrans %}" class="form-control geo-pt-council">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="taxNumber">{% trans %}Tax Number{% endtrans %}: *</label><br>
+                                    <input type="text" required name="taxNumber" placeholder="{% trans %}Tax Number{% endtrans %}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="nameToInvoice">{% trans %}Name To Invoice{% endtrans %}:</label><br>
+                                    <input type="text" name="nameToInvoice" placeholder="{% trans %}Name To Invoice{% endtrans %}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="form-group">
+                                    <label for="line1">{% trans %}Alias{% endtrans %}:</label><br>
+                                    <input type="text" name="alias" placeholder="{% trans %}Alias{% endtrans %}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-12 mt-2 text-right">
+                                <div class="form-group">
+                                    <input type="checkbox" name="mainBilling" value="1">
+                                    <label>{% trans %}Main Billing{% endtrans %}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button class="primary-btn" data-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                    <button class="blue-btn btn-new-data"> {% trans %}Save{% endtrans %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal_delete" aria-modal="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h4 class="modal-title">{% trans %}Delete?{% endtrans %}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% trans %}Are you sure you want to delete this registry?{% endtrans %}
+                    <form class="delete-invoice" action="/customer/my-account" method="POST">
+                        <input type="hidden" name="action" value="delete_invoice">
+                        <input type="hidden" name="invoiceCustomerId">
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button class="btn btn-secondary" data-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                    <button class="btn btn-danger"> {% trans %}Delete{% endtrans %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/customer/querybiz-customer-my-invoices.js?v={{ LayoutFunctions.getHashFile('/assets/js/customer/querybiz-customer-my-invoices.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('.form-select2').select2();
+            var options = {
+                'successMessage': '{% trans %}Data Updated{% endtrans %}',
+                'errorMessage': '{% trans %}Error Occurred on updating!{% endtrans %}',
+                'requiredMessage': '{% trans %}Required{% endtrans %}',
+                'invalidMessage': '{% trans %}Invalid{% endtrans %}',
+            };
+            querybizCustomerMyInvoices.init(options);
+        });
+    </script>
+{% endblock %}

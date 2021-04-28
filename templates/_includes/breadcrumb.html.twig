@@ -1,0 +1,31 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb align-items-center">
+                    <li class="breadcrumb-item"><a href="{{ baseUri }}/">{% trans %}Home{% endtrans %}</a></li>
+                    {% if path is defined %}
+                        {% if path is iterable %}
+                            {% for crumb in path %}
+                                {% set i = loop.index %}
+                                {% set classActive = '' %}
+                                {% if i == path|length %}
+                                    {% set classActive = 'active" aria-current="page' %}
+                                {% endif %}
+                                {% for href, text in crumb %}
+                                    <li class="breadcrumb-item {{ classActive|raw }}">
+                                        {% if classActive == '' %}
+                                            <a href="{{ baseUri }}/{{ href }}">{{ text }}</a>
+                                        {% else %}
+                                            {{ text }}
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endif %}
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>

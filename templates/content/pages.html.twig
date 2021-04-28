@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ arPage.title }} - {% endblock %}
+{% block description %}{{ arPage.description }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'page': arPage.title}
+        ]
+    })}}
+
+    <section class="section-min-height">
+        <div class="container"><h1>{{ arPage.title }}</h1></div>
+        <div class="container">
+            {{ arPage.text|raw }}
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

@@ -1,0 +1,18 @@
+{% if not app.request.cookies.has('cookie-consent-' ~ appVersionCookiePolicy) %}
+    <div id="cookie_consent" class="py-3 bg-dark fixed-bottom">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-9">
+                    <article class="mb-3 mb-lg-0">
+                        <small class="text-white">
+                            {% trans %}This website uses its own and third party cookies in order to personalize the content, improve the user experience, provide social media functions and analyze traffic. To continue browsing you must agree to our{% endtrans %} <a href="{{ baseUri }}/privacy-policy">{% trans %}Privacy Policy{% endtrans %}</a>.
+                        </small>
+                    </article>
+                </div>
+                <div class="col-lg-3 align-self-center">
+                    <button type="button" data-action="/cookieConsent" class="btn btn-primary btn-lg btn-block">{% trans %}Yes I do.{% endtrans %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

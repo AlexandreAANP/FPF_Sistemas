@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Authentication'|trans,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'\/product-cart': 'Cart'|trans},
+            {'#': 'Authentication'|trans},
+        ]
+    }) }}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-5">
+                <section class="login-box">
+                    <h1>{% trans %}I'm already a customer{% endtrans %}</h1>
+
+                    <div class="d-flex justify-content-center w-100 mt-2">
+                        <div id="checkout_auth_msg_login" class="alert alert-warning" role="alert" style="display: none; box-shadow: 0 0 2px 3px #fff; padding: 5px; border: #ccc 1px solid; border-radius: 5px; margin-bottom: 10px"></div>
+                    </div>
+
+                    <form id="form_login" action="/customer/login" method="post" novalidate>
+                        <!-- form spoofing -->
+                        <input type="hidden" name="origin" value="checkout">
+
+                        <div class="required-input w-100">
+                            <label for="login_email">{% trans %}Email{% endtrans %}:</label>
+                            <input type="email" name="email" id="login_email" class="form-control" required>
+                        </div>
+                        <div class="required-input w-100">
+                            <label for="login_password">{% trans %}Password{% endtrans %}:</label>
+                            <input type="password" name="password" id="login_password" class="form-control" required>
+                        </div>
+
+                        <div class="text-center">
+                            <a href="{{ baseUri }}/customer/recover-password">
+                                {% trans %}Forgot your password?{% endtrans %}
+                            </a>
+                        </div>
+
+                        <div class="d-flex justify-content-center">
+                            <div>
+                                <button data-spinner="" type="submit" id="form_checkout_login_submit" class="btn-form-action login-btn mt-4">{% trans %}Access account{% endtrans %}</button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <div class="col-lg-2 text-center">
+                <span class="display-4 font-weight-bold">{% trans %}or{% endtrans %}</span>
+            </div>
+
+            <div class="col-lg-5">
+                <section class="login-box">
+                    <h1>{% trans %}I want to sign up{% endtrans %}</h1>
+
+                    <div class="d-flex justify-content-center w-100 mt-2">
+                        <div id="checkout_auth_msg_signup" class="alert alert-warning" role="alert" style="display: none; box-shadow: 0 0 2px 3px #fff; padding: 5px; border: #ccc 1px solid; border-radius: 5px; margin-bottom: 10px"></div>
+                    </div>
+
+                    <form id="form_signup" action="/customer/signup" method="post" novalidate>
+                        <!-- form spoofing -->
+                        <input type="hidden" name="origin" value="checkout">
+
+                        <div class="required-input w-100">
+                            <label for="signup_name">{% trans %}Name{% endtrans %}:</label>
+                            <input type="text" name="name" id="signup_name" class="form-control" autofocus required>
+                        </div>
+                        <div class="required-input w-100">
+                            <label for="signup_email">{% trans %}Mobile{% endtrans %}:</label>
+                            <input type="text" name="phone" id="signup_email" class="form-control">
+                        </div>
+                        <div class="required-input w-100">
+                            <label for="email">{% trans %}Email{% endtrans %}:</label>
+                            <input type="text" name="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="required-input w-100">
+                            <label for="signup_password">{% trans %}Password{% endtrans %}:</label>
+                            <input type="password" name="password" id="signup_password" class="form-control" required>
+                        </div>
+                        <div class="required-input w-100">
+                            <label for="signup_password_confirm">{% trans %}Password Confirm{% endtrans %}:</label>
+                            <input type="password" name="password_confirm" id="signup_password_confirm" class="form-control" required>
+                        </div>
+
+                        <div class="d-flex justify-content-center">
+                            <button data-spinner="" type="submit" id="form_checkout_signup_submit" class="login-btn mt-4">
+                                {% trans %}Create an account{% endtrans %}
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function () {
+            var options = {};
+            querybizCheckout.init(options);
+            querybizProduct.init(options);
+            querybizProduct.showCart('checkout/auth');
+            //querybizProduct.getProductInCart('cart');
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% macro customerMenuTemplate(baseUri, app) %}
+    <style type="text/css">
+        .bg-eeeeee{background-color: #eeeeee}
+    </style>
+
+    <div class="container">
+        <div class="rounded border mt-2 mb-2 p-2 bg-eeeeee">
+
+        {% for link in [
+            {'text':'Customer Home', 'path':'\/customer'},
+            {'text':'My Account', 'path':'\/customer/my-account'},
+            {'text':'My Invoices', 'path':'\/customer/my-invoices'},
+            {'text':'My Orders', 'path':'\/customer/my-orders'},
+            {'text':'My Wishlist', 'path':'\/customer/my-wishlist/'},
+            {'text':'Support', 'path':'\/customer/support'},
+            {'text':'Drive', 'path':'\/customer/drive'}
+        ] %}
+
+        <a href="{{baseUri~link.path}}">
+            <span {{app.request.pathinfo == link.path ? "class='font-weight-bold'" : null}}>{{ link.text|trans }}</span>
+        </a> |
+
+        {% endfor %}
+
+        <a href="{{ baseUri}}/customer/logout"><span>{{ 'Logout'|trans }}</span></a>
+        </div>
+    </div>
+
+{% endmacro %}

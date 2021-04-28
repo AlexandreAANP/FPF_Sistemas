@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': arContent.title,
+        'description': arContent.description,
+        'image': arContent.filename,
+    }) }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <section class="section-min-height">
+        <div class="container" style="height: 500px">
+            <h1 class="mt-3 mb-3">{{ arContent.title }}</h1>
+
+            <div class="d-block w-100 text-info mb-3" style="font-size: 12px">
+                {% for category in arContent.colContentCategory %}
+                    {{ category.name }} |
+                {% endfor %}
+            </div>
+
+            {% if arContent.filename %}
+                <img src="{{ arContent.filename }}" style="width: 100px; float: left; margin: 5px; margin-top: 0">
+            {% endif %}
+            {{ arContent.text|raw }}
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

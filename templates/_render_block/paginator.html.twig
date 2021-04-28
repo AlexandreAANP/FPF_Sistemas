@@ -1,0 +1,46 @@
+{#<nav>
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#">Ant</a></li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">4</a></li>
+        <li class="page-item"><a class="page-link" href="#">5</a></li>
+        <li class="page-item"><a class="page-link" href="#">Seg</a></li>
+    </ul>
+</nav>#}
+
+{% if (arPagination.currentPage is defined) and (arPagination.currentPage > 0) %}
+    <nav>
+        <ul class="pagination">
+            {% if (arPagination.currentPage is defined) and (arPagination.currentPage > 1) %}
+                <li class="page-item"><a href="{{ baseUri }}/product/{{ productType }}/1" class="page-link"><i class='fas fa-angle-double-left'></i></a></li>
+            {% endif %}
+
+            {% if (arPagination.currentPage is defined) and (arPagination.currentPage > 1) %}
+                <li class="page-item"><a href="{{ baseUri }}/product/{{ productType }}/{{ (arPagination.currentPage - 1) }}" class="page-link"><i class='fas fa-angle-left'></i></a></li>
+            {% endif %}
+
+            {% for key in 1..arPagination.pages %}
+                {% if key == arPagination.currentPage %}
+                    {% set current = 'active' %}
+                    <li class="page-item">
+                        <a href="{{ baseUri }}/product/{{ productType }}/{{ key }}" class="{{ current }} page-link">
+                            {% if (arPagination.currentPage is defined) and (arPagination.currentPage > 0) %} {{ key }} {% else %} 1 {% endif %} {% trans %}of{% endtrans %} {{ arPagination.pages }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            <li class="page-item">
+                {% if (arPagination.currentPage is defined) and (arPagination.currentPage < arPagination.pages) %}
+            <li class="page-item"><a href="{{ baseUri }}/product/{{ productType }}/{{ (arPagination.currentPage + 1) }}" class="page-link"><i class='fas fa-angle-right'></i></a></li>
+                {% endif %}
+
+                {% if (arPagination.currentPage is defined) and (arPagination.currentPage < arPagination.pages) %}
+                    <li class="page-item"><a href="{{ baseUri }}/product/{{ productType }}/{{ arPagination.pages }}" class="page-link"><i class='fas fa-angle-double-right'></i></a></li>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+{% endif %}

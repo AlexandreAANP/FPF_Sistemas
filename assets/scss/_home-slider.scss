@@ -1,0 +1,101 @@
+#slider {
+    position: relative;
+
+    .overslider {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1050;
+        padding-top: 35px;
+    }
+}
+
+#home-slider {
+    height: 100vh;
+
+    &.smaller-slider {
+        max-height: 503px;
+    }
+
+    .tns-item, .slider-content, .slider-image {
+        height: 100% !important;
+    }
+
+    .slider- {
+        &content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        &image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            z-index: -1;
+        }
+
+        &title {
+            @include AntonFont(2.3em, $primary);
+        }
+
+        &subtitle {
+            @include RobotoFont(1.4em, 300, $primary);
+            padding-bottom: 10px;
+        }
+
+        &product- {
+            &offer {
+                @include AntonFont(3.35em, $primary);
+
+                @media (min-width: 992px) {
+                    font-size: 4.85em;
+                }
+            }
+
+            &name {
+                @include AntonFont(1.5em, $primary);
+            }
+        }
+    }
+}
+
+.tns-outer {
+    position: relative;
+}
+
+.tns-nav {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+
+    > button {
+        width: 10px;
+        height: 10px;
+        background-color: $primary;
+        opacity: 50%;
+        border: 0;
+        border-radius: 50%;
+        margin: 0 11px;
+        
+        &.tns-nav-active {
+            opacity: 1;
+            width: 17px;
+            height: 17px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        bottom: 35px;
+    }
+}

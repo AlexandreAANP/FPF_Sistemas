@@ -1,0 +1,29 @@
+#shopping {
+    margin-bottom: 60px;
+
+    h1 {
+        @include RobotoFont(2em, 700);
+        margin-top: 28px;
+        margin-bottom: 14px;
+    }
+
+    p {
+        @include RobotoFont(0.95em, 400, $secondary, 2em);
+        margin-bottom: 28px;
+
+        small {
+            font-size: 0.86em;
+
+            .mdi:before {
+                position: relative;
+                top: 3px;
+                margin-right: 9px;
+            }
+        }
+    }
+
+    .continue-shopping {
+        margin-top: 20px;
+        font-size: 0.7em;
+    }
+}

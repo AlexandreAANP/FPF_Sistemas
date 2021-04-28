@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Register'|trans,
+    }) }}
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'#': 'Register'|trans}
+        ]
+    }) }}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+                <div class="login-box">
+                    <h1>{% trans %}Create New Customer Account{% endtrans %}</h1>
+                    <h2 class="mt-2">{% trans %}Personal information{% endtrans %}</h2>
+
+                    <div class="d-flex justify-content-center w-100 mt-2">
+                        <div id="customer_msg_signup" class="alert alert-warning" role="alert" style="display: none; box-shadow: 0 0 2px 3px #fff; padding: 5px; border: #ccc 1px solid; border-radius: 5px; margin-bottom: 10px"></div>
+                    </div>
+
+                    <div id="customer_signup_redirect" class="text-center" style="display: none;">
+                        <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+
+                    <form id="form_signup" action="{{ baseUri }}/customer/signup" method="post" class="d-flex flex-column align-items-center" novalidate>
+                        <div class="required-input w-100">
+                            <label for="name">{% trans %}Name{% endtrans %}:</label>
+                            <input type="text" name="name" id="name" class="form-control" tabIndex="1" autofocus required>
+                        </div>
+                        <div class="required-input w-100">
+                            <label for="phone">{% trans %}Mobile{% endtrans %}:</label>
+                            <input type="text" name="phone" id="phone" class="form-control" tabIndex="2">
+                        </div>
+                        <div class="required-input w-100">
+                            <label for="email">{% trans %}Email{% endtrans %}:</label>
+                            <input type="text" name="email" id="email" class="form-control" required tabIndex="3">
+                        </div>
+
+                        <h2 class="my-4">{% trans %}Access Information{% endtrans %}</h2>
+                        <div class="required-input w-100">
+                            <label for="password">{% trans %}Password{% endtrans %}:</label>
+                            <input type="password" name="password" id="password" class="form-control" required tabIndex="4">
+                        </div>
+                        <div class="required-input w-100">
+                            <label for="password_confirm">{% trans %}Password Confirm{% endtrans %}:</label>
+                            <input type="password" name="password_confirm" id="password_confirm" class="form-control" required tabIndex="5">
+                        </div>
+
+                        <!-- reCAPTCHA -->
+                        <div class="d-block w-100 text-center">
+                            <div class="d-inline-block">
+                                <div id="recaptcha_html_element"></div>
+                            </div>
+                        </div>
+                        <!-- /reCAPTCHA -->
+
+                        <div>
+                            <button data-spinner="" type="submit" id="form_customer_signup_submit" class="login-btn mt-4" tabIndex="6">
+                                {% trans %}Create an account{% endtrans %}
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <h1>{% trans %}I already have an Account!{% endtrans %}</h1>
+                    <a href="{{ baseUri }}/customer/login" class="register-secondary-btn" tabIndex="7">
+                        {% trans %}Go to Login{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function () {
+            var options = {};
+            querybizCustomer.init(options);
+        });
+    </script>
+
+    <script type="text/javascript">
+        var onloadCallback = function () {
+            grecaptcha.render('recaptcha_html_element', {
+                'sitekey': '{{ LayoutFunctions.getSettingsVars('GOOGLE_CAPTCHA_PUBLIC_KEY_V2') }}'
+            });
+        };
+    </script>
+
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
+{% endblock %}

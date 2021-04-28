@@ -1,0 +1,221 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Cart'|trans,
+        'index': false,
+    }) }}
+{% endblock %}
+
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style type="text/css">
+        .datepicker {
+            width: 100%;
+        }
+        .table-condensed {
+            width: 100%;
+        }
+    </style>
+
+{% endblock %}
+
+{% block body %}
+    {{ include('_includes/breadcrumb.html.twig', {
+        'path': [
+            {'product-cart': 'Cart'}
+        ]
+    })}}
+
+    <div class="modal fade" id="modal_product_availability" tabindex="-1" aria-labelledby="modal_product_availability" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal_calendar_product_name"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" prev-data-loading-text="×">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <h3>{% trans %}Choose one Day{% endtrans %}</h3>
+                    <div class="date_picker date_picker_d"></div>
+
+                    <hr>
+
+                    <h3>{% trans %}Choose one hour{% endtrans %}</h3>
+                    <div class="d-block w-100 text-center">
+                        <div class="d-inline-block">
+                            <input type="time" id="modal_calendar_time" class="form-control text-center" style="width: 200px">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h3>{% trans %}Type a quantity{% endtrans %}</h3>
+                    <div class="d-block w-100 text-center">
+                        <div class="d-inline-block">
+                            <input type="number" id="modal_calendar_quantity" class="form-control text-center" style="width: 80px">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+                    <div>
+                        <button type="button" id="btn_modal_calendar_save" class="btn btn-success" data-product-item-stock-id="">{% trans %}Save{% endtrans %}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="cart-box">
+                    {% set totalProductItems = 0 %}
+                    {% set isAllowedQuantity = false %}
+
+                    {% if (product.listProductItemStock is defined) and (product.listProductItemStock|length > 0) %}
+                        {% set productQuantity = product.productQuantity %}
+                        {% set productCalendar = product.productCalendar %}
+                        {% set productPriceQuantity = product.productPriceQuantity %}
+                        {% set productPrice = product.productPrice %}
+
+                        {% set totalProductItems = product.listProductItemStock|length %}
+
+                        {% for key,item in product.listProductItemStock %}
+                            {% set dateCalendar = productCalendar[item.productItemStockId] %}
+                            {% set isDateInSession = true %}
+                            {% set dateInSession = dateCalendar|date('d/m/Y H:i') %}
+
+                            {% if dateCalendar == '' %}
+                                {% set dateCalendar = 'now'|date('Y-m-d 00:00:00') %}
+                                {% set dateInSession = 'Select an Availability' %}
+                                {% set isDateInSession = false %}
+                            {% endif %}
+
+                            <div class="order-product order-product-inner" id="product_{{ item.productItemStockId }}">
+                                <div class="row w-100 flex-lg-nowrap align-items-center">
+                                    <div class="col">
+                                        <div class="order-image large mx-auto" style="background-image: url('{{ item.filename }}');"></div>
+                                    </div>
+                                    <div class="col flex-fill order-info">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h1 class="order-info-title">{{ item.name }}</h1>
+                                                {% if item.productStockType == 'single-color-size' %}
+                                                    <span class="order-info-subtitle">{% trans %}Color{% endtrans %}: {{ product.productItems[item.productItemStockId].color }} | {% trans %}Size{% endtrans %}: {{ product.productItems[item.productItemStockId].size }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-12 mt-3 d-flex align-items-center">
+                                                <span class="order-info-price text-nowrap">{{ productPrice[item.productItemStockId] }} {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                                                <span class="order-info-quantity">
+                                                    {% if item.allowQuantity %}
+                                                        {% set isAllowedQuantity = true %}
+
+                                                        {% if item.productStockType == 'calendar' %}
+                                                            <span class="p-1">{% trans %}Calendar{% endtrans %}</span>
+                                                            <button class="btn {{ isDateInSession ? 'btn-outline-success' : 'btn-danger'}} btn-form-open-availability" data-date-in-session="{{ isDateInSession ? 1 : 0 }}" data-product-item-stock-id="{{ item.productItemStockId }}" data-has-ticket="{{ item.hasTicket }}" data-quantity="{{ productQuantity[item.productItemStockId] }}" data-date-calendar="{{ dateCalendar }}">{{ dateInSession|trans }}</button>
+
+                                                            <span class="ml-3 p-1">{% trans %}Quantity{% endtrans %}</span>
+                                                            <input type="text" class="cart-products-quantity form-control text-center m-0" data-product-item-stock-id="{{ item.productItemStockId }}" value="{{ productQuantity[item.productItemStockId] }}" style="width: 50px" readOnly>
+
+                                                        {% else %}
+                                                            <span class="p-1">{% trans %}Quantity{% endtrans %}</span>
+                                                            <select class="form-control quantity-select-2 squared-form cart-products-quantity" data-product-item-stock-id="{{ item.productItemStockId }}" data-product-id="{{ item.productId }}" data-value="{{ productQuantity[item.productItemStockId] }}" value="{{ productQuantity[item.productItemStockId] }}">
+                                                                {% set maxQuantity = item.maxQuantity %}
+                                                                {% set showMaxQuantityInCart = LayoutFunctions.getSettingsVars('SHOW_MAX_QUANTITY_IN_CART') %}
+                                                                {% if not showMaxQuantityInCart or showMaxQuantityInCart > maxQuantity %}
+                                                                    {% set showMaxQuantityInCart = maxQuantity %}
+                                                                {% endif %}
+
+                                                                {% if productQuantity[item.productItemStockId] > showMaxQuantityInCart %}
+                                                                    <option value="{{ productQuantity[item.productItemStockId] }}" selected="selected">{{ productQuantity[item.productItemStockId] }}</option>
+                                                                {% endif %}
+
+                                                                {% for quantityNum in 1..showMaxQuantityInCart %}
+                                                                    <option value="{{ quantityNum }}" {{ productQuantity[item.productItemStockId] == quantityNum ? 'SELECTED' : '' }}>{{ quantityNum }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            <div class="col-12 mt-3 d-flex align-items-center justify-content-between">
+                                                <span class="order-info-delivery-date">{#Entrega entre 3-4 Dias#}</span>
+                                                <a href="#" value="{{ item.productItemStockId }}" class="order-info-link btn-delete-product-cart" data-productid="{{ item.productItemStockId }}" data-redirect="{{ baseUri }}/addProductToCart">
+                                                    <i class="mdi mdi-trash-can"></i>
+                                                    {% trans %}Remove{% endtrans %}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-end p-18">
+                        <div id="DIV_cart_msg_warning" class="w-100 text-center bg-light p-2 mb-4" style="display: none">
+                            <div class="d-inline-block bg-warning p-2 rounded shadow-sm font-weight-bold">{% trans %}You have to Select an Availability for each Product{% endtrans %}</div>
+                        </div>
+                        {% if isAllowedQuantity %}
+                            <a href="#" data-loading-text="{% trans %}Updating{% endtrans %}" class="clean-btn btn-cart-products-quantity-update">{% trans %}Update Stock{% endtrans %}</a>
+                        {% endif %}
+                        <a href="{{ baseUri }}/product" class="clean-btn">{% trans %}Keep buying{% endtrans %}</a>
+                        <a href="#" id="btn_cart_go_to_checkout" data-prev-loading-text="{% trans %}Going to{% endtrans %}" class="btn-form-go-to-checkout secondary-btn">{% trans %}Checkout{% endtrans %}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <ul class="list-group">
+                    <li class="list-group-item header">{% trans %}Value Details{% endtrans %}</li>
+                    <li class="list-group-item">
+                        {% trans %}Price{% endtrans %} ({{ totalProductItems }}
+                        {% if totalProductItems == 1 %}
+                            {% trans %}Item{% endtrans %})
+                        {% elseif totalProductItems > 1 %}
+                            {% trans %}Items{% endtrans %})
+                        {% endif %}
+
+                        <span>{{ product.totalPrice }} {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                    </li>
+                    {#
+                    <li class="list-group-item">
+                        Portes de Envio
+                        <span>10 {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                    </li>
+                    #}
+                    <li class="list-group-item footer">
+                        {% trans %}Total{% endtrans %}
+                        <span>{{ product.totalPrice }} {{ LayoutFunctions.getCurrencySymbol() }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function() {
+            var options = {
+            };
+            querybizProduct.init(options);
+            querybizProduct.initCart();
+
+            querybizProduct.delProductFromCart();
+            querybizProduct.listenerBtnCartProductQuantityUpdate();
+
+            $('.quantity-select-2').select2({
+                tags: true
+            });
+
+            /*querybizProduct.getProductInCart('cart'); // Call data from Route and put in <div id="product-cart-content">  */
+        });
+    </script>
+{% endblock %}

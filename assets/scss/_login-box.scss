@@ -1,0 +1,64 @@
+.login-box {
+    @extend .d-flex, .flex-column, .align-items-center;
+    background-color: #F4F5F8;
+    border: 1px solid #E3E5EE;
+    border-radius: 50px;
+    padding: 50px 20px;
+    margin-bottom: 70px;
+    
+    @media (min-width: 768px) {
+        padding: 50px;
+    }
+
+    h1, h2, p {
+        @extend .text-center;
+    }
+
+    h1 {
+        @include RobotoFont(1.35em, 500);
+        margin-bottom: 22px;
+    }
+
+    h2 {
+        @include RobotoFont(1.06em, 500);
+        margin-bottom: 16px;
+    }
+
+    p {
+        @include RobotoFont(0.85em, 400, $secondary, 2em);
+        max-width: 406px;
+        margin-bottom: 20px;
+    }
+
+    a:not([class*="btn"]) {
+        @include RobotoFont(0.85em, 400, $info);
+
+        &:hover, &:active {
+            text-decoration: none;
+        }
+    }
+
+    form {
+        @extend .w-100;
+        max-width: 337px;
+        margin-top: 15px;
+
+        div[class*="input"] {
+            margin-bottom: 20px;
+        }
+
+        .check-input {
+            label {
+                @include RobotoFont(0.85em, 400,#848798);
+            }
+        }
+    }
+
+    hr {
+        width: 100%;
+        max-width: 337px;
+        border-color: #D2D2D2;
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+}

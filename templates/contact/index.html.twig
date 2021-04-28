@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block seo %}
+    {{ include ('_includes/seo.html.twig', {
+        'title': 'Contacts',
+    }) }}
+{% endblock %}
+
+{% block body %}
+    <section class="section-min-height">
+
+        <div class="container mb-5">
+            {% set arContent = LayoutFunctions.getAPI('content/pages-contact-us?language=' ~ app.request.getLocale()) %}
+            {% if arContent is defined and arContent is iterable and arContent|length > 0%}
+                {% if arContent.title is defined and arContent.title != '' %}
+                    <h1>{{ arContent.title }}</h1>
+                {% endif %}
+
+                {% if arContent.text is defined and arContent.text != '' %}
+                    <h5 class="text-black-50">{{ arContent.text|raw }}</h5>
+                {% endif %}
+            {% else %}
+                <h1 class="text-center my-3">{% trans %}CONTACT{% endtrans %}</h1>
+            {% endif %}
+        </div>
+
+        <div class="container">
+            {% set varNameFormTemplateEmail = 'contact' %}
+            <div id="form_{{ varNameFormTemplateEmail }}_sendmail_template_sent" class="shadow p-2" style="display: none">
+                <button type="button" id="form_{{ varNameFormTemplateEmail }}_sendmail_template_form_back" class="close"><span aria-hidden="true">&times;</span></button>
+                <strong>{% trans %}Email has sent successfully{% endtrans %}!</strong><br>{% trans %}Thank you for contacting us{% endtrans %}!
+            </div>
+
+            <form id="form_{{ varNameFormTemplateEmail }}_sendmail_template" class="sendmail-template" action="/sendmailTemplate" method="POST" novalidate>
+                <input type="hidden" name="content_email_template" value="emailtemplate-{{ varNameFormTemplateEmail }}">
+                <input type="hidden" name="content_email_template_table" value="{{ varNameFormTemplateEmail }}">
+                <input type="hidden" name="date_inserted" value="{{ 'now'|date('d/m/Y H:i:s') }}">
+                <input type="hidden" name="customer_id" value="{{ customerId }}">
+
+                {% if colContactForms.checkout is defined and colContactForms.checkout|length > 0 %}
+                    {% set colAdditionalFields = colContactForms %}
+                    {% set fieldPrefix = '' %}
+                    {% set fieldExcluded = ['customer_id', 'date_inserted'] %}
+                    {% include '/_includes/additional_fields.html.twig' %}
+
+                {% else %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="md-form mb-0">
+                                <label for="name" class="font-weight-bold" style="color:#182752">{% trans %}Your name{% endtrans %}</label>
+                                <input type="text" id="name" name="name" class="form-control" autofocus required2>
+                                <div class="invalid-feedback">{% trans %}Opss ... this field is required!{% endtrans %}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="md-form mb-0">
+                                <label for="email" class="font-weight-bold" style="color:#182752">{% trans %}Your email{% endtrans %}</label>
+                                <input type="email" id="email" name="email" class="form-control" required2>
+                                <div class="invalid-feedback">{% trans %}Opsss ... this field is required!{% endtrans %}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="md-form">
+                                <label for="message" class="font-weight-bold" style="color:#182752">{% trans %}Your message{% endtrans %}</label>
+                                <textarea type="text" id="message" name="message" rows="4" class="form-control md-textarea" required2></textarea>
+                                <div class="invalid-feedback">{% trans %}Opsss ... this field is required!{% endtrans %}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="d-flex w-100 mt-3 justify-content-between">
+                    <div class="mt-2" id="recaptcha_html_element"></div>
+                    <div>
+                        <input type="submit" id="form_{{ varNameFormTemplateEmail }}_sendmail_template_submit" value="{% trans %}Send{% endtrans %}" class="btn btn-outline-info" data-loading-text="{% trans %}Sending{% endtrans %}">
+                    </div>
+                </div>
+            </form>
+
+            <h2 class="h1-responsive font-weight-bold text-center my-4" style="color:#182752">{% trans %}Other ways to contact us{% endtrans %}</h2>
+
+            <div class="d-block text-center my-5">
+                <div class="d-inline-block m-2">
+                    <i class="fas fa-map-marker-alt m-2 fa-2x" style="color:#182752"></i>
+                    <p>{{ LayoutFunctions.getLayoutVars('PAGE_CONTACT_ADDRESS') }}</p>
+                </div>
+
+                <div class="d-inline-block m-2">
+                    <i class="fas fa-phone m-2 fa-2x" style="color:#182752"></i>
+                    <p>{{ LayoutFunctions.getLayoutVars('PAGE_CONTACT_PHONE') }}</p>
+                </div>
+
+                <div class="d-inline-block m-2">
+                    <i class="fas fa-envelope m-2 fa-2x" style="color:#182752"></i>
+                    <p>{{ LayoutFunctions.getLayoutVars('PAGE_CONTACT_EMAIL') }}</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script type="text/javascript">
+        var onloadCallback = function() {
+            grecaptcha.render('recaptcha_html_element', {
+                'sitekey' : '{{ LayoutFunctions.getSettingsVars('GOOGLE_CAPTCHA_PUBLIC_KEY_V2') }}'
+            });
+        };
+    </script>
+
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
+{% endblock %}

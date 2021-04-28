@@ -1,0 +1,112 @@
+{% if colAdditionalFields.checkout is defined and colAdditionalFields.checkout|length > 0 %}
+    {% for colFields in colAdditionalFields.checkout  %}
+        {% if colFields.columns is defined and colFields.columns|length > 0 %}
+            {% for field in colFields.columns %}
+                {% if (fieldExcluded is not defined) or (fieldExcluded is defined and field.field not in fieldExcluded) %}
+
+                    {% if field.type != '' %}
+
+                        {% if field.type != 'hidden' %}
+                            <div class="{% if divOptions.class is defined %} {{ divOptions.class }} {% else %}mb-3{% endif %}" style="{% if divOptions.style is defined %} {{ divOptions.style }} {% endif %}">
+                            <label for="{{ fieldPrefix }}-{{field.field}}" class="mb-0 font-weight-bold">
+                                {% if field.required != '' %}* {% endif %}
+                                {{field.placeholder}}:
+                            </label>
+                        {% endif %}
+
+                        {% if field.type == 'varchar(255)' or field.type == 'file' or field.type == 'datetime' or field.type == 'date' or field.type == 'decimal(10,2)' or  field.type == 'int(11)' or field.type == 'hidden'  %}
+                            {% set fieldType = '' %}
+                            {% set extraAttrib = '' %}
+
+                            {% if field.type == 'varchar(255)' %}
+                                {% set fieldType = 'text' %}
+                            {% endif %}
+
+                            {% if field.type == 'file' %}
+                                {% set fieldType = field.type %}
+                            {% endif %}
+
+                            {% if field.type == 'datetime' %}
+                                {% set fieldType = 'datetime-local' %}
+                            {% endif %}
+
+                            {% if field.type == 'date' %}
+                                {% set fieldType = 'date' %}
+                            {% endif %}
+
+                            {% if field.type == 'decimal(10,2)' %}
+                                {% set fieldType = 'number' %}
+                                {% set extraAttrib = ' min="0" value="0.00" step="0.01" ' %}
+                            {% endif %}
+
+                            {% if field.type == 'int(11)' %}
+                                {% set fieldType = 'number' %}
+                                {% set extraAttrib = ' min="0" value="0" step="1" ' %}
+                            {% endif %}
+
+                            {% if field.type == 'hidden' %}
+                                {% set fieldType = field.type %}
+                            {% endif %}
+
+                            <input type="{{ fieldType }}" class="form-control" id="additional_fields_{{ fieldPrefix ? fieldPrefix ~ '_' : '' }}{{field.field}}" name="additional_fields[{{ fieldPrefix }}{{field.field}}]" placeholder="{{field.placeholder}}" {{ extraAttrib }} {{field.required}} >
+
+                        {% elseif field.type == 'radiobox'  %}
+
+                            {% set fieldType = 'radio' %}
+                            {% if field.options is iterable %}
+                                <br>
+                                {% set counterRadio = 0 %}
+                                {% for option in field.options %}
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" id="additional_fields_{{ fieldPrefix ? fieldPrefix ~ '_' : '' }}{{counterRadio}}" name="additional_fields[{{ fieldPrefix }}{{field.field}}]" {{field.required}} >
+                                        <label class="form-check-label" for="additional_fields_{{ fieldPrefix ? fieldPrefix ~ '_' : '' }}{{counterRadio}}">
+                                            {{ option.text }}
+                                        </label>
+                                    </div>
+                                    {% set counterRadio = counterRadio + 1 %}
+                                {% endfor %}
+                            {% endif %}
+
+                        {% elseif field.type == 'checkbox'  %}
+
+                            {% set fieldType = 'checkbox' %}
+                            {% if field.options is iterable %}
+                                <br>
+                                {% set counterCheckbox = 0 %}
+                                {% for option in field.options %}
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" id="additional_fields_{{ fieldPrefix ? fieldPrefix ~ '_' : '' }}{{counterCheckbox}}" name="additional_fields[{{ fieldPrefix }}{{field.field}}]" {{field.required}} >
+                                        <label class="form-check-label" for="additional_fields_{{ fieldPrefix ? fieldPrefix ~ '_' : '' }}{{counterCheckbox}}">
+                                            {{ option.text }}
+                                        </label>
+                                    </div>
+                                    {% set counterCheckbox = counterCheckbox + 1 %}
+                                {% endfor %}
+                            {% endif %}
+
+                        {% elseif field.type == 'selectbox' %}
+
+                            <select class="custom-select" id="additional_fields_{{ fieldPrefix ? fieldPrefix ~ '_' : '' }}{{field.field}}" name="additional_fields[{{ fieldPrefix }}{{field.field}}]" {{field.required}}>
+                                <option selected value="">{% trans %}Choose{% endtrans %}...</option>
+                                {% for option in field.options %}
+                                    <option value="{{option.value}}">{{option.text}}</option>
+                                {% endfor %}
+                            </select>
+
+                        {% elseif field.type == 'text'  %}
+                            <textarea id="additional_fields_{{ fieldPrefix ? fieldPrefix ~ '_' : '' }}{{field.field}}" name="additional_fields[{{ fieldPrefix }}{{field.field}}]" placeholder="{{field.placeholder}}"  class="form-control" rows="3" {{field.required}}></textarea>
+
+                        {% endif %}
+
+                        <div class="invalid-feedback">* {% trans %}Required field!{% endtrans %}</div>
+
+                        {% if field.type != 'hidden' %}
+                            </div>
+                        {% endif %}
+
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
