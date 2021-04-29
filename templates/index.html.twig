@@ -1,9 +1,21 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% include 'slider.html.twig' %}
+    {#% include 'slider.html.twig' %#}
 
-    {% include '_includes/modal_product_color_size.html.twig' %}
+
+    {#% include '_includes/modal_product_color_size.html.twig' %#}
+
+  <div class="background-image-header">
+    <div class="container">
+        <div class="d-flex justify-content-center">
+            <div class="header-text-index">
+                <h1 class='header-tittle-index'>{% trans %}Management Systems{% endtrans %}</h1>
+                <h2 class="header-subtittle-index">{% trans %}We add value to your business{% endtrans %}</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
     <section class="mt-5 mb60">
 

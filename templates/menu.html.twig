@@ -1,11 +1,14 @@
-<nav class="navbar fixed-top navbar-expand-lg bg-primary flex-wrap py-3 b-b">
-    <ul class="container">
+
+
+
+<nav class="navbar navbar-expand-lg bg-primary flex-wrap pt-5 bg-transparent navbar-style">
+    <ul class="container-fluid">
         <a href="/{{ app.request.getLocale() }}" title="{% trans %}Home{% endtrans %}">
-            <img src="/assets/images/logo-frontoffice.png" style="width: 120px" alt="title="{% trans %}Home{% endtrans %}"">
+            <img src="/assets/images/logotipo.svg" class="svg-logo-image" style="width: 120px" alt="title="{% trans %}Home{% endtrans %}"">
         </a>
 
         <div class="collapse navbar-collapse">
-            <ul id="desktop-menu" class="list-unstyled d-flex align-items-center justify-content-center mt-0 mb-0 w-100">
+            <ul id="desktop-menu" class="list-unstyled d-flex align-items-center justify-content-end mt-0 mb-0 w-100">
 {#                <li class="nav-item dropdown">
                     <a class="dropdown-toggle btn-sm" href="#" id="dropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
                         Coleções
@@ -18,9 +21,39 @@
                 </li>#}
 
                 {% include '_render_block/menu_links.html.twig' %}
-            </ul>
+                  {% set supportedLanguages = LayoutFunctions.getSupportedLanguages(LayoutFunctions.getEnvVars('SUPPORTED_LOCALES')) %}
+                {% if supportedLanguages|length > 1 %}
+                    <li class="language-style nav-item dropdown py-3 ">
+                        <a class="nav-link py-0 px-4 dropdown-toggle btn-sm p-1 menu-link-font" href="#" id="dropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
+                            {{ LayoutFunctions.getCurrentLanguage()|upper }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            {% for language in supportedLanguages %}
+                                {% set href = LayoutFunctions.changeLanguage(language, languageUri) %}
+                                {% if href == '/' %}
+                                    {% set href = '/' ~ LayoutFunctions.getEnvVars('DEFAULT_LANGUAGE') %}
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{{ href }}">{{ language|upper }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            
 
-            <ul class="list-unstyled d-flex align-items-center justify-content-center mt-0 mb-0">
+            </ul>
+      
+
+                <li class="btn-speak-with-us d-flex align-items-center" style="list-style-type:none;">
+                    <a href="/contact">
+                        <div class="dropleft-speak-with-us">
+                            <span class="text-speak-with-us">{% trans %}Speak with us{% endtrans %}</span>
+                            <spam class='box-speak-with-us'></spam>
+                            <spam class='box-speak-with-us-rigth'></spam> 
+                        </div>
+                    </a>
+                    <span class="btn d-flex align-items-center"><i class="mdi mdi-rectangle-outline p-1 text-white"></i></span>
+                </li>
+           {# <ul class="list-unstyled d-flex align-items-center justify-content-center mt-0 mb-0">
                 {% set supportedLanguages = LayoutFunctions.getSupportedLanguages(LayoutFunctions.getEnvVars('SUPPORTED_LOCALES')) %}
                 {% if supportedLanguages|length > 1 %}
                     <li class="nav-item dropdown">
@@ -39,7 +72,7 @@
                     </li>
                 {% endif %}
 
-                <li class="nav-item dropdown">
+                {#<li class="nav-item dropdown">
                     <a class="nav-link py-0 dropdown-toggle btn-sm" href="#" id="dropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
                         EUR €
                     </a>
@@ -47,17 +80,17 @@
                         <li><a class="dropdown-item" href="#">EUR €</a></li>
                     </ul>
                 </li>
-            </ul>
+            </ul>#}
         </div>
 
-        <a href="#" class="nav-link nav-link-warning btn-open-modal-product-search">
+        {#<a href="#" class="nav-link nav-link-warning btn-open-modal-product-search">
             <i class="mdi mdi-shopping-search"></i>
         </a>
 
         <a href="{{ baseUri }}/product-cart" class="nav-link nav-link-warning" data-loading-text="{% trans %}Cart{% endtrans %} ({{ productItemsInCart }})">
             <i class="mdi mdi-cart"></i>
             <span class="warning">{{ productItemsInCart ?? 0 }}</span>
-        </a>
+        </a>#}
 
         <a href="#menu" class="d-lg-none btn bt-link ml-auto main-menu">
             <img src="/assets/images/navbar.svg" />
@@ -73,7 +106,7 @@
                     <div class="d-table-cell align-top w-100">
                         <input list="list_search_all_categories" type="text" autocomplete="off" name="search" class="form-control m-0" placeholder="{% trans %}What are you looking for?{% endtrans %}" style="border: #343232 1px solid; height: 38px!important; border-right: 0!important; border-bottom-right-radius: 0!important; border-top-right-radius: 0!important">
                         <datalist id="list_search_all_categories">
-                            {% set colProductCategories = LayoutFunctions.getProductCategories() %}
+                            {% set colProductCategories = LayoutFunctions.getProductCategories() ?? null %}
                             {% if colProductCategories|length %}
                                 {% for productCategory in colProductCategories %}
                                     <option>{{ productCategory.name }}</option>
@@ -97,13 +130,14 @@
         </a>
         <ul id="menu-links" class="list-unstyled d-flex flex-column flex-fill w-100">
             {% include '_render_block/menu_links.html.twig' %}
+            <li class='mobile-menu-speak-with-us'><a>{% trans %}Speak with us{% endtrans %}</a></li>
         </ul>
 
-        <div class="d-flex align-items-center justify-content-between w-100 pr-1 pl-1">
+        {#<div class="d-flex align-items-center justify-content-between w-100 pr-1 pl-1">
             {% include '_render_block/menu_links.html.twig' %}
-        </div>
+        </div>#}
     </div>
 </nav>
 
-<div class="container" style="margin-top: 100px">
-</div>
+{#<div class="container" style="margin-top: 100px">
+</div>#}

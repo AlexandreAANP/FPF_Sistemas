@@ -43,3 +43,137 @@
 	height: 100%;
 	width: 100%;
 }
+.language-style .dropdown-menu{
+	min-width: 0 !important;
+}
+
+
+
+
+/*Mycode*/
+
+/*@media only screen and (max-width: 600px) {
+ .background-image-header  {
+    background-position: right !important;
+    background-size: 50%;
+  }
+}*/
+
+.btn-speak-with-us{
+
+	width: 56px;
+	height: 56px;
+	background-color: #8ac926;
+	list-style-type:none;
+	box-shadow: 0px 3px 6px 0px #000000;
+
+}
+.dropleft-speak-with-us{
+	display: none;
+	position: absolute;
+	right: 88px;
+	top: 53px;
+	width:168px;
+	height:56px;
+	background-color: #8ac926;
+	box-shadow: 0px 3px 6px 0px #000000;
+	animation-name: anim-dropleft;
+	animation-duration: 0.2s; 
+}
+
+
+
+.btn-speak-with-us:hover .dropleft-speak-with-us{
+	display: block !important;
+
+}
+
+@keyframes anim-dropleft{
+	from{ opacity: 0; }
+	to{ opacity: 1 ; }
+}
+.box-speak-with-us{
+	display: inline-block;
+	position: absolute;
+    left: 56px;
+	width: 56px !important;
+	height: 56px !important;
+	box-shadow: 0px 2px 3px 0px #000000;
+	z-index: 1;
+}
+.box-speak-with-us-rigth{
+	display: inline-block;
+	position: absolute;
+    left: 112px;
+	width: 56px !important;
+	height: 56px !important;
+	
+	/*border-right: 1px solid #000000;*/	
+}
+.text-speak-with-us{
+	left: 50%;
+    top: 50%;
+    width: 100%;
+    transform: translate(-50%,-50%);
+	position: absolute;
+	text-transform: uppercase;
+	font-family: "MuseoModerno", sans-serif ;
+	font-weight: 600;
+	color: white;
+	text-align: center;
+	z-index: 2;
+
+}
+.mobile-menu-speak-with-us{
+	height: 56px;
+	width: auto;
+	background-color:  #8ac926;
+	text-transform: uppercase;
+	box-shadow: 0px 3px 6px 0px #000000;
+}
+.mobile-menu-speak-with-us a{
+	font-size: 17px !important;
+	color: white !important;
+	text-align: center;
+}
+.background-image-header{
+	position: relative;
+	color: white !important;
+	width: auto;
+	height: 85vh;
+	background-image: url('/assets/images/background-image-index.svg');
+	background-position: center;
+	background-size: cover;
+}
+
+.menu-link-font{
+	color: white !important;
+	font-size: 17px !important;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+.svg-logo-image{
+	width: 150px !important;
+}
+.navbar-style{
+	position: absolute;
+	width: 100%;
+	z-index: 9;
+}
+.header-text-index{
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.header-tittle-index{
+	text-align: center;
+	font-weight: 350;
+	color: white;
+	font-size: 61px;
+}
+.header-subtittle-index{
+	text-align: center;
+	font-weight: 350;
+	color: white;
+	font-size: 43px;
+}
