@@ -23,7 +23,7 @@
                 {% include '_render_block/menu_links.html.twig' %}
                   {% set supportedLanguages = LayoutFunctions.getSupportedLanguages(LayoutFunctions.getEnvVars('SUPPORTED_LOCALES')) %}
                 {% if supportedLanguages|length > 1 %}
-                    <li class="language-style nav-item dropdown py-3 ">
+                    <li class="language-style nav-item dropdown py-3 mr-5 ">
                         <a class="nav-link py-0 px-4 dropdown-toggle btn-sm p-1 menu-link-font" href="#" id="dropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
                             {{ LayoutFunctions.getCurrentLanguage()|upper }}
                         </a>
@@ -33,7 +33,7 @@
                                 {% if href == '/' %}
                                     {% set href = '/' ~ LayoutFunctions.getEnvVars('DEFAULT_LANGUAGE') %}
                                 {% endif %}
-                                <li><a class="dropdown-item" href="{{ href }}">{{ language|upper }}</a></li>
+                                <li><a class="dropdown-item language-links-menu" href="{{ href }}">{{ language|upper }}</a></li>
                             {% endfor %}
                         </ul>
                     </li>
@@ -41,7 +41,7 @@
             
 
             </ul>
-      
+        
 
                 <li class="btn-speak-with-us d-flex align-items-center" style="list-style-type:none;">
                     <a href="/contact">
@@ -51,7 +51,7 @@
                             <spam class='box-speak-with-us-rigth'></spam> 
                         </div>
                     </a>
-                    <span class="btn d-flex align-items-center"><i class="mdi mdi-rectangle-outline p-1 text-white"></i></span>
+                    <span class="btn d-flex justify-content-center" style="width:100%;"><!--<i class="mdi mdi-rectangle-outline p-1 text-white"></i>--><img src="assets/icons/settings.svg"></span>
                 </li>
            {# <ul class="list-unstyled d-flex align-items-center justify-content-center mt-0 mb-0">
                 {% set supportedLanguages = LayoutFunctions.getSupportedLanguages(LayoutFunctions.getEnvVars('SUPPORTED_LOCALES')) %}
@@ -123,12 +123,12 @@
     </div>
 </div>
 
-<nav id="menu" class="panel" role="navigation">
+<nav id="menu" class="panel bg-color-black" role="navigation">
     <div class="d-flex flex-column align-items-end h-100">
         <a href="#menu" class="main-menu mb-4">
             <img src="/assets/images/close-menu.svg" alt="close menu">
         </a>
-        <ul id="menu-links" class="list-unstyled d-flex flex-column flex-fill w-100">
+        <ul id="menu-links" class="menu-mobile-link list-unstyled d-flex flex-column flex-fill w-100">
             {% include '_render_block/menu_links.html.twig' %}
             <li class='mobile-menu-speak-with-us'><a>{% trans %}Speak with us{% endtrans %}</a></li>
         </ul>
@@ -139,5 +139,4 @@
     </div>
 </nav>
 
-{#<div class="container" style="margin-top: 100px">
-</div>#}
+

@@ -17,7 +17,100 @@
     </div>
 </div>
 
-    <section class="mt-5 mb60">
+<span  class="background-squares-left"></span>
+<span  class="background-squares-right"></span>
+<!--Restauração-->
+<div class="container">
+
+    <div class="row">
+        <!--Negocios-->
+        <div class="container row pb-4">
+            <div class="col-12 d-flex justify-content-center py-3"><span class="tittle-body-index">{% trans %}Business{% endtrans %}</span></div>
+            <div class="col-12 d-flex justify-content-center"><span class="subtittle-body-index">{% trans %}Billing Software for Retail Stores, Restaurants, Cafes and Others{% endtrans %}</span></div>
+        </div>
+        <div class="container row">
+            <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('/assets/images/negocios-index.svg');"  class="index-img-restauration"></div>
+            <div class="col-12 d-flex justify-content-center"><span class="index-restoration">{% trans %}Restoration{% endtrans %}</span></div>
+        </div>
+        <div class="container">
+            {% set items = ['Restaurant','Cerveijarias','Fast-Food','Marisquerias', 'Pizzarias', 'Snack-bar', 'take-away', 'Discotecas'] %}
+                {% set icons = ['restaurant','sports_bar','fastfood','set_meal', 'local_pizza', 'lunch_dining', 'delivery_dining', 'liquor'] %}
+            
+
+            <div class="row py-3"> 
+            {% for i in 0..7 %}
+                <div class="col item-index">
+                        <img src='assets/images/restaurante-item-hover-1.svg' class="img-squares">
+                        <span class="material-icons index-icon-restoration d-flex justify-content-center">{{icons[i]}}</span>
+
+                        <p class=" d-flex justify-content-center font-weight-bold">{{items[i]}}</p>
+                </div>
+            {% endfor %}
+            </div>
+
+
+
+            <div class="row py-3"> 
+            {% for i in 0..7 %}
+                <div class="col">
+                        <span class="material-icons index-icon-restoration d-flex justify-content-center">{{icons[i]}}</span>
+                        <p class=" d-flex justify-content-center font-weight-bold">{{items[i]}}</p>
+                </div>
+            {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="row">
+        <!--Negocios-->
+        <div class="container row pb-4">
+            <div class="col-12 d-flex justify-content-center py-3"><span class="tittle-body-index">{% trans %}Business{% endtrans %}</span></div>
+            <div class="col-12 d-flex justify-content-center"><span class="subtittle-body-index">{% trans %}Billing Software for Retail Stores, Restaurants, Cafes and Others{% endtrans %}</span></div>
+        </div>
+        <div class="container row">
+            <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('/assets/images/negocios-index.svg');"  class="index-img-restauration"></div>
+            <div class="col-12 d-flex justify-content-center"><span class="index-restoration">{% trans %}Restoration{% endtrans %}</span></div>
+        </div>
+        <div class="container">
+            {% set items = ['Restaurant','Cerveijarias','Fast-Food','Marisquerias', 'Pizzarias', 'Snack-bar', 'take-away', 'Discotecas'] %}
+                {% set icons = ['restaurant','sports_bar','fastfood','set_meal', 'local_pizza', 'lunch_dining', 'delivery_dining', 'liquor'] %}
+            
+
+            <div class="row py-3"> 
+            {% for i in 0..7 %}
+                <div class="col item-index">
+                        <img src='assets/images/restaurante-item-hover-1.svg' class="img-squares">
+                        <span class="material-icons index-icon-restoration d-flex justify-content-center">{{icons[i]}}</span>
+
+                        <p class=" d-flex justify-content-center font-weight-bold">{{items[i]}}</p>
+                </div>
+            {% endfor %}
+            </div>
+
+
+
+            <div class="row py-3"> 
+            {% for i in 0..7 %}
+                <div class="col">
+                        <span class="material-icons index-icon-restoration d-flex justify-content-center">{{icons[i]}}</span>
+                        <p class=" d-flex justify-content-center font-weight-bold">{{items[i]}}</p>
+                </div>
+            {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--/Restauração-->
+
+<!--Serviços-->
+<!--/Serviços-->
+   {# <section class="mt-5 mb60">
 
         <div class="container text-center mb-5">
             {% set colContentHomeInstitucional = LayoutFunctions.getContentGroup('content?area=content-area-home-institucional&fields=area,url', 'area') %}
@@ -81,7 +174,7 @@
                 {% endif %}
             </div>
         </div>
-    </section>
+    </section>#}
 {% endblock %}
 
 {% block javascripts %}

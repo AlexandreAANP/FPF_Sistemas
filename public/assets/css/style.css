@@ -1,3 +1,13 @@
+
+@font-face {
+	font-family: 'MuseoModerno';
+	src: url('/assets/css/MuseoModerno.ttf')  format('truetype'), url('/assets/css/MuseoModerno.woff')  format('woff'), url('/assets/css/MuseoModerno.woff2')  format('woff2'), url('/assets/css/MuseoModerno.eot')  format('eot'),url('/assets/css/MuseoModerno.otf')  format('otf'); 
+}
+
+body {
+	height: 100%;
+	margin: 0px;
+    font: 16px/28px "MuseoModerno", sans-serif !important;}
 .card-header .card-message {
 	text-align: left;
 }
@@ -51,16 +61,32 @@
 
 
 /*Mycode*/
+/*mobile*/
+@media only screen and (max-width: 600px) {
+ .header-tittle-index{
+ 	font-size: 43px !important;
+ }
+ .header-subtittle-index{
+ 	font-size: 22px !important;
+ }
+}
+.menu-mobile-link :nth-child(2){
+border-top: 1px solid white !important;
+border-bottom: 1px solid white !important;
+}
 
-/*@media only screen and (max-width: 600px) {
- .background-image-header  {
-    background-position: right !important;
-    background-size: 50%;
-  }
-}*/
+.menu-mobile-link a{
+	font-family: 'MuseoModerno' !important;
+}
+/*COLORS*/
+.bg-color-black{
+	background-color: #222327 !important;
+}
+
 
 .btn-speak-with-us{
-
+	position: fixed;
+	right:31px;
 	width: 56px;
 	height: 56px;
 	background-color: #8ac926;
@@ -68,9 +94,13 @@
 	box-shadow: 0px 3px 6px 0px #000000;
 
 }
+
+.btn-speak-with-us img{
+	position: center;
+}
 .dropleft-speak-with-us{
 	display: none;
-	position: absolute;
+	position: fixed;
 	right: 88px;
 	top: 53px;
 	width:168px;
@@ -81,16 +111,29 @@
 	animation-duration: 0.2s; 
 }
 
+.btn-speak-with-us:hover img{
 
+	transform: rotate(90deg);
+	animation-name: rotateIcon;
+	animation-duration: 0.2s;
+}
 
 .btn-speak-with-us:hover .dropleft-speak-with-us{
 	display: block !important;
 
 }
-
+/*animation speak with us*/
 @keyframes anim-dropleft{
 	from{ opacity: 0; }
 	to{ opacity: 1 ; }
+}
+/* animation icon speak with us*/
+
+@keyframes rotateIcon {
+	from{ transform: rotate(0deg); }
+	to{
+		transform: rotate(90deg);
+	}
 }
 .box-speak-with-us{
 	display: inline-block;
@@ -117,7 +160,7 @@
     transform: translate(-50%,-50%);
 	position: absolute;
 	text-transform: uppercase;
-	font-family: "MuseoModerno", sans-serif ;
+	font-family: "MuseoModerno" !important;
 	font-weight: 600;
 	color: white;
 	text-align: center;
@@ -125,7 +168,6 @@
 
 }
 .mobile-menu-speak-with-us{
-	height: 56px;
 	width: auto;
 	background-color:  #8ac926;
 	text-transform: uppercase;
@@ -141,6 +183,7 @@
 	color: white !important;
 	width: auto;
 	height: 85vh;
+	margin-bottom: 15vh;
 	background-image: url('/assets/images/background-image-index.svg');
 	background-position: center;
 	background-size: cover;
@@ -151,6 +194,7 @@
 	font-size: 17px !important;
 	text-transform: uppercase;
 	font-weight: bold;
+	font-family: 'MuseoModerno' !important;
 }
 .svg-logo-image{
 	width: 150px !important;
@@ -176,4 +220,101 @@
 	font-weight: 350;
 	color: white;
 	font-size: 43px;
+}
+.tittle-body-index{
+	font-family: 'MuseoModerno';
+	font-size: 26px;
+	font-weight: bold;
+	color: #000000;
+}
+.subtittle-body-index{
+	font-family: 'MuseoModerno';
+	font-size: 26px;
+	font-weight: lighter;
+	color: #000000;
+}
+.index-img-restauration{
+	width: 226px !important;
+	height: 226px !important;
+}
+.index-img-restauration:hover{
+
+	background-image: url('/assets/images/negocios-index-hover.svg') !important;
+	animation-name: anim-fail;
+	animation-duration: 0.07s;
+	/*animation-iteration-count: 3;*/
+}
+@keyframes anim-fail {
+	from{
+		/*background-image: url('assets/images/negocios-index.svg');*/
+		opacity: 0;
+}
+
+	to{
+		/*background-image: url('assets/images/negocios-index-hover.svg');*/
+		opacity: 1;
+	}
+
+}
+
+
+.language-links-menu{
+	    font-family: 'MuseoModerno' !important;
+}
+.language-links-menu:hover{
+	color: white !important;
+	background-color: #222327 !important; 
+}
+
+
+.index-restoration{
+	text-transform: uppercase;
+	font-family: 'MuseoModerno', sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+	color: #8019B3;
+}
+
+.index-icon-restoration{
+	font-size: 80px;
+	color: #8019B3;
+}
+.item-index{
+	cursor: pointer;
+}
+.item-index:hover .img-squares{
+	opacity: 1;
+	/*font-family: 25px !important;*/
+}
+.img-squares{
+	position: absolute;
+	top: 0;
+	left: 101px;
+	opacity: 0;
+}
+.background-squares-left{
+    display: block;
+
+    background-image: url(/assets/images/background-squares.svg);
+    background-repeat: repeat-y;
+    position: absolute;
+    left: 0;
+    top: 85vh;
+    z-index: -999;
+    width: 25vh;
+    height: 100%;
+
+}
+.background-squares-right{
+    display: block;
+
+    background-image: url(/assets/images/background-squares.svg);
+    background-repeat: repeat-y;
+    position: absolute;
+    right: 0;
+    top: 85vh;
+    z-index: -999;
+    width: 25vh;
+    height: 100%;
+    
 }
