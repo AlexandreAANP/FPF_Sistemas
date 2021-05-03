@@ -183,7 +183,7 @@ border-bottom: 1px solid white !important;
 	color: white !important;
 	width: auto;
 	height: 85vh;
-	margin-bottom: 15vh;
+	/*margin-bottom: 15vh;*/
 	background-image: url('/assets/images/background-image-index.svg');
 	background-position: center;
 	background-size: cover;
@@ -239,7 +239,7 @@ border-bottom: 1px solid white !important;
 }
 .index-img-restauration:hover{
 
-	background-image: url('/assets/images/negocios-index-hover.svg') !important;
+	/*background-image: url('/assets/images/negocios-index-hover.svg') !important;*/
 	animation-name: anim-fail;
 	animation-duration: 0.07s;
 	/*animation-iteration-count: 3;*/
@@ -275,24 +275,34 @@ border-bottom: 1px solid white !important;
 	color: #8019B3;
 }
 
-.index-icon-restoration{
-	font-size: 80px;
+.index-icon-restoration::before{
+	font-size: 75px !important;
 	color: #8019B3;
+	
 }
-.item-index{
+.item-index p{
 	cursor: pointer;
+	transition: transform 0.4s;
 }
+.item-index:hover p{
+	font-family: 90px !important;
+	transform: scale(100);
+	transform: translateY(10%);
+}
+
 .item-index:hover .img-squares{
+
 	opacity: 1;
 	/*font-family: 25px !important;*/
 }
 .img-squares{
-	position: absolute;
-	top: 0;
-	left: 101px;
-	opacity: 0;
+	width: 40px;
+    position: absolute;
+    top: -24px;
+    left: calc(50% + 40px);
+    opacity: 0;
 }
-.background-squares-left{
+/*.background-squares-left{
     display: block;
 
     background-image: url(/assets/images/background-squares.svg);
@@ -306,15 +316,22 @@ border-bottom: 1px solid white !important;
 
 }
 .background-squares-right{
+	width: 25vh;
+    height: 100%;
     display: block;
-
-    background-image: url(/assets/images/background-squares.svg);
-    background-repeat: repeat-y;
-    position: absolute;
+    background-color: orange;
+    /*background-image: url(/assets/images/background-squares.svg);*/
+  /*  background-repeat: repeat-y;
     right: 0;
     top: 85vh;
     z-index: -999;
-    width: 25vh;
-    height: 100%;
+  
     
+}*/
+.background-index-image{
+	/*background-color: orange;*/
+	margin:0 ;
+	background-image: url(/assets/images/background-image-index1.svg);
+	background-position: center;
+	background-size: 100vw;
 }

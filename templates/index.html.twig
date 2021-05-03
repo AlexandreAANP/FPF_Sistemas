@@ -16,97 +16,101 @@
         </div>
     </div>
 </div>
+     
 
-<span  class="background-squares-left"></span>
-<span  class="background-squares-right"></span>
-<!--Restauração-->
-<div class="container">
+        
 
-    <div class="row">
-        <!--Negocios-->
-        <div class="container row pb-4">
-            <div class="col-12 d-flex justify-content-center py-3"><span class="tittle-body-index">{% trans %}Business{% endtrans %}</span></div>
-            <div class="col-12 d-flex justify-content-center"><span class="subtittle-body-index">{% trans %}Billing Software for Retail Stores, Restaurants, Cafes and Others{% endtrans %}</span></div>
-        </div>
-        <div class="container row">
-            <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('/assets/images/negocios-index.svg');"  class="index-img-restauration"></div>
-            <div class="col-12 d-flex justify-content-center"><span class="index-restoration">{% trans %}Restoration{% endtrans %}</span></div>
-        </div>
-        <div class="container">
-            {% set items = ['Restaurant','Cerveijarias','Fast-Food','Marisquerias', 'Pizzarias', 'Snack-bar', 'take-away', 'Discotecas'] %}
-                {% set icons = ['restaurant','sports_bar','fastfood','set_meal', 'local_pizza', 'lunch_dining', 'delivery_dining', 'liquor'] %}
+
+              
+
+<div class="background-index-image" style="padding-top: 15vh;">
+      
+{% set business_header = LayoutFunctions.getAPI('content?type=files&area=content-area-business-header&fields=text,url&language=' ~ app.request.locale) %}
+    {% if business_header is defined %}
+
+        {% set Title = null %}
+        {% set Description = null %}
+        {% set url_first_image = null %}
+        {% set  url_second_image = null %}
+        
+        {% for files_area in business_header.colContent %}
+            {% if files_area.referenceKey == 'files-business' %}
+                {% set Title = files_area.title %}
             
-
-            <div class="row py-3"> 
-            {% for i in 0..7 %}
-                <div class="col item-index">
-                        <img src='assets/images/restaurante-item-hover-1.svg' class="img-squares">
-                        <span class="material-icons index-icon-restoration d-flex justify-content-center">{{icons[i]}}</span>
-
-                        <p class=" d-flex justify-content-center font-weight-bold">{{items[i]}}</p>
-                </div>
-            {% endfor %}
-            </div>
-
-
-
-            <div class="row py-3"> 
-            {% for i in 0..7 %}
-                <div class="col">
-                        <span class="material-icons index-icon-restoration d-flex justify-content-center">{{icons[i]}}</span>
-                        <p class=" d-flex justify-content-center font-weight-bold">{{items[i]}}</p>
-                </div>
-            {% endfor %}
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container">
-
-    <div class="row">
-        <!--Negocios-->
-        <div class="container row pb-4">
-            <div class="col-12 d-flex justify-content-center py-3"><span class="tittle-body-index">{% trans %}Business{% endtrans %}</span></div>
-            <div class="col-12 d-flex justify-content-center"><span class="subtittle-body-index">{% trans %}Billing Software for Retail Stores, Restaurants, Cafes and Others{% endtrans %}</span></div>
-        </div>
-        <div class="container row">
-            <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('/assets/images/negocios-index.svg');"  class="index-img-restauration"></div>
-            <div class="col-12 d-flex justify-content-center"><span class="index-restoration">{% trans %}Restoration{% endtrans %}</span></div>
-        </div>
-        <div class="container">
-            {% set items = ['Restaurant','Cerveijarias','Fast-Food','Marisquerias', 'Pizzarias', 'Snack-bar', 'take-away', 'Discotecas'] %}
-                {% set icons = ['restaurant','sports_bar','fastfood','set_meal', 'local_pizza', 'lunch_dining', 'delivery_dining', 'liquor'] %}
+                {% set Description = files_area.description %}
+                    <pre>{{dump(files_area)}}</pre>
+                {% set url_first_image = files_area.filename %}
+                
+                {% set url_second_image = files_area.url %}
             
+            {% endif %}
 
-            <div class="row py-3"> 
-            {% for i in 0..7 %}
-                <div class="col item-index">
-                        <img src='assets/images/restaurante-item-hover-1.svg' class="img-squares">
-                        <span class="material-icons index-icon-restoration d-flex justify-content-center">{{icons[i]}}</span>
+        {% endfor %}
+       
+    {% endif %}
 
-                        <p class=" d-flex justify-content-center font-weight-bold">{{items[i]}}</p>
+     {% set restoration_area = LayoutFunctions.getAPI('content?type=files&area=content-area-business-index&fields=text,url&language=' ~ app.request.locale) %}
+
+    
+       
+
+                <!--Restauração-->
+                <div class="container py-5">
+
+                    <div class="row">
+                        <!--Negocios-->
+                        <div class="container row pb-4">
+                            <div class="col-12 d-flex justify-content-center py-3"><span class="tittle-body-index">{{Title}}</span></div>
+                            <div class="col-12 d-flex justify-content-center"><span class="subtittle-body-index">{{Description}}</span></div>
+                        </div>
+            {% if restoration_area is defined %}
+                        <div class="container row py-3">
+                            <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-restauration"></div>
+                            <div class="col-12 d-flex justify-content-center"><span class="index-restoration">{% trans %}Restoration{% endtrans %}</span></div>
+                            <style type="text/css">.index-img-restauration:hover{ background-image: url("{{url_second_image}}") !important; }</style>
+                        </div>
+                        <div class="container">
+                            {% set items = ['Restaurant','Cerveijarias','Fast-Food','Marisquerias', 'Pizzarias', 'Snack-bar', 'take-away', 'Discotecas'] %}
+                                {% set icons = ['restaurant','sports_bar','fastfood','set_meal', 'local_pizza', 'lunch_dining', 'delivery_dining', 'liquor'] %}
+                                
+            
+                            <div class="row py-3"> 
+                     {% for items in restoration_area.colContent %}
+                                <div class="col item-index">
+                                        <img src='{{items.filename}}' class="img-squares">
+                                        <i class="mdi-48px {{items.url}} index-icon-restoration d-flex justify-content-center"></i>
+
+                                        <p class=" d-flex justify-content-center font-weight-bold py-4">{{items.title}}</p>
+                                </div>
+                      {% endfor %}
+                            </div>
+           
+
+
+                            <div class="row py-3"> 
+                            {% for i in 0..7 %}
+                                <div class="col item-index">
+                                        <img src='assets/images/restaurante-item-hover-1.svg' class="img-squares">
+                                        <span class="material-icons index-icon-restoration d-flex justify-content-center"></span>
+                                        <p class=" d-flex justify-content-center font-weight-bold"></p>
+                                </div>
+                            {% endfor %}
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            {% endfor %}
-            </div>
+            {% endif %}
 
 
-
-            <div class="row py-3"> 
-            {% for i in 0..7 %}
-                <div class="col">
-                        <span class="material-icons index-icon-restoration d-flex justify-content-center">{{icons[i]}}</span>
-                        <p class=" d-flex justify-content-center font-weight-bold">{{items[i]}}</p>
-                </div>
-            {% endfor %}
-
-            </div>
-        </div>
-    </div>
-</div>
-
+  <span class="background-squares-right"></span>  
 <!--/Restauração-->
+</div>
+
+     
+     
+        <!--div class=""><img src="/assets/images/background-squares.svg"></div>
+        <div class="background-squares-right"></div-->
 
 <!--Serviços-->
 <!--/Serviços-->
@@ -179,4 +183,5 @@
 
 {% block javascripts %}
     {{ parent() }}
+ 
 {% endblock %}
