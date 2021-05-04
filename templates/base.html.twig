@@ -94,7 +94,6 @@
         arDefaultOptions['cdnUrl'] = '{{ cdnUrl }}';
         arDefaultOptions['requestUri'] = '{{ app.request.requestUri()  }}';
         arDefaultOptions['requestUriB64'] = '{{ LayoutFunctions.base64_encode(app.request.requestUri()) }}';
-
         var defaultIsDev = {{ LayoutFunctions.isDev(app.request) ? 'true' : 'false' }};
     </script>
 

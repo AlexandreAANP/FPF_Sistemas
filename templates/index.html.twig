@@ -38,7 +38,7 @@
                 {% set Title = files_area.title %}
             
                 {% set Description = files_area.description %}
-                    <pre>{{dump(files_area)}}</pre>
+                    <!--pre>{{dump(files_area)}}</pre-->
                 {% set url_first_image = files_area.filename %}
                 
                 {% set url_second_image = files_area.url %}
@@ -54,57 +54,244 @@
     
        
 
-                <!--Restauração-->
-                <div class="container py-5">
+               
 
-                    <div class="row">
+                    <div class="container py-5">
                         <!--Negocios-->
-                        <div class="container row pb-4">
+                        <div class="row pb-4">
                             <div class="col-12 d-flex justify-content-center py-3"><span class="tittle-body-index">{{Title}}</span></div>
                             <div class="col-12 d-flex justify-content-center"><span class="subtittle-body-index">{{Description}}</span></div>
                         </div>
+
+                         <!--Restauração-->
             {% if restoration_area is defined %}
-                        <div class="container row py-3">
+                        <!--Header-->
+                        <div class="row py-3">
                             <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-restauration"></div>
-                            <div class="col-12 d-flex justify-content-center"><span class="index-restoration">{% trans %}Restoration{% endtrans %}</span></div>
-                            <style type="text/css">.index-img-restauration:hover{ background-image: url("{{url_second_image}}") !important; }</style>
+                            <div class="col-12 d-flex justify-content-center py-4"><span class="index-restoration">{% trans %}Restoration{% endtrans %}</span></div>
+                            <style type="text/css">.index-img-restauration:hover{ background-image: url("{{apiUrl}}{{url_second_image}}") !important; }</style>
                         </div>
-                        <div class="container">
-                            {% set items = ['Restaurant','Cerveijarias','Fast-Food','Marisquerias', 'Pizzarias', 'Snack-bar', 'take-away', 'Discotecas'] %}
-                                {% set icons = ['restaurant','sports_bar','fastfood','set_meal', 'local_pizza', 'lunch_dining', 'delivery_dining', 'liquor'] %}
-                                
-            
-                            <div class="row py-3"> 
-                     {% for items in restoration_area.colContent %}
-                                <div class="col item-index">
-                                        <img src='{{items.filename}}' class="img-squares">
-                                        <i class="mdi-48px {{items.url}} index-icon-restoration d-flex justify-content-center"></i>
+                        <!--/header-->
 
-                                        <p class=" d-flex justify-content-center font-weight-bold py-4">{{items.title}}</p>
-                                </div>
-                      {% endfor %}
-                            </div>
-           
+                        <!--Body icons-->
+                        <div class="row">
+                            <div class="container row py-4 mx-0"> 
+                                {% for  items in restoration_area.colContent %}
 
+                                    <div class="col item-index">
+                                            <img src='{{items.filename}}' class="img-squares">
+                                            <i class="mdi-48px {{items.url}} index-icon-restoration d-flex justify-content-center"></i>
 
-                            <div class="row py-3"> 
-                            {% for i in 0..7 %}
-                                <div class="col item-index">
-                                        <img src='assets/images/restaurante-item-hover-1.svg' class="img-squares">
-                                        <span class="material-icons index-icon-restoration d-flex justify-content-center"></span>
-                                        <p class=" d-flex justify-content-center font-weight-bold"></p>
-                                </div>
-                            {% endfor %}
-
-                            </div>
+                                            <p class=" d-flex justify-content-center font-weight-bold text-center py-4">{{items.title}}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>    
                         </div>
-                    </div>
-                </div>
+                        <!--/Body icons-->
             {% endif %}
 
 
-  <span class="background-squares-right"></span>  
-<!--/Restauração-->
+
+
+            {% set retail_header = LayoutFunctions.getAPI('content?type=files&area=content-area-retail-header&fields=text,url&language=' ~ app.request.locale) %}
+                {% if retail_header is defined %}
+                    {% set Title = null %}
+                    {% set url_first_image = null %}
+                    {% set  url_second_image = null %}
+                   
+                    {% for files_area in retail_header.colContent %}
+                        {% if files_area.referenceKey == 'files-retail' %}
+                            {% set Title = files_area.title %}
+                            
+                            {% set url_first_image = files_area.filename %}
+                            
+                            {% set url_second_image = files_area.url %}
+                        
+                        {% endif %}
+
+                    {% endfor %}
+                   
+                {% endif %}
+
+                {% set retail_area = LayoutFunctions.getAPI('content?type=files&area=content-area-retail-index&fields=text,url&language=' ~ app.request.locale) %}
+                {% if retail_area is defined %}
+                     <!--Header-->
+                        <div class="row py-3">
+                            <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-retail"></div>
+                            <div class="col-12 d-flex justify-content-center py-4"><span class="index-retail">{% trans %}Retail{% endtrans %}</span></div>
+                            <style type="text/css">.index-img-retail:hover{ background-image: url("{{apiUrl}}{{url_second_image}}") !important; }</style>
+                        </div>
+                        <!--/header-->
+                           <!--Body icons-->
+                        <div class="row">
+                            <div class="container row py-4 mx-0"> 
+                                {% for  items in retail_area.colContent %}
+
+                                    <div class="col item-index">
+                                            <img src='{{items.filename}}' class="img-squares-retail">
+                                            <i class="mdi-48px {{items.url}} index-icon-retail d-flex justify-content-center"></i>
+
+                                            <p class=" d-flex justify-content-center font-weight-bold text-center py-4">{{items.title}}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>    
+                        </div>
+                        <!--/Body icons-->
+                {% endif %}
+
+
+
+            {% set services_header = LayoutFunctions.getAPI('content?type=files&area=content-area-services-header&fields=text,url&language=' ~ app.request.locale) %}
+                {% if services_header is defined %}
+                    {% set Title = null %}
+                    {% set url_first_image = null %}
+                    {% set  url_second_image = null %}
+                   
+                    {% for files_area in services_header.colContent %}
+                        {% if files_area.referenceKey == 'files-services' %}
+                            {% set Title = files_area.title %}
+                            
+                            {% set url_first_image = files_area.filename %}
+                            
+                            {% set url_second_image = files_area.url %}
+                        
+                        {% endif %}
+
+                    {% endfor %}
+                   
+                {% endif %}
+
+                {% set services_area = LayoutFunctions.getAPI('content?type=files&area=content-area-services-index&fields=text,url&language=' ~ app.request.locale) %}
+                {% if services_area is defined %}
+                     <!--Header-->
+                        <div class="row py-3">
+                            <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-services"></div>
+                            <div class="col-12 d-flex justify-content-center py-4"><span class="index-services">{% trans %}Services{% endtrans %}</span></div>
+                            <style type="text/css">.index-img-services:hover{ background-image: url("{{apiUrl}}{{url_second_image}}") !important; }</style>
+                        </div>
+                        <!--/header-->
+                           <!--Body icons-->
+                        <div class="row">
+                            <div class="container row py-4 mx-0"> 
+                                {% for  items in services_area.colContent %}
+
+                                    <div class="col item-index">
+                                            <img src='{{items.filename}}' class="img-squares-services">
+                                            <i class="mdi-48px {{items.url}} index-icon-services d-flex justify-content-center"></i>
+
+                                            <p class=" d-flex justify-content-center font-weight-bold text-center py-4">{{items.title}}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>    
+                        </div>
+                        <!--/Body icons-->
+                {% endif %}
+
+
+
+
+
+            {% set mobile_header = LayoutFunctions.getAPI('content?type=files&area=content-area-mobile-header&fields=text,url&language=' ~ app.request.locale) %}
+                {% if mobile_header is defined %}
+                    {% set Title = null %}
+                    {% set url_first_image = null %}
+                    {% set  url_second_image = null %}
+                   
+                    {% for files_area in mobile_header.colContent %}
+                        {% if files_area.referenceKey == 'files-mobile' %}
+                            {% set Title = files_area.title %}
+                            
+                            {% set url_first_image = files_area.filename %}
+                            
+                            {% set url_second_image = files_area.url %}
+                        
+                        {% endif %}
+
+                    {% endfor %}
+                   
+                {% endif %}
+
+                {% set mobile_area = LayoutFunctions.getAPI('content?type=files&area=content-area-mobile-index&fields=text,url&language=' ~ app.request.locale) %}
+                {% if mobile_area is defined %}
+                     <!--Header-->
+                        <div class="row py-3">
+                            <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-mobile"></div>
+                            <div class="col-12 d-flex justify-content-center py-4"><span class="index-mobile">{% trans %}Services{% endtrans %}</span></div>
+                            <style type="text/css">.index-img-mobile:hover{ background-image: url("{{apiUrl}}{{url_second_image}}") !important; }</style>
+                        </div>
+                        <!--/header-->
+                           <!--Body icons-->
+                        <div class="row">
+                            <div class="container row py-4 mx-0"> 
+                                {% for  items in mobile_area.colContent %}
+
+                                    <div class="col item-index">
+                                            <img src='{{items.filename}}' class="img-squares-mobile">
+                                            <i class="mdi-48px {{items.url}} index-icon-mobile d-flex justify-content-center"></i>
+
+                                            <p class=" d-flex justify-content-center font-weight-bold text-center py-4">{{items.title}}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>    
+                        </div>
+                        <!--/Body icons-->
+                {% endif %}
+
+
+
+
+            {% set health_header = LayoutFunctions.getAPI('content?type=files&area=content-area-health-header&fields=text,url&language=' ~ app.request.locale) %}
+                {% if health_header is defined %}
+                    {% set Title = null %}
+                    {% set url_first_image = null %}
+                    {% set  url_second_image = null %}
+                   
+                    {% for files_area in health_header.colContent %}
+                        {% if files_area.referenceKey == 'files-health' %}
+                            {% set Title = files_area.title %}
+                            
+                            {% set url_first_image = files_area.filename %}
+                            
+                            {% set url_second_image = files_area.url %}
+                        
+                        {% endif %}
+
+                    {% endfor %}
+                   
+                {% endif %}
+
+                {% set health_area = LayoutFunctions.getAPI('content?type=files&area=content-area-health-index&fields=text,url&language=' ~ app.request.locale) %}
+                {% if health_area is defined %}
+                     <!--Header-->
+                        <div class="row py-3">
+                            <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-health"></div>
+                            <div class="col-12 d-flex justify-content-center py-4"><span class="index-health">{% trans %}Health{% endtrans %}</span></div>
+                            <style type="text/css">.index-img-health:hover{ background-image: url("{{apiUrl}}{{url_second_image}}") !important; }</style>
+                        </div>
+                        <!--/header-->
+                           <!--Body icons-->
+                        <div class="row">
+                            <div class="container row py-4 mx-0"> 
+                                {% for  items in health_area.colContent %}
+
+                                    <div class="col item-index">
+                                            <img src='{{items.filename}}' class="img-squares-health">
+                                            <i class="mdi-48px {{items.url}} index-icon-health d-flex justify-content-center"></i>
+
+                                            <p class=" d-flex justify-content-center font-weight-bold text-center py-4">{{items.title}}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>    
+                        </div>
+                        <!--/Body icons-->
+                {% endif %}
+
+
+
+
+
+            </div>
+
 </div>
 
      
