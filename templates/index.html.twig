@@ -6,16 +6,26 @@
 
     {#% include '_includes/modal_product_color_size.html.twig' %#}
 
-  <div class="background-image-header">
+    {% set text = null  %}
+    {% set image = null %}
+    {% for media in colBanner %}
+        {% if media.referenceKey == 'richmedia-home-banner' %}
+            {% set text = media.text %}
+            {% set image = media.filename %}
+        {% endif %}
+    {% endfor %}
+  <div class="background-image-header" style="background-image: url('{{image}}')">
     <div class="container">
         <div class="d-flex justify-content-center">
-            <div class="header-text-index">
-                <h1 class='header-tittle-index'>{% trans %}Management Systems{% endtrans %}</h1>
-                <h2 class="header-subtittle-index">{% trans %}We add value to your business{% endtrans %}</h2>
-            </div>
+            {{text|raw}}
+            <!--div class="header-text-index">
+                <h1 class='header-tittle-index'>{{title ?? null}}</h1>
+                <h2 class="header-subtittle-index">{{description ?? null}}</h2>
+            </div-->
         </div>
     </div>
 </div>
+
      
 
         
@@ -23,33 +33,32 @@
 
               
 
-<div class="background-index-image" style="padding-top: 15vh;">
-      
-{% set business_header = LayoutFunctions.getAPI('content?type=files&area=content-area-business-header&fields=text,url&language=' ~ app.request.locale) %}
-    {% if business_header is defined %}
+<div class="background-index-image" style="padding-top: 15vh; padding-bottom: 100px;">
 
-        {% set Title = null %}
-        {% set Description = null %}
-        {% set url_first_image = null %}
-        {% set  url_second_image = null %}
-        
-        {% for files_area in business_header.colContent %}
-            {% if files_area.referenceKey == 'files-business' %}
-                {% set Title = files_area.title %}
-            
-                {% set Description = files_area.description %}
-                    <!--pre>{{dump(files_area)}}</pre-->
-                {% set url_first_image = files_area.filename %}
-                
-                {% set url_second_image = files_area.url %}
-            
-            {% endif %}
+<!--Restoration-->
 
-        {% endfor %}
-       
-    {% endif %}
+                {% if colRestoration.header is defined %}
 
-     {% set restoration_area = LayoutFunctions.getAPI('content?type=files&area=content-area-business-index&fields=text,url&language=' ~ app.request.locale) %}
+                    {% set Title = null %}
+                    {% set Description = null %}
+                    {% set url_first_image = null %}
+                    {% set  url_second_image = null %}
+                    
+                    {% for header in colRestoration.header %}
+                        {% if header.referenceKey == 'files-business' %}
+                            {% set Title = header.title %}
+                        
+                            {% set Description = header.description %}
+                            {% set url_first_image = header.filename %}
+                            
+                            {% set url_second_image = header.url %}
+                        
+                        {% endif %}
+
+                    {% endfor %}
+                   
+                {% endif %}
+
 
     
        
@@ -57,14 +66,13 @@
                
 
                     <div class="container py-5">
-                        <!--Negocios-->
+                        <!--Header Business-->
                         <div class="row pb-4">
                             <div class="col-12 d-flex justify-content-center py-3"><span class="tittle-body-index">{{Title}}</span></div>
                             <div class="col-12 d-flex justify-content-center"><span class="subtittle-body-index">{{Description}}</span></div>
                         </div>
-
-                         <!--Restauração-->
-            {% if restoration_area is defined %}
+                        <!--/Header Business-->
+            {% if colRestoration is defined %}
                         <!--Header-->
                         <div class="row py-3">
                             <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-restauration"></div>
@@ -76,7 +84,7 @@
                         <!--Body icons-->
                         <div class="row">
                             <div class="container row py-4 mx-0"> 
-                                {% for  items in restoration_area.colContent %}
+                                {% for  items in colRestoration.body %}
 
                                     <div class="col item-index">
                                             <img src='{{items.filename}}' class="img-squares">
@@ -90,22 +98,23 @@
                         <!--/Body icons-->
             {% endif %}
 
+<!--/Restoration-->
 
+<!--Retail-->
 
-
-            {% set retail_header = LayoutFunctions.getAPI('content?type=files&area=content-area-retail-header&fields=text,url&language=' ~ app.request.locale) %}
-                {% if retail_header is defined %}
+                    
+                {% if colRetail.header is defined %}
                     {% set Title = null %}
                     {% set url_first_image = null %}
                     {% set  url_second_image = null %}
                    
-                    {% for files_area in retail_header.colContent %}
-                        {% if files_area.referenceKey == 'files-retail' %}
-                            {% set Title = files_area.title %}
+                    {% for header in colRetail.header %}
+                        {% if header.referenceKey == 'files-retail' %}
+                            {% set Title = header.title %}
                             
-                            {% set url_first_image = files_area.filename %}
+                            {% set url_first_image = header.filename %}
                             
-                            {% set url_second_image = files_area.url %}
+                            {% set url_second_image = header.url %}
                         
                         {% endif %}
 
@@ -113,8 +122,8 @@
                    
                 {% endif %}
 
-                {% set retail_area = LayoutFunctions.getAPI('content?type=files&area=content-area-retail-index&fields=text,url&language=' ~ app.request.locale) %}
-                {% if retail_area is defined %}
+          
+                {% if colRetail is defined %}
                      <!--Header-->
                         <div class="row py-3">
                             <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-retail"></div>
@@ -125,7 +134,7 @@
                            <!--Body icons-->
                         <div class="row">
                             <div class="container row py-4 mx-0"> 
-                                {% for  items in retail_area.colContent %}
+                                {% for  items in colRetail.body %}
 
                                     <div class="col item-index">
                                             <img src='{{items.filename}}' class="img-squares-retail">
@@ -139,21 +148,22 @@
                         <!--/Body icons-->
                 {% endif %}
 
+<!--/Retail-->
 
+<!--Services-->
 
-            {% set services_header = LayoutFunctions.getAPI('content?type=files&area=content-area-services-header&fields=text,url&language=' ~ app.request.locale) %}
-                {% if services_header is defined %}
+                {% if colServices is defined %}
                     {% set Title = null %}
                     {% set url_first_image = null %}
                     {% set  url_second_image = null %}
                    
-                    {% for files_area in services_header.colContent %}
-                        {% if files_area.referenceKey == 'files-services' %}
-                            {% set Title = files_area.title %}
+                    {% for header in colServices.header %}
+                        {% if header.referenceKey == 'files-services' %}
+                            {% set Title = header.title %}
                             
-                            {% set url_first_image = files_area.filename %}
+                            {% set url_first_image = header.filename %}
                             
-                            {% set url_second_image = files_area.url %}
+                            {% set url_second_image = header.url %}
                         
                         {% endif %}
 
@@ -161,8 +171,8 @@
                    
                 {% endif %}
 
-                {% set services_area = LayoutFunctions.getAPI('content?type=files&area=content-area-services-index&fields=text,url&language=' ~ app.request.locale) %}
-                {% if services_area is defined %}
+            
+                {% if colServices is defined %}
                      <!--Header-->
                         <div class="row py-3">
                             <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-services"></div>
@@ -173,7 +183,7 @@
                            <!--Body icons-->
                         <div class="row">
                             <div class="container row py-4 mx-0"> 
-                                {% for  items in services_area.colContent %}
+                                {% for  items in colServices.body %}
 
                                     <div class="col item-index">
                                             <img src='{{items.filename}}' class="img-squares-services">
@@ -188,22 +198,22 @@
                 {% endif %}
 
 
+<!--/Services-->
 
+<!--Mobile-->
 
-
-            {% set mobile_header = LayoutFunctions.getAPI('content?type=files&area=content-area-mobile-header&fields=text,url&language=' ~ app.request.locale) %}
-                {% if mobile_header is defined %}
+                {% if colMobile is defined %}
                     {% set Title = null %}
                     {% set url_first_image = null %}
                     {% set  url_second_image = null %}
                    
-                    {% for files_area in mobile_header.colContent %}
-                        {% if files_area.referenceKey == 'files-mobile' %}
-                            {% set Title = files_area.title %}
+                    {% for header in colMobile.header %}
+                        {% if header.referenceKey == 'files-mobile' %}
+                            {% set Title = header.title %}
                             
-                            {% set url_first_image = files_area.filename %}
+                            {% set url_first_image = header.filename %}
                             
-                            {% set url_second_image = files_area.url %}
+                            {% set url_second_image = header.url %}
                         
                         {% endif %}
 
@@ -211,19 +221,19 @@
                    
                 {% endif %}
 
-                {% set mobile_area = LayoutFunctions.getAPI('content?type=files&area=content-area-mobile-index&fields=text,url&language=' ~ app.request.locale) %}
-                {% if mobile_area is defined %}
+
+                {% if colMobile is defined %}
                      <!--Header-->
                         <div class="row py-3">
                             <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-mobile"></div>
-                            <div class="col-12 d-flex justify-content-center py-4"><span class="index-mobile">{% trans %}Services{% endtrans %}</span></div>
+                            <div class="col-12 d-flex justify-content-center py-4"><span class="index-mobile">{% trans %}Mobile{% endtrans %}</span></div>
                             <style type="text/css">.index-img-mobile:hover{ background-image: url("{{apiUrl}}{{url_second_image}}") !important; }</style>
                         </div>
                         <!--/header-->
                            <!--Body icons-->
                         <div class="row">
                             <div class="container row py-4 mx-0"> 
-                                {% for  items in mobile_area.colContent %}
+                                {% for  items in colMobile.body %}
 
                                     <div class="col item-index">
                                             <img src='{{items.filename}}' class="img-squares-mobile">
@@ -237,22 +247,22 @@
                         <!--/Body icons-->
                 {% endif %}
 
+<!--/Mobile-->
 
+<!--Health-->
 
-
-            {% set health_header = LayoutFunctions.getAPI('content?type=files&area=content-area-health-header&fields=text,url&language=' ~ app.request.locale) %}
-                {% if health_header is defined %}
+                {% if colHealth.header is defined %}
                     {% set Title = null %}
                     {% set url_first_image = null %}
                     {% set  url_second_image = null %}
                    
-                    {% for files_area in health_header.colContent %}
-                        {% if files_area.referenceKey == 'files-health' %}
-                            {% set Title = files_area.title %}
+                    {% for header in colHealth.header %}
+                        {% if header.referenceKey == 'files-health' %}
+                            {% set Title = header.title %}
                             
-                            {% set url_first_image = files_area.filename %}
+                            {% set url_first_image = header.filename %}
                             
-                            {% set url_second_image = files_area.url %}
+                            {% set url_second_image = header.url %}
                         
                         {% endif %}
 
@@ -260,8 +270,8 @@
                    
                 {% endif %}
 
-                {% set health_area = LayoutFunctions.getAPI('content?type=files&area=content-area-health-index&fields=text,url&language=' ~ app.request.locale) %}
-                {% if health_area is defined %}
+          
+                {% if colHealth is defined %}
                      <!--Header-->
                         <div class="row py-3">
                             <div class="col-12 d-flex justify-content-center mt-3 mb-4"><span style="background-image: url('{{url_first_image}}');"  class="index-img-health"></div>
@@ -272,7 +282,7 @@
                            <!--Body icons-->
                         <div class="row">
                             <div class="container row py-4 mx-0"> 
-                                {% for  items in health_area.colContent %}
+                                {% for  items in colHealth.body %}
 
                                     <div class="col item-index">
                                             <img src='{{items.filename}}' class="img-squares-health">
@@ -286,13 +296,93 @@
                         <!--/Body icons-->
                 {% endif %}
 
+<!--/Health-->
+
+<!--Serviços-->
+
+        <div class="row">
+            <div class="col-12 d-flex justify-content-center"><span class="title_services">{% trans %}Services{% endtrans %}</span></div>
+            <div class="col-12 d-flex justify-content-center"><span style="display: inline-block; height: 750px;"></span></div>
+        </div>
+
+
+<!--/Serviços-->
+
+  
+
+<!--Testemunhos-->
 
 
 
+    <div class="container-fluid">
+        <div class="row d-flex justify-content-center py-5"><span class="title_services">{% trans %}Witnesses{% endtrans %}</span></div>
+        <div class="row py-5 m-0">
+        {% set leftCard = colWitnesses.leftCard %}      
+             <div class="card-secondary card-left">
+                <div>
+                    <div class="card-group-img"  data-src='{{leftCard.url}}'>
+                        <img class='card-img' src='{{leftCard.filename}}'>
+                      
+                    </div>
+                </div>
+
+                <div class='card-under-image'>
+                    {{leftCard.text|raw}}
+                    <p class="card-text">{{leftCard.description}}</p>
+                </div>
+            </div>
+
+
+            {% set mainCard = colWitnesses.mainCard %}
+
+            <div class="card-main">
+                <div>
+                    <div class="video-group d-none">
+                    <i class="mdi mdi-close-thick icon-to-close-video"></i>
+                    <iframe class="card-video" src="" allowscriptaccess="always" allowfullscreen='true' allow="autoplay"></iframe>
+                    </div>
+                    <div class="card-group-img"  data-src='{{mainCard.url}}'>
+                        <img class='card-img' src='{{mainCard.filename}}'>
+                        <img class="play-symbol"  src="/assets/images/play-symbol.svg">
+                    </div>
+                </div>
+                <div>
+                    <i class="mdi mdi-48px mdi-menu-left-outline seta-esquerda"></i>
+                    <i class="mdi mdi-48px mdi-menu-right-outline seta-direita"></i>
+                </div>
+                <div class='card-under-image'>
+                    {{mainCard.text|raw}}
+                    <p class="card-text">{{mainCard.description}}</p>
+                </div>
+            </div>
+
+
+            {% set rightCard = colWitnesses.rightCard %}
+             <div class="card-secondary card-right">
+                <div>
+                    <div class="card-group-img"  data-src='{{rightCard.url}}'>
+                        <img class='card-img' src='{{rightCard.filename}}'>
+                      
+                    </div>
+                </div>
+
+                <div class='card-under-image'>
+                    {{rightCard.text|raw}}
+                    <p class="card-text">{{rightCard.description}}</p>
+                </div>
+            </div>
+           
+
+
+        </div>
+    </div>
+
+<!--/Testemunhos-->
 
             </div>
 
 </div>
+
 
      
      
@@ -370,5 +460,150 @@
 
 {% block javascripts %}
     {{ parent() }}
- 
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('.card-group-img').on('click', function(){
+
+            if($(this).parent().parent().hasClass('card-main')){
+
+                $videoSrc=$(this).data('src');   
+                $(this).addClass('d-none');
+                $(this).parent().find('.video-group').removeClass('d-none');
+                $(this).parent().find('.card-video').attr('src', $videoSrc + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0");
+                
+
+
+             }
+        });
+       $('.icon-to-close-video').on('click', function(){
+        $(this).parent().find('.card-video').attr('src', $videoSrc);
+        $(this).parent().addClass('d-none');
+        $(this).parent().parent().find('.card-group-img').removeClass('d-none');
+       });
+
+       $('.card-right').on('click', function(){
+
+            let srcVideo = $(this).find('.card-group-img').data('src');
+            let srcVideoMain = $('.card-main').find('.card-group-img').data('src');
+            let srcimg = $(this).find('.card-img').attr('src');
+            let title = $(this).find('.card-title').html();
+            let text = $(this).find('.card-text').html();
+            
+            //stop video, hide video, show image
+            $('.card-main').find('.card-video').attr('src',"");
+            $('.card-main').find('.video-group').addClass('d-none');
+            $('.card-main').find('.card-group-img').removeClass('d-none');
+            //Replace data
+
+            //replace srcVideo
+            //data main go to secondary
+         
+            $(this).find('.card-group-img').data('src', $('.card-main').find('.card-group-img').data('src'));
+            //data secondary go to main
+            $('.card-main').find('.card-group-img').data('src',srcVideo);
+           
+             //replace srcimg
+            //data main go to secondary
+            $(this).find('.card-img').attr('src', $('.card-main').find('.card-img').attr('src'));
+            //data secondary go to main
+            $('.card-main').find('.card-img').attr('src', srcimg);
+
+            //replace title
+            //data main go to secondary
+            $(this).find('.card-title').html($('.card-main').find('.card-title').html());
+            //data secondary go to main
+            $('.card-main').find('.card-title').html(title);
+
+            //replace text
+            //data main go to secondary
+            $(this).find('.card-text').html($('.card-main').find('.card-text').html());
+            //data secondary go to main
+            $('.card-main').find('.card-text').html(text);
+
+        });
+
+
+        $('.card-left').on('click', function(){
+            let srcVideo = $(this).find('.card-group-img').data('src');
+            let srcVideoMain = $('.card-main').find('.card-group-img').data('src');
+            let srcimg = $(this).find('.card-img').attr('src');
+            let title = $(this).find('.card-title').html();
+            let text = $(this).find('.card-text').html();
+            
+            //stop video, hide video, show image
+            $('.card-main').find('.card-video').attr('src',"");
+            $('.card-main').find('.video-group').addClass('d-none');
+            $('.card-main').find('.card-group-img').removeClass('d-none');
+            //Replace data
+
+            //replace srcVideo
+            //data main go to secondary
+         
+            $(this).find('.card-group-img').data('src', $('.card-main').find('.card-group-img').data('src'));
+            //data secondary go to main
+            $('.card-main').find('.card-group-img').data('src',srcVideo);
+           
+             //replace srcimg
+            //data main go to secondary
+            $(this).find('.card-img').attr('src', $('.card-main').find('.card-img').attr('src'));
+            //data secondary go to main
+            $('.card-main').find('.card-img').attr('src', srcimg);
+
+            //replace title
+            //data main go to secondary
+            $(this).find('.card-title').html($('.card-main').find('.card-title').html());
+            //data secondary go to main
+            $('.card-main').find('.card-title').html(title);
+
+            //replace text
+            //data main go to secondary
+            $(this).find('.card-text').html($('.card-main').find('.card-text').html());
+            //data secondary go to main
+            $('.card-main').find('.card-text').html(text);
+
+        });
+
+        //variável verifica o carousel/ apenas em mobile ou width a menos 999px
+        let i = 0;
+        $('.seta-esquerda').on('click', function(){
+            if(i==-1){
+                return;
+            }
+            if(i==1){
+                i--;
+                $('.card-right').trigger('click');
+                return;
+            }
+            $('.card-left').trigger('click');
+            i--;
+        });
+
+        $('.seta-direita').on('click', function(){
+            if(i==1){
+                return;
+            }
+            if(i==-1){
+                i++;
+                $('.card-left').trigger('click');
+                return;
+            }
+            $('.card-right').trigger('click');
+            i++;
+        });
+        /*$('.card-video').on('pause', function(){
+            let video = $(this);
+            window.setTimeout(function(){
+                let video2 = $('.card-main').find('.card-video');
+                if(video2.paused){
+                    console.log("está pousado");
+                }
+                else{
+                    console.log("deu play");
+                }
+            },2000);
+        })*/
+     
+  
+    });
+    </script>
 {% endblock %}

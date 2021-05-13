@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {% set text = null  %}
+    {% set image = null %}
+    {% for media in colBanner %}
+        {% if media.referenceKey == 'richmedia-page-header-customer-support' %}
+            {% set text = media.text %}
+            {% set image = media.filename %}
+        {% endif %}
+    {% endfor %}
+  <div class="background-image-header" style="background-image: url('{{image}}')">
+    <div class="container">
+        <div class="d-flex justify-content-center">
+            {{text|raw}}
+            <!--div class="header-text-index">
+                <h1 class='header-tittle-index'>{{title ?? null}}</h1>
+                <h2 class="header-subtittle-index">{{description ?? null}}</h2>
+            </div-->
+        </div>
+    </div>
+</div>
+
+
+<div class="background-index-image" style="padding-top: 15vh; padding-bottom: 100px;">
+	<div class="container" style="padding-bottom: 180px;">
+		<div class="row d-flex justify-content-center py-5">
+			<span class="title-customer-page text-center">{% trans %}Technical Support{% endtrans %}</span>
+		</div>
+		<div class="row d-flex justify-content-center" style="padding-top: 180px;">
+			<span class="second-title-customer-page text-center">{% trans %}Select your equipment{% endtrans %}:</span>
+		</div>
+		<div class="row d-flex justify-content-center">
+			{% for i in colContent %}
+				<img class='image-device-customer-page' src="{{i.filename}}" title='{{i.title}}'>
+			{% endfor %}
+			<!--img class='image-device-customer-page' src="assets/images/sp-img.svg"-->
+		</div>
+	</div>
+	<div class="container py-5">
+		<div class="row">
+			<span class="second-title-customer-page text-center">{% trans %}Still having doubts{% endtrans %}?</span>
+		</div>
+		<div class="row py-5">
+			<div class="col-12 col-md-8 col-lg-8 py-5"><img src="assets/images/help-person.svg" style="width:100%;"></div>
+			<div class="col-12 col-md-4 col-lg-4 py-5">
+				<form>
+					<label class="" for='input_name'>{% trans %}Name{% endtrans %}</label>
+					<input class="form-control rounded-0" id='input_name' type="text" name="name">
+					
+					<label class="" for='input_name'>{% trans %}Company{% endtrans %}</label>
+					<input class="form-control rounded-0" id='input_name' type="text" name="empresa">
+					
+					<label class="" for='input_name'>{% trans %}Role{% endtrans %}</label>
+					<input class="form-control rounded-0" id='input_name' type="text" name="cargo">
+
+					<div class="row">
+						<div class="col-5">
+							<label class="" for='input_name'>{% trans %}Indicative{% endtrans %}</label>
+							<input class="form-control rounded-0" id='input_name' type="text" name="Indicativo">
+						</div>
+						<div class="col-7">
+							<label class="" for='input_name'>{% trans %}Phone{% endtrans %}</label>
+							<input class="form-control rounded-0" id='input_name' type="text" name="telefone">
+						</div>
+					</div>
+
+					<label class="" for='input_name'>{% trans %}Email{% endtrans %}</label>
+					<input class="form-control rounded-0" id='input_name' type="email" name="email">
+
+					<label class="" >{% trans %}Why do you contact us{% endtrans %}?</label>
+					<textarea class="form-control rounded-0 border" rows="5" name='' ></textarea>
+					<div class="py-5">
+						<input class="btn btn-submit-customer" type="submit" name="" value="{% trans %}Send{% endtrans %}">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+	    {{ parent() }}
+{% endblock %}

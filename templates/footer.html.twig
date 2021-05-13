@@ -1,5 +1,81 @@
-<footer>
-    <div class="footer-top">
+ {% set color = null %}
+{% set image = null %}
+{% for i in colFooter %}
+{% if i.url == 'footer'%}
+    {% set color = i.description %}
+    {% set image = i.filename %}
+{% endif %}
+{% endfor %}
+<footer class="background-footer" style="background-color:{{color}}; background-image: url({{image}});">
+
+        <div class="row d-flex justify-content-center text-white font-weight-bold">{% trans %}Restauration{% endtrans %}</div>
+    <div class="container d-flex justify-content-center pb-5">
+        <div class="row d-flex justify-content-center text-white text-center font-weight-bold" style="width: 690px; font-size: 17px;">
+            {% for i,item in colRestoration.body %}
+                {{item.title}}{% if i != colRestoration.body|length-1 %} |{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+
+        <div class="row d-flex justify-content-center text-white font-weight-bold">{% trans %}Retail{% endtrans %}</div>
+    <div class="container d-flex justify-content-center pb-5">
+        <div class="row d-flex justify-content-center text-white text-center font-weight-bold" style="width: 690px; font-size: 17px;">
+            {% for i,item in colRetail.body %}
+                {{item.title}}{% if i != colRetail.body|length-1 %} |{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+        <div class="row d-flex justify-content-center text-white font-weight-bold">{% trans %}Services{% endtrans %}</div>
+    <div class="container d-flex justify-content-center pb-5">
+        <div class="row d-flex justify-content-center text-white text-center font-weight-bold" style="width: 690px; font-size: 17px;">
+            {% for i,item in colServices.body %}
+                {{item.title}}{% if i != colServices.body|length-1 %} |{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+     
+        <div class="row d-flex justify-content-center text-white font-weight-bold">{% trans %}Mobile{% endtrans %}</div>
+    <div class="container d-flex justify-content-center pb-5">
+        <div class="row d-flex justify-content-center text-white text-center font-weight-bold" style="width: 690px; font-size: 17px;">
+            {% for i,item in colMobile.body %}
+                {{item.title}}{% if i != colMobile.body|length-1 %} |{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+
+     
+        <div class="row d-flex justify-content-center text-white font-weight-bold">{% trans %}Health{% endtrans %}</div>
+    <div class="container d-flex justify-content-center pb-5">
+        <div class="row d-flex justify-content-center text-white text-center font-weight-bold" style="width: 690px; font-size: 17px;">
+            {% for i,item in colHealth.body %}
+                {{item.title}}{% if i != colHealth.body|length-1 %} |{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+
+    {% include '_includes/cookie_consent.html.twig' %}
+</footer>
+{% set color = null %}
+{% set image = null %}
+{% for i in colFooterDown %}
+{% if i.url == 'footer-down'%}
+    {% set color = i.description %}
+    {% set image = i.filename %}
+{% endif %}
+{% endfor %}
+
+<div class="background-footer" style="background-image: url({{image}});  background-color: white;">
+    <div class='row d-flex justify-content-center'>
+        <span class="credits-footer" style="color:{{color}};">{% trans %}Powered by Intouchbiz{% endtrans %}</span>
+            
+        </div>
+</div>
+    <!--div class="footer-top">
         <div class="container">
             <div class="row">
                 <div class="col" style="height: 50px">&nbsp;</div>
@@ -20,9 +96,9 @@
                 #}
             </div>
         </div>
-    </div>
+    </div-->
 
-    <div class="footer-menu mt-5">
+    <!--div class="footer-menu">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-5 d-flex flex-column order-1 order-lg-2">
@@ -87,9 +163,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div-->
 
-    <div class="payments">
+    <!--div class="payments">
         <div class="container">
             <div class="row">
                 <div class="col-12 mb-5">
@@ -138,12 +214,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div-->
 
-    <div class="copyright d-flex justify-content-center mb-5">{{ LayoutFunctions.getLayoutVars('COPYRIGHT')|raw }} {{ 'now' | date('Y') }} - {% trans %}All rights reserved{% endtrans %}.</div>
+    <!--div class="copyright d-flex justify-content-center">{{ LayoutFunctions.getLayoutVars('COPYRIGHT')|raw }} {{ 'now' | date('Y') }} - {% trans %}All rights reserved{% endtrans %}.</div-->
 
-    {% include '_includes/cookie_consent.html.twig' %}
-</footer>
 
 
 {#
